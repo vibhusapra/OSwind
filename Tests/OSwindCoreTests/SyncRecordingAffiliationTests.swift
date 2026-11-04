@@ -76,6 +76,7 @@ extension SyncOutgoingTests {
         XCTAssertEqual(try store.get(caption.id)?.recordingDetails,nativeAssociation)
         XCTAssertEqual(try recordingPacket("independent").identity.table,.source)
         XCTAssertNil(try cache.record(original.reference,admit:{_ in}),"A user-authored name must not reconstruct lost audio evidence")
+        XCTAssertEqual(try store.withRoutineDatabase {try RecordingAffiliationStore.read($0,id:caption.id)?.reference},try original.reference,"Keep the exact identity without reviving its missing body")
     }
     func testRecordingMetadataUnavailableDoesNotAttachWhenAudioLaterReusesMatchingEvidence()throws {
         var (audio,caption)=try namedClip();let original=audio
@@ -102,7 +103,7 @@ extension SyncOutgoingTests {
         for identity in [owner,target] {
             var mutated=false
             XCTAssertThrowsError(try cache.recordingSourceBinding(current,admit:{record in
-                if !mutated,record.identity==identity {mutated=true;try self.store.setFavorite(identity==owner ? caption.id:audio.id,value:identity==owner ? false:true)}
+                if !mutated,record.identity==target {mutated=true;try self.store.setFavorite(identity==owner ? caption.id:audio.id,value:identity==owner ? false:true)}
             }))
             XCTAssertTrue(mutated);XCTAssertEqual(try store.get(caption.id),current);XCTAssertEqual(try store.get(audio.id),audio)
         }

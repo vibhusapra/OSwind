@@ -214,6 +214,7 @@ public final class MemoryStore: @unchecked Sendable {
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try RecordedMeetingSchema.install(RoutineDatabase(handle:db!))
+        try RecordingAffiliationStore.install(RoutineDatabase(handle:db!))
         try SyncIncomingEntitySchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try exec(EntitySchema.sql)
@@ -350,6 +351,10 @@ public final class MemoryStore: @unchecked Sendable {
         do {
         try validateRecapInsertion(memory,deferred:deferRecapLinks)
         let previous=try get(memory.id)
+        if let before=previous,before.kind == .recordingMetadata,memory.kind == .recordingMetadata,
+           let a=before.recordingDetails?.scope,let b=memory.recordingDetails?.scope,RecordingDetails.sameTarget(a,b) {
+            try RecordingAffiliationStore.rememberProjection(RoutineDatabase(handle:db!),memory:before)
+        }
         if let before=previous,try !incomingSourceProjection.permits(memory) {
             let changed=before.timestamp.timeIntervalSince1970.bitPattern != memory.timestamp.timeIntervalSince1970.bitPattern || before.kind != memory.kind || [before.title,before.app,before.text].map({Data($0.utf8)}) != [memory.title,memory.app,memory.text].map({Data($0.utf8)}) || before.url.map({Data($0.utf8)}) != memory.url.map({Data($0.utf8)})
             if changed {try retireEntityScopesForSourceRevision(memory.id,db:RoutineDatabase(handle:db!))}
@@ -774,7 +779,7 @@ public final class MemoryStore: @unchecked Sendable {
     }
     private func changeMetadata(_ id:String,preservingPIIScan:Bool=false,change:(inout Memory)->Void) throws {
         lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
-        do {if var memory=try get(id) {change(&memory);try updateMetadata(memory,preservingPIIScan:preservingPIIScan)};try exec("COMMIT")}
+        do {if var memory=try get(id) {if memory.kind == .recordingMetadata {try RecordingAffiliationStore.rememberProjection(RoutineDatabase(handle:db!),memory:memory)};change(&memory);try updateMetadata(memory,preservingPIIScan:preservingPIIScan)};try exec("COMMIT")}
         catch {try? exec("ROLLBACK");throw error}
     }
     public func setFavorite(_ id: String, value: Bool) throws {try changeMetadata(id,preservingPIIScan:true) {$0.favorite=value}}
