@@ -11,6 +11,33 @@ final class RecordingDetailsTests:XCTestCase {
         try store.insert(value);return value
     }
     private func source(_ id:String)throws->RecordedMeetingSource {try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==id})}
+    func testRecreatedIdenticalMetadataCannotAcceptItsRetiredEditSnapshot()throws {
+        try audio("a");let ref=try source("a"),old=try store.saveRecordedMeetingName("Original",for:ref),body=try XCTUnwrap(store.get(old.id))
+        try store.delete(old.id);try store.insert(body)
+        XCTAssertThrowsError(try store.saveRecordedMeetingName("Must refuse retired edit",for:ref,replacing:old))
+    }
+    func testByteDifferentMetadataReplacementCannotReuseCanonicalEquivalentIDSnapshot()throws {
+        try audio("a");let ref=try source("a"),first=try store.saveRecordedMeetingName("Original",for:ref)
+        var body=try XCTUnwrap(store.get(first.id));try store.delete(first.id);body.id="é";try store.insert(body)
+        let old=try XCTUnwrap(store.recordedMeetingDetails(for:ref).first)
+        try store.delete(body.id);body.id="e\u{301}";try store.insert(body)
+        XCTAssertThrowsError(try store.saveRecordedMeetingName("Must not retarget",for:ref,replacing:old))
+    }
+    func testNewNameAdvancesRecordingRevisionWithoutChangingAudioSourceReference()throws {
+        try audio("a");let ref=try source("a"),before=try store.recordedMeetingRevision()
+        _ = try store.saveRecordedMeetingName("Fresh name",for:ref)
+        XCTAssertNotEqual(try store.recordedMeetingRevision(),before)
+        XCTAssertEqual(try store.recordedMeetingEvidence(ref).id,"a")
+    }
+    func testPreparedNameCannotPublishAfterAnotherConnectionRenamesIt()throws {
+        try audio("a");let ref=try source("a"),old=try store.saveRecordedMeetingName("Old name",for:ref),page=try store.recordedMeetingPage()
+        let other=try MemoryStore(root:store.root);defer {try? other.close()}
+        let otherRef=try XCTUnwrap(other.recordedMeetingPage().sources.first),current=try XCTUnwrap(other.recordedMeetingDetails(for:otherRef).first)
+        _ = try other.saveRecordedMeetingName("New name",for:otherRef,replacing:current)
+        var published:String?
+        XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {published=old.name})
+        XCTAssertNil(published)
+    }
     func testNamePersistsWithoutChangingAudioAndFollowsNewClipsInExactSession()throws {
         let a=try audio("a"),b=try audio("b",offset:40),ref=try source("a")
         let saved=try store.saveRecordedMeetingName("  Planning discussion  ",for:ref)
