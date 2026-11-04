@@ -102,7 +102,7 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
 
     /// Preparation must supply every retained asset; never silently drop media.
     /// resolve receives the recorded evidence revision, not just a local ID.
-    init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,historical:((RecapSource)throws->SyncVersionReference)?=nil,recordingSession:((String)throws->SyncSessionToken?)?=nil,recordingSource:((String,String)throws->SyncVersionReference)?=nil,resolve:@escaping (String,String)throws->SyncVersionReference)throws {
+    init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,historical:((RecapSource)throws->SyncVersionReference)?=nil,recordingSession:((String)throws->SyncSessionToken?)?=nil,recordingSource:((String,String)throws->SyncRecordingSourceResolution)?=nil,resolve:@escaping (String,String)throws->SyncVersionReference)throws {
         try memory.validateRecordingDetails()
         guard memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("Use a canonical complete source before sync preparation")}
         let roles:Set<SyncMediaRole>=Set([(memory.imagePath == nil ? nil:SyncMediaRole.image),(memory.audioPath == nil ? nil:SyncMediaRole.audio),(memory.videoPath == nil ? nil:SyncMediaRole.video)].compactMap {$0})
@@ -130,7 +130,7 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
                 return .init(source:reference,score:source.score,match:source.match,passage:source.passage)
             })
         }
-        recordingDetails=try memory.recordingDetails.map {try .init($0,session:recordingSession,source:recordingSource ?? resolve)}
+        recordingDetails=try memory.recordingDetails.map {try .init($0,session:recordingSession,source:recordingSource ?? { .available(try resolve($0,$1)) })}
         try validate()
     }
     func validate()throws {

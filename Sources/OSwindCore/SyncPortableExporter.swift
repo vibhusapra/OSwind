@@ -10,7 +10,8 @@ struct SyncPortableReferences {
     let recipe:(String,Int64)throws->SyncRoutineRevision
     let session:(Memory)throws->SyncSessionToken?
     var recordingSession:((String)throws->SyncSessionToken?)? = nil
-    var recordingSource:((String,String)throws->SyncVersionReference)? = nil
+    var recordingSource:((Memory,String,String)throws->SyncRecordingSourceResolution)? = nil
+    var recordingSourceBinding:((Memory)throws->SyncRecordingSourceResolution?)? = nil
     var historical:((String,String)throws->SyncVersionReference)? = nil
     var pin:((String)throws->SyncVersionReference?)? = nil
     var runRecipe:((String,String,Int64)throws->SyncRoutineRevision?)? = nil
@@ -71,7 +72,7 @@ struct SyncPortableExporter {
         case .source:
             let memory=try decode("payload",Memory.self)
             guard Data(memory.id.utf8)==Data(try text("id").utf8),memory.timestamp.timeIntervalSince1970.bitPattern == (try number("timestamp")).bitPattern,memory.kind.rawValue == (try text("kind")),Data(memory.app.utf8)==Data(try text("app").utf8),Data(memory.title.utf8)==Data(try text("title").utf8),memory.url.map({Data($0.utf8)}) == (try optionalText("url")).map({Data($0.utf8)}),Data(memory.text.utf8)==Data(try text("text").utf8),memory.favorite == (try boolean("favorite")) else {throw OSwindError.invalid("Portable sync source columns differ from payload")}
-            body = .source(try .init(memory:memory,origin:identity.origin,media:references.media(memory),sessionBinding:references.session(memory),historical:{source in guard let handle=source.historicalHandle,let resolve=references.historical else {throw OSwindError.unavailable("Historical recap version resolver is required")};return try resolve(handle,source.id)},recordingSession:references.recordingSession,recordingSource:references.recordingSource) {id,revision in try references.source(id,.evidence(revision))})
+            body = .source(try .init(memory:memory,origin:identity.origin,media:references.media(memory),sessionBinding:references.session(memory),historical:{source in guard let handle=source.historicalHandle,let resolve=references.historical else {throw OSwindError.unavailable("Historical recap version resolver is required")};return try resolve(handle,source.id)},recordingSession:references.recordingSession,recordingSource:references.recordingSource.map {resolver in {id,revision in try resolver(memory,id,revision)}}) {id,revision in try references.source(id,.evidence(revision))})
         case .conversation:body = try .conversation(.init(title:text("title"),created:date("created"),updated:date("updated")))
         case .turn:
             let value=try decode("payload",ChatPayload.self)

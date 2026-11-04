@@ -37,13 +37,18 @@ struct SyncIncomingSourceWriter {
         return try history.adopt(reference,cache:cache,pathsFor:pathsFor,admit:admit,verifyMedia:verify)
     }
     func references(_ record:SyncPortableRecord,local:String,paths:[SyncMediaRole:String])->SyncPortableReferences {
-        let base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{memory in
+        var base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{memory in
             guard Data(memory.id.utf8)==Data(local.utf8),case .source(let body)=record.body else {throw OSwindError.invalid("Incoming source media binding differs")}
             var actual=[SyncMediaRole:String]();actual[.image]=memory.imagePath;actual[.audio]=memory.audioPath;actual[.video]=memory.videoPath
             guard actual==paths else {throw OSwindError.invalid("Incoming source paths changed")};return body.media
         },recipe:{try cache.recipeVersion(localID:$0,ordinal:$1,admit:admit)},session:{memory in
             guard Data(memory.id.utf8)==Data(local.utf8),case .source(let body)=record.body else {throw OSwindError.invalid("Incoming source session binding differs")};return body.audioSession
         })
+        base.recordingSourceBinding={memory in
+            guard Data(memory.id.utf8)==Data(local.utf8),case .source(let body)=record.body,let details=body.recordingDetails else {throw OSwindError.invalid("Incoming recording affiliation owner differs")}
+            if let source=details.scope.source {return .available(source)}
+            return details.scope.selector == .unavailable ? .unavailable:nil
+        }
         return history.decorating(base,admit:admit,verify:{value in
             guard case .source(let body)=value.record.body else {throw OSwindError.invalid("Incoming original source differs")}
             var paths=[SyncMediaRole:String]();paths[.image]=value.memory.imagePath;paths[.audio]=value.memory.audioPath;paths[.video]=value.memory.videoPath

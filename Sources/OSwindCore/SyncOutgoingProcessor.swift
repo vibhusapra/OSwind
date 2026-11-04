@@ -119,6 +119,10 @@ struct SyncOutgoingProcessor {
             _=try self.prepare(self.identity(.routine,[.text(Data(recipe.utf8))]))
             return try self.cache.runRecipe(localRunID:run,recipeID:recipe,ordinal:ordinal,admit:self.processor.admitVersion)
         },runOriginal:{run in try RoutineRunOriginalStore(db:self.db).read(run)},erasedRunConversation:{try self.cache.erasedRunConversation(localRunID:$0)})
+            base.recordingSourceBinding={memory in try self.cache.recordingSourceBinding(memory,admit:self.processor.admitVersion)}
+            base.recordingSource={_,id,revision in
+                try self.cache.currentRecordingSource(localID:id,revision:revision,prepare:{_=try self.prepare($0)},admit:self.processor.admitVersion)
+            }
             base.recordingSession={session in
                 try RecordedMeetingSchema.populateIfNeeded(self.db)
                 let row=try self.db.statement("SELECT memory_id FROM recorded_meeting_sources WHERE grouped=1 AND recording_id=? ORDER BY memory_id LIMIT 1");defer {sqlite3_finalize(row)};self.db.bind(row,1,session)

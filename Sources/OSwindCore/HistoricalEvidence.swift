@@ -203,7 +203,20 @@ extension HistoricalEvidenceStore {
     }
     func decorating(_ base:SyncPortableReferences,admit:@escaping (SyncPortableRecord)throws->Void,verify:@escaping (HistoricalEvidence)throws->Void)->SyncPortableReferences {
         var result=base
-        result.recordingSource={id,revision in
+        result.recordingSource={memory,id,revision in
+            if let bound=try base.recordingSourceBinding?(memory) {
+                if case .available(let reference)=bound {
+                    guard try base.source(id,.current).identity==reference.identity else {throw OSwindError.invalid("Recording affiliation lifetime differs")}
+                }
+                return bound
+            }
+            if let resolve=base.recordingSource,case .available(let reference)=try resolve(memory,id,revision) {return .available(reference)}
+            if base.recordingSource != nil {
+                let native=try database.statement("SELECT kind FROM memories WHERE id IS ?");defer {sqlite3_finalize(native)};database.bind(native,1,id)
+                let code=sqlite3_step(native);if code==SQLITE_DONE {return .unavailable}
+                guard code==SQLITE_ROW else {throw database.error()}
+                if database.text(native,0) != MemoryKind.audio.rawValue {return .unavailable}
+            }
             // Resolve only exact, already-retained evidence owned by this live
             // canonical lifetime. Never use a historical display ID as an owner.
             let current=try base.source(id,.current)
@@ -215,10 +228,11 @@ extension HistoricalEvidenceStore {
             for handle in handles {
                 let value=try read(handle,sourceID:id,verifyMedia:{_,_,_ in})
                 guard value.record.identity==current.identity,Data(value.memory.evidenceHash.utf8)==Data(revision.utf8) else {continue}
-                guard selected==nil else {throw OSwindError.unavailable("Recording original revision is ambiguous")};selected=value
+                if selected != nil {return .unavailable};selected=value
             }
-            if let selected {return try wireReference(selected.handle,sourceID:id,admit:admit,verify:verify)}
-            return try base.source(id,.evidence(revision))
+            if let selected {return .available(try wireReference(selected.handle,sourceID:id,admit:admit,verify:verify))}
+            if base.recordingSource != nil {return .unavailable}
+            return .available(try base.source(id,.evidence(revision)))
         }
         result.historical={handle,owner in try wireReference(handle,sourceID:owner,admit:admit,verify:verify)}
         result.pin={owner in
