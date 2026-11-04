@@ -35,6 +35,33 @@ final class SyncNativeWriterAdmissionTests:XCTestCase {
     func deliveryID()throws->String {
         try XCTUnwrap(storage.values.first {_,data in (try? JSONSerialization.jsonObject(with:data) as? [String:Any])?["format"] as? String == "OSwind.sync.delivery-anchor"}?.key)
     }
+    private func checkPreparedRecordingAdmission(backend:any SyncCredentialStorage,state:URL,device:any SyncMachineFingerprint)throws {
+        let spy=PreparedRecordingCredentialSpy(backend),env=SyncNativeWriterEnvironment(stateRoot:state,machine:device,storage:{_ in spy})
+        defer {spy.blockReads=false}
+        var audio=Memory(id:"recording",kind:.audio,app:"Owned recording",title:"Owned native page",text:"Authored recording words")
+        audio.audioSessionID="owned-session";audio.transcript = .init(text:audio.text,duration:30,segments:[.init(start:0,end:30,text:audio.text)],model:"Authored fixture");try library.insert(audio)
+        let owner=try PersonalSyncPairing(store:library,stateRoot:state,machine:device,storage:spy);pairing=owner;_=try owner.createGroup(deviceName:"Owned prepared read")
+        service=try owner.prepareAnchoredService(shared:root.appendingPathComponent("shared"),createShared:true);try service!.installNativeWriterAdmission();try ready()
+        let reader=try MemoryStore(root:library.root,recoveryReadOnly:false,nativeWriterEnvironment:env);defer {try? reader.close()}
+        let page=try reader.recordedMeetingPage();spy.blockReads=true
+        var published=false;try reader.withCurrentRecordedMeetingPage(page) {published=true};XCTAssertTrue(published);XCTAssertEqual(spy.blockedAttempts,0)
+        spy.blockReads=false;try library.insert(Memory(id:"advance-checkpoint",kind:.note,text:"Authored unrelated native note"));try ready()
+        spy.blockReads=true
+        XCTAssertThrowsError(try reader.withCurrentRecordedMeetingPage(page) {}) {XCTAssertTrue($0 is RecordedMeetingRefreshError)}
+        XCTAssertEqual(spy.blockedAttempts,0,"Publication must refuse a changed prepared proof without trying external credential refresh")
+        spy.blockReads=false
+        let current=try reader.recordedMeetingPage();try reader.withCurrentRecordedMeetingPage(current) {}
+        XCTAssertEqual(current.sources.map(\.memoryID),["recording"])
+    }
+    func testPreparedRecordingPublicationUsesCachedNativeProofAndRefusesChangedCheckpoint()throws {
+        try checkPreparedRecordingAdmission(backend:storage,state:environment.stateRoot,device:machine)
+    }
+    func testOwnedKeychainPreparedRecordingPublicationPreservesOriginalAccounts()throws {
+        guard ProcessInfo.processInfo.environment["OSWIND_TEST_NATIVE_SYNC_KEYCHAIN"]=="1" else {throw XCTSkip("Explicit owned Keychain prepared recording fixture")}
+        let backend=NativeWriterKeychainFixture();defer {try? stop();try? library.close();do {try backend.cleanup()}catch {XCTFail("Owned prepared recording Keychain cleanup failed")}}
+        try checkPreparedRecordingAdmission(backend:backend,state:root.appendingPathComponent("native-prepared-state"),device:MacSyncMachineFingerprint())
+        XCTAssertEqual(backend.accounts.count,2);try stop();try library.close();try backend.cleanup();XCTAssertTrue(backend.accounts.isEmpty)
+    }
     func testCurrentConcurrentWritersRefreshCheckpointsAndPreserveVersion35()throws {
         try prepare();try service!.installNativeWriterAdmission()
         let second=try reopen();defer {try? second.close()}
@@ -200,4 +227,17 @@ final class NativeWriterKeychainFixture:SyncCredentialStorage,@unchecked Sendabl
         }
         accounts.removeAll()
     }
+}
+
+private final class PreparedRecordingCredentialSpy:SyncCredentialStorage,@unchecked Sendable {
+    private let base:any SyncCredentialStorage,lock=NSLock()
+    private var blocked=false,attempts=0
+    init(_ base:any SyncCredentialStorage) {self.base=base}
+    var protection:SyncCredentialProtection {base.protection}
+    var blockReads:Bool {get {lock.lock();defer {lock.unlock()};return blocked} set {lock.lock();blocked=newValue;lock.unlock()}}
+    var blockedAttempts:Int {lock.lock();defer {lock.unlock()};return attempts}
+    func read(id:String)throws->Data {lock.lock();let refuse=blocked;if refuse {attempts+=1};lock.unlock();if refuse {throw SyncCredentialStorageError.unavailable(-1)};return try base.read(id:id)}
+    func create(id:String,bytes:Data)throws {try base.create(id:id,bytes:bytes)}
+    func replace(id:String,expected:Data,bytes:Data)throws {try base.replace(id:id,expected:expected,bytes:bytes)}
+    func remove(id:String,expected:Data)throws {try base.remove(id:id,expected:expected)}
 }

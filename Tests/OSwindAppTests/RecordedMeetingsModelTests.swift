@@ -5,6 +5,12 @@ import Combine
 @testable import OSwindCore
 @testable import OSwind
 
+private final class RecordingChangeReadCounter:@unchecked Sendable {
+    private let lock=NSLock()
+    private var value=0
+    func increment() {lock.lock();value+=1;lock.unlock()}
+    var count:Int {lock.lock();defer {lock.unlock()};return value}
+}
 @MainActor final class RecordedMeetingsModelTests:XCTestCase {
     private var root:URL!,store:MemoryStore!,work:LibraryWorkRegistry!,models=[RecordedMeetingsModel](),appModels=[AppModel](),sessions=[AppSession](),suites=[String]()
     override func setUpWithError()throws {
@@ -74,6 +80,158 @@ import Combine
         XCTAssertNil(try store.get("deleted"));XCTAssertTrue(try store.recordedMeetingPage().sources.isEmpty)
         gate.release();try await settle(value)
         XCTAssertTrue(value.sessions.isEmpty);XCTAssertFalse(publishedIDs.contains("deleted"),"A page already obsolete before publication must not flash its removed source")
+    }
+    func testRevisionPollingIgnoresHiddenLockedAndUnrelatedWrites()async throws {
+        try audio("a");var active=false,admitted=true
+        let reads=RecordingChangeReadCounter(),windows=RecordingChangeReadCounter()
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{active},pollSeconds:{10_000},readRevision:{store in reads.increment();return try store.recordedMeetingRevision()},readWindow:{store,count,refs in windows.increment();return try store.recordedMeetingWindow(pages:count,retaining:refs)})
+        value.allowed={admitted};models.append(value);value.activate();try await settle(value)
+        await value.checkForChanges();XCTAssertEqual(reads.count,0)
+        active=true;admitted=false;await value.checkForChanges();XCTAssertEqual(reads.count,0)
+        admitted=true;let before=value.sessions
+        let other=try MemoryStore(root:root);try other.insert(Memory(id:"note",kind:.note,app:"Owned notes",text:"Authored unrelated note"));try other.close()
+        await value.checkForChanges();XCTAssertEqual(reads.count,1);XCTAssertEqual(windows.count,0);XCTAssertEqual(value.sessions,before)
+        value.deactivate();await value.checkForChanges();XCTAssertEqual(reads.count,1)
+    }
+    func testChangedWindowPreservesSelectionAndPagesThroughMoreThan512Arrivals()async throws {
+        for index in 0..<600 {try audio("clip-\(index)",session:"session-\(index)",at:Double(index))}
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{10_000});value.allowed={true};models.append(value)
+        value.activate();try await settle(value);value.loadOlder();try await settle(value)
+        let selected=try XCTUnwrap(value.sessions.first {$0.sources.first?.memoryID=="clip-0"});value.selectedID=selected.id
+        let other=try MemoryStore(root:root);defer {try? other.close()}
+        for index in 600..<1300 {try audio("clip-\(index)",session:"session-\(index)",at:Double(index),in:other)}
+        await value.checkForChanges();try await settle(value)
+        XCTAssertNil(value.error);XCTAssertEqual(value.selectedID,selected.id);XCTAssertEqual(value.selected?.sources.map(\.memoryID),["clip-0"])
+        XCTAssertEqual(value.sessions.flatMap(\.sources).count,1025);XCTAssertTrue(value.hasOlder)
+        value.loadOlder();try await settle(value);XCTAssertNil(value.error);XCTAssertFalse(value.hasOlder)
+        XCTAssertEqual(Set(value.sessions.flatMap(\.sources).map(\.memoryID)),Set((0..<1300).map {"clip-\($0)"}))
+        var moved=try XCTUnwrap(other.get("clip-0"));moved.audioSessionID="moved-session";moved.title="New owned title";try other.insert(moved)
+        await value.checkForChanges();try await settle(value)
+        XCTAssertFalse(value.sessions.contains {$0.id==selected.id});XCTAssertTrue(value.sessions.flatMap(\.sources).contains {$0.memoryID=="clip-0" && $0.title=="New owned title"})
+        try other.delete("clip-1299");await value.checkForChanges();try await settle(value)
+        XCTAssertFalse(value.sessions.flatMap(\.sources).contains {$0.memoryID=="clip-1299"});XCTAssertNil(value.error)
+    }
+    func testOlderPageCannotMergeAnAlreadyDeletedLoadedMember()async throws {
+        for index in 0..<600 {try audio("clip-\(index)",session:"session-\(index)",at:Double(index))}
+        let gate=ImportWorkerGate(),groups=RecordingChangeReadCounter();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{10_000},groupSources:{sources in groups.increment();if groups.count==2 {try gate.pause()};return RecordedMeetingPlanner.group(sources)})
+        value.allowed={true};models.append(value);value.activate();try await settle(value);value.loadOlder();await fulfillment(of:[gate.entered],timeout:5)
+        let other=try MemoryStore(root:root);try other.delete("clip-599");try other.close()
+        var emitted=[String]();let observer=value.$sessions.sink {emitted += $0.flatMap(\.sources).map(\.memoryID)}
+        emitted=[];gate.release();try await settle(value);observer.cancel()
+        XCTAssertFalse(value.sessions.flatMap(\.sources).contains {$0.memoryID=="clip-599"});XCTAssertFalse(emitted.contains("clip-599"));XCTAssertNil(value.error)
+        XCTAssertEqual(value.sessions.flatMap(\.sources).count,599)
+    }
+    func testArchiveChangeDuringLoadOlderPreservesTheRequestedExtraPageBudget()async throws {
+        for index in 0..<600 {try audio("clip-\(index)",session:"session-\(index)",at:Double(index))}
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{10_000});value.allowed={true};models.append(value)
+        value.activate();try await settle(value);XCTAssertEqual(value.sessions.count,512)
+        let other=try MemoryStore(root:root);try audio("arrived",session:"arrived",at:600,in:other);try other.close()
+        value.loadOlder();try await settle(value)
+        XCTAssertNil(value.error);XCTAssertFalse(value.hasOlder);XCTAssertEqual(value.sessions.flatMap(\.sources).count,601)
+        XCTAssertEqual(Set(value.sessions.flatMap(\.sources).map(\.memoryID)),Set((0..<600).map {"clip-\($0)"}).union(["arrived"]))
+    }
+    func testActualAppDepartureJoinsBlockedRevisionReaderBeforeStoreClose()async throws {
+        let location=root.appendingPathComponent("app-revision");try Paths.ensure(location);var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.automaticMaintenance=false;try settings.save(root:location)
+        let suite="org.oswind.tests.recorded-revision."+UUID().uuidString;suites.append(suite)
+        let app=AppSession(selection:.init(url:location,requiresExisting:false,origin:"owned-revision"),defaults:UserDefaults(suiteName:suite)!,locked:{false});sessions.append(app)
+        let end=SuspendingClock.now.advanced(by:.seconds(20));while app.busy,SuspendingClock.now<end {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertNil(app.failure);let old=try XCTUnwrap(app.model);old.showOnboarding=false;try audio("a",in:old.store)
+        let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:old.store,work:old.libraryWork,foreground:{true},pollSeconds:{10_000},readRevision:{store in let revision=try store.recordedMeetingRevision();try gate.pause();return revision});value.allowed={[weak old] in old?.libraryWorkAvailable==true};models.append(value)
+        value.activate();try await settle(value);let check=Task {await value.checkForChanges()};await fulfillment(of:[gate.entered],timeout:5);value.deactivate()
+        let joined=Task {await app.lockForTermination()};for _ in 0..<10 {await Task.yield()}
+        XCTAssertTrue(old.libraryWork.busy);XCTAssertFalse(old.store.isClosed);gate.release();await check.value
+        let clean=await joined.value;XCTAssertTrue(clean);XCTAssertFalse(old.libraryWork.busy);try old.store.close();app.model=nil;XCTAssertTrue(value.sessions.isEmpty)
+    }
+    func testWindowRefreshWorkerRemainsOwnedUntilActualAppDepartureCompletes()async throws {
+        let location=root.appendingPathComponent("app-window");try Paths.ensure(location);var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.automaticMaintenance=false;try settings.save(root:location)
+        let suite="org.oswind.tests.recorded-window."+UUID().uuidString;suites.append(suite)
+        let app=AppSession(selection:.init(url:location,requiresExisting:false,origin:"owned-window"),defaults:UserDefaults(suiteName:suite)!,locked:{false});sessions.append(app)
+        let end=SuspendingClock.now.advanced(by:.seconds(20));while app.busy,SuspendingClock.now<end {try await Task.sleep(for:.milliseconds(5))}
+        XCTAssertNil(app.failure);let old=try XCTUnwrap(app.model);old.showOnboarding=false;try audio("a",in:old.store)
+        let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:old.store,work:old.libraryWork,foreground:{true},pollSeconds:{10_000},readWindow:{store,count,refs in let window=try store.recordedMeetingWindow(pages:count,retaining:refs);try gate.pause();return window});value.allowed={[weak old] in old?.libraryWorkAvailable==true};models.append(value)
+        value.activate();try await settle(value);try audio("b",in:old.store);await value.checkForChanges();await fulfillment(of:[gate.entered],timeout:5);value.deactivate()
+        let joined=Task {await app.lockForTermination()};for _ in 0..<10 {await Task.yield()}
+        XCTAssertTrue(old.libraryWork.busy);XCTAssertFalse(old.store.isClosed);gate.release();let clean=await joined.value
+        XCTAssertTrue(clean);XCTAssertFalse(old.libraryWork.busy);try old.store.close();app.model=nil;XCTAssertTrue(value.sessions.isEmpty)
+    }
+    func testQuietRefreshRetainsTheSelectedDisplayUntilCurrentReplacementIsReady()async throws {
+        try audio("a",session:"first");let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{10_000},readWindow:{store,count,refs in let window=try store.recordedMeetingWindow(pages:count,retaining:refs);try gate.pause();return window})
+        value.allowed={true};models.append(value);value.activate();try await settle(value);let selected=try XCTUnwrap(value.selectedID)
+        let other=try MemoryStore(root:root);try audio("b",session:"second",in:other);try other.close()
+        await value.checkForChanges();await fulfillment(of:[gate.entered],timeout:5)
+        XCTAssertTrue(value.busy);XCTAssertEqual(value.selectedID,selected);XCTAssertEqual(value.sessions.flatMap(\.sources).map(\.memoryID),["a"]);XCTAssertNil(value.error)
+        gate.release();try await settle(value);XCTAssertEqual(value.selectedID,selected);XCTAssertEqual(Set(value.sessions.flatMap(\.sources).map(\.memoryID)),["a","b"])
+    }
+    func testExternalPrivacySettingsClearTheOldDisplayBeforeReplacementPreparation()async throws {
+        try audio("a");let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{10_000},readWindow:{store,count,refs in let window=try store.recordedMeetingWindow(pages:count,retaining:refs);try gate.pause();return window})
+        value.allowed={true};models.append(value);value.activate();try await settle(value);XCTAssertFalse(value.sessions.isEmpty)
+        var settings=AppSettings();settings.privacy.excludedApps.append("owned.meeting");try settings.save(root:root)
+        await value.checkForChanges();await fulfillment(of:[gate.entered],timeout:5);XCTAssertTrue(value.busy);XCTAssertTrue(value.sessions.isEmpty)
+        gate.release();try await settle(value);XCTAssertTrue(value.sessions.isEmpty);XCTAssertNil(value.error)
+    }
+    func testRenderQuietRefreshKeepsSelectedRecordingInBothAppearances()async throws {
+        guard let path=ProcessInfo.processInfo.environment["OSWIND_RECORDED_MEETING_UI_QA_DIR"] else {throw XCTSkip("Explicit generated recording refresh components only")}
+        let output=URL(fileURLWithPath:path);try Paths.ensure(output)
+        for dark in [false,true] {
+            let app=try AppModel(root:root.appendingPathComponent(dark ? "refresh-dark":"refresh-light"),startServices:false,recordingsLocked:{false});app.showOnboarding=false;appModels.append(app);try audio("a",session:"first",in:app.store)
+            let blocker=RecordingWindowRenderBlocker();defer {blocker.gate.release()}
+            let value=RecordedMeetingsModel(store:app.store,work:app.libraryWork,foreground:{true},pollSeconds:{10_000},readWindow:{store,count,refs in let window=try store.recordedMeetingWindow(pages:count,retaining:refs);try blocker.pauseIfEnabled();return window});value.allowed={true};models.append(value)
+            let size=NSSize(width:900,height:650),content=RecordedMeetingsView(model:value).environmentObject(app).frame(width:size.width,height:size.height).background(Color(nsColor:.windowBackgroundColor)).preferredColorScheme(dark ? .dark:.light)
+            let view=NSHostingView(rootView:content),window=NSWindow(contentRect:.init(origin:.zero,size:size),styleMask:[.titled],backing:.buffered,defer:false);window.isReleasedWhenClosed=false;window.contentView=view;defer {window.close()}
+            value.activate();view.layoutSubtreeIfNeeded();window.displayIfNeeded();try await Task.sleep(for:.milliseconds(350));try await settle(value)
+            XCTAssertEqual(value.sessions.count,1);let selection=value.selectedID;blocker.enable();try audio("b",session:"second",in:app.store);await value.checkForChanges();await fulfillment(of:[blocker.gate.entered],timeout:5)
+            XCTAssertTrue(value.busy);XCTAssertEqual(value.sessions.count,1);XCTAssertEqual(value.selectedID,selection)
+            view.layoutSubtreeIfNeeded();window.displayIfNeeded();let bitmap=try XCTUnwrap(view.bitmapImageRepForCachingDisplay(in:view.bounds));view.cacheDisplay(in:view.bounds,to:bitmap)
+            let bytes=try XCTUnwrap(bitmap.representation(using:.png,properties:[:]));try bytes.write(to:output.appendingPathComponent("updating-\(dark ? "dark":"light").png"));XCTAssertGreaterThan(bytes.count,4000)
+            blocker.gate.release();try await settle(value);XCTAssertEqual(value.sessions.count,2);XCTAssertEqual(value.selectedID,selection)
+        }
+    }
+    func testPublicPeerIncomingRecordingAndDeletionUpdateTheActiveAppWorkspace()async throws {
+        let app=try AppModel(root:root.appendingPathComponent("receiving-app"),startServices:false,recordingsLocked:{false});app.showOnboarding=false;appModels.append(app)
+        let credentials=RecordingPeerCredentialFixture(),machine=RecordingPeerMachine(),state=root.appendingPathComponent("peer-state")
+        let env=SyncNativeWriterEnvironment(stateRoot:state,machine:machine,storage:{_ in credentials}),peer=try MemoryStore(root:root.appendingPathComponent("sending-peer"),recoveryReadOnly:false,nativeWriterEnvironment:env)
+        let owner=try PersonalSyncPairing(store:app.store,stateRoot:state,machine:machine,storage:credentials),joining=try PersonalSyncPairing(store:peer,stateRoot:state,machine:machine,storage:credentials)
+        var peers=[PersonalSyncSession]()
+        do {
+            let now=Date();_=try owner.createGroup(deviceName:"Owned receiving app",now:now)
+            let fingerprint=try XCTUnwrap(owner.status().rootFingerprint),request=try XCTUnwrap(joining.requestJoin(deviceName:"Owned sending fixture",now:now).request)
+            _=try joining.acceptResponse(owner.approve(owner.reviewRequest(request,now:now),now:now),trustedRootFingerprint:fingerprint,now:now)
+            let folder=root.appendingPathComponent("peer-provider"),receiving=try owner.prepareSession(sharedFolder:folder,createSharedFolder:true),sending=try joining.prepareSession(sharedFolder:folder);peers=[sending,receiving]
+            let value=RecordedMeetingsModel(store:app.store,work:app.libraryWork,foreground:{true},pollSeconds:{0.05});value.allowed={[weak app] in app?.libraryWorkAvailable==true};models.append(value)
+            value.activate();try await settle(value);XCTAssertTrue(value.sessions.isEmpty)
+            try audio("peer-original",session:"peer-recording",in:peer)
+            func cycle()async throws {
+                for session in peers {
+                    try await session.setProcessingEnabled(true);let deadline=SuspendingClock.now.advanced(by:.seconds(20))
+                    while true {
+                        let state=await session.status();if state.phase == .upToDate {break}
+                        guard state.phase != .failed,state.phase != .waitingForPolicy,SuspendingClock.now<deadline else {throw OSwindError.unavailable("Owned public recording peer cycle refused or timed out")}
+                        try await Task.sleep(for:.milliseconds(5))
+                    }
+                    try await session.setProcessingEnabled(false)
+                }
+            }
+            for _ in 0..<8 {try await cycle();if !value.sessions.isEmpty {break};try await Task.sleep(for:.milliseconds(60))}
+            let deadline=SuspendingClock.now.advanced(by:.seconds(5));while value.sessions.isEmpty,SuspendingClock.now<deadline {try await Task.sleep(for:.milliseconds(10))}
+            let source=try XCTUnwrap(value.sessions.first?.sources.first);XCTAssertNotEqual(source.memoryID,"peer-original");XCTAssertEqual(try app.store.recordedMeetingEvidence(source).text,"Authored source text peer-original")
+            try peer.delete("peer-original")
+            for _ in 0..<8 {try await cycle();if try app.store.recordedMeetingPage().sources.isEmpty {break}}
+            let erased=SuspendingClock.now.advanced(by:.seconds(5));while !value.sessions.isEmpty,SuspendingClock.now<erased {try await Task.sleep(for:.milliseconds(10))}
+            XCTAssertTrue(value.sessions.isEmpty);XCTAssertNil(value.error);XCTAssertNil(try app.store.get(source.memoryID))
+            value.deactivate();for session in peers {try await session.stop()};owner.close();joining.close();try peer.close()
+        }catch {for session in peers {try? await session.stop()};owner.close();joining.close();try? peer.close();throw error}
+    }
+    func testVisibleTimerRefreshesNewOwnedRecordingAndStopsOnDeparture()async throws {
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{0.05});value.allowed={true};models.append(value)
+        value.activate();try await settle(value);try audio("arrived")
+        let end=SuspendingClock.now.advanced(by:.seconds(5));while value.sessions.isEmpty,SuspendingClock.now<end {try await Task.sleep(for:.milliseconds(10))}
+        XCTAssertEqual(value.sessions.flatMap(\.sources).map(\.memoryID),["arrived"]);XCTAssertNil(value.error)
+        value.deactivate();await work.cancelAndWait();try await Task.sleep(for:.milliseconds(100));XCTAssertFalse(work.busy);XCTAssertTrue(value.sessions.isEmpty)
     }
     func testActualAppDepartureJoinsBlockedGroupingBeforeStoreClose()async throws {
         let location=root.appendingPathComponent("app-group");try Paths.ensure(location);var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.automaticMaintenance=false;try settings.save(root:location)
@@ -238,4 +396,23 @@ import Combine
         view.layoutSubtreeIfNeeded();window.displayIfNeeded()
         let bitmap=try XCTUnwrap(view.bitmapImageRepForCachingDisplay(in:view.bounds));view.cacheDisplay(in:view.bounds,to:bitmap);let bytes=try XCTUnwrap(bitmap.representation(using:.png,properties:[:]));try bytes.write(to:path);XCTAssertGreaterThan(bytes.count,4000)
     }
+}
+
+private struct RecordingPeerMachine:SyncMachineFingerprint {func fingerprint()throws->String {String(repeating:"7",count:64)}}
+private final class RecordingPeerCredentialFixture:SyncCredentialStorage,@unchecked Sendable {
+    let protection:SyncCredentialProtection = .loginKeychain
+    private let lock=NSLock()
+    private var values=[String:Data]()
+    func create(id:String,bytes:Data)throws {lock.lock();defer {lock.unlock()};guard values[id]==nil else {throw SyncCredentialStorageError.alreadyExists};values[id]=bytes}
+    func read(id:String)throws->Data {lock.lock();defer {lock.unlock()};guard let value=values[id] else {throw SyncCredentialStorageError.missing};return value}
+    func replace(id:String,expected:Data,bytes:Data)throws {lock.lock();defer {lock.unlock()};guard values[id]==expected else {throw SyncCredentialStorageError.changed};values[id]=bytes}
+    func remove(id:String,expected:Data)throws {lock.lock();defer {lock.unlock()};guard values[id]==expected else {throw SyncCredentialStorageError.changed};values.removeValue(forKey:id)}
+}
+
+private final class RecordingWindowRenderBlocker:@unchecked Sendable {
+    let gate=ImportWorkerGate()
+    private let lock=NSLock()
+    private var enabled=false
+    func enable() {lock.lock();enabled=true;lock.unlock()}
+    func pauseIfEnabled()throws {lock.lock();let active=enabled;lock.unlock();if active {try gate.pause()}}
 }

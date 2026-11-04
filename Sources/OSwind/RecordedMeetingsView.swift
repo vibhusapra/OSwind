@@ -58,7 +58,7 @@ struct RecordedMeetingsView:View {
                                         Text(countLabel+(session.hasUnobservedTimes ? " · saved dates":"")).font(.caption2).foregroundStyle(.secondary)
                                     }.frame(maxWidth:.infinity,alignment:.leading).padding(12)
                                         .background(model.selectedID==session.id ? OSwindTheme.accent.opacity(0.12):Color.clear,in:RoundedRectangle(cornerRadius:10))
-                                }.buttonStyle(.plain).accessibilityLabel(session.title+", "+countLabel)
+                                }.buttonStyle(.plain).disabled(model.busy).accessibilityLabel(session.title+", "+countLabel)
                             }
                             if model.hasOlder {Button("Load older recordings") {model.loadOlder()}.disabled(model.busy).padding(.vertical,10)}
                         }.padding(.trailing,10)
@@ -67,7 +67,7 @@ struct RecordedMeetingsView:View {
                     if let session=model.selected {detail(session).frame(maxWidth:.infinity,maxHeight:.infinity,alignment:.topLeading)}else {ContentUnavailableView("Choose a session",systemImage:"waveform")}
                 }
             }
-            Text("Only loaded clips are counted. Live spans preserve observed gaps and overlapping audio channels; import dates are not original meeting times. Speaker labels remain local to each source recording.").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
+            Text("New recordings refresh automatically while this view is active. Only loaded clips are counted. Live spans preserve observed gaps and overlapping audio channels; import dates are not original meeting times. Speaker labels remain local to each source recording.").font(.caption).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
         }.padding(26).frame(maxWidth:.infinity,maxHeight:.infinity,alignment:.topLeading)
             .onAppear {appearance=model.activate()}.onDisappear {if let appearance {model.deactivate(appearance)}}
     }
