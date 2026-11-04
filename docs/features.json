@@ -332,7 +332,7 @@
     "axis": "Audio",
     "feature": "Meeting sessions / detection",
     "status": "partial",
-    "evidence": "Nov 4: explicit session workspace/scoped Ask, native labels and reviewed Calendar links; exact retained-original recovery and reassignment pass selected native/optimized/TSAN controls. Automatic no-edit erasure/outbox, full transport/device and live interaction remain WIP; see RECORDING-DETAILS-WIP.md.",
+    "evidence": "Nov 4: recording workspace/scoped Ask, native labels and reviewed Calendar links; exact-original recovery, durable reassignment and bounded no-edit erasure/outbox reconciliation pass selected native/optimized/TSAN controls. Full late/concurrent/restored transport and live/device acceptance remain WIP; see RECORDING-DETAILS-WIP.md.",
     "references": "Granola, Littlebird, Omi"
   },
   {

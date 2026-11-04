@@ -1,5 +1,10 @@
 # Owned owner-app vault diagnostics
 
+## 58ed3b0 recording erasure follow-up
+
+The no-edit recording reconciliation/required-graph audit production snapshot passes scoped 34-class Debug 826 passed / 20 skipped, optimized 828 passed / 18 skipped and Thread Sanitizer 826 passed / 20 skipped, zero failures or race reports, including the retained owned APFS/Keychain controls. The exact sanitizer exit is saved before retention. Two later test methods have separate optimized results on identical production inputs; no unchanged broad replay is used for provenance. The fresh normal ad-hoc package passes actual-own-canonical-product and ZIP/signature checks. These results do not explain or erase the earlier unrelated owner/peer failures, prove physical interaction, or promote full v0. CurrentTSan generated images are 2×; only the optimized 1x set is byte-identical to prior reviewed outputs. [Recording scope and failures](RECORDING-DETAILS-WIP.md#no-edit-erasure-reconciliation--58ed3b0) · [Receipt](../benchmarks/recording-reconciliation-v1.json).
+
+
 ## Recording-original runtime qualification — 9805caa
 
 The substantive recording-original/reassignment runtime passes selected Debug 807/20, optimized 810/18 and Thread Sanitizer 807/20 (passes/explicit skips), with zero failures or race reports. The 33-class selections include real owned APFS/Keychain owner/peer/source-work/vault joining and recording-name/Calendar lifecycle controls. Exact current sanitizer exit zero is saved before retention; both tested engines and original failures remain preserved. A separate normal canonical app passes signature/product-code, packaged CLI and ZIP round trip after correcting a cross-build comparison boundary without rebuilding. Historical failures and their unproved causes remain visible. These fixtures establish no physical two-Mac/provider, signed interactive/EventKit, capture-quality, controlled-power or production acceptance. [Qualification](../benchmarks/recording-original-recovery-v1.json) · [Raw evidence](../benchmarks/recording-original-recovery-raw-v1.zip).

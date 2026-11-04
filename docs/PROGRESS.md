@@ -1,5 +1,14 @@
 # OSwind delivery ledger
 
+## 2026-11-04 — recording metadata reconciles after original erasure
+
+Runtime `58ed3b0` removes the caption-edit requirement after original-only erasure. One bounded operational marker and the existing canonical index drive ordinary admitted export; partial scans, second erasure, restart, cancellation, work quota and policy retry are covered. An actual encrypted-folder control exposed and fixes an audit of an uncited replaced root while keeping retained originals/non-root graphs checked.
+
+The production snapshot passes 36 focused controls and 34-class scoped **Debug 826 passed / 20 skipped, optimized 828 passed / 18 skipped and Thread Sanitizer 826 passed / 20 skipped**, zero failures or race reports. Two later test-only controls pass in optimized on identical 565 production, package and model input hashes. The authored 2,001-label measurement scans at most 64 per step, requeues only 1, takes 0.767 s total, and has 19.972 ms median scan time/134-byte peak marker. These are component measurements; all observations and actual failed attempts are retained. A 32 KiB admission probe disproves the proposed large-ID cursor regression; its original failure stays failed.
+
+A fresh normal ad-hoc package passes its own canonical-product match, packaged CLI and ZIP/hash/signature round trip. Optimized 46 images match reviewed 1× outputs; current TSan 46 images are 2×, with separate limited inspection rather than an equality claim. F042 stays partial. Full late/concurrent/restored transport, live EventKit/accessibility, physical ASR/GPU, power/current automatic 24h, real two-Mac/provider, distribution, v0 parity and ranking remain open. [Details/TODOs](RECORDING-DETAILS-WIP.md) · [Qualification](../benchmarks/recording-reconciliation-v1.json) · [Raw evidence](../benchmarks/recording-reconciliation-raw-v1.zip).
+
+
 ## 2026-11-04 — exact original recovery and durable recording reassignment
 
 Runtime `9805caa` recovers only a previously admitted recording source from actual retained canonical history after operational cache loss. Missing proof stays unavailable; deliberate transcript purges and erasure cannot resurrect audio. Explicit native scope edits retain bounded owning-lifetime intent through reopen and consume it after checked publication. All-thirteen-kind transport, policy/media/quota/corruption/rollback, current App and real owned APFS/Keychain controls pass in selected **Debug 807-pass/20-skip, optimized 810-pass/18-skip and Thread Sanitizer 807-pass/20-skip** runs, with zero failures/races. The 26 focused methods overlap those selections. The whole current 3,101-method suite has been discovered, not executed locally.
