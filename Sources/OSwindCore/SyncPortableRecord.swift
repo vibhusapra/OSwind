@@ -243,7 +243,7 @@ struct SyncPortableRecord:Codable,Equatable,Sendable {
     func validate()throws {
         guard format=="OSwind.sync.record",version==1,identity.table==body.table else {throw OSwindError.invalid("Sync record format/table differs")}
         _=try identity.key;try body.validate()
-        if case .source(let value)=body,let recap=value.recap {guard !recap.sources.contains(where:{$0.source.identity==identity}) else {throw OSwindError.invalid("Sync recap cannot cite itself")}}
+        if case .source(let value)=body {guard !value.sourceReferences.contains(where:{$0.identity==identity}) else {throw OSwindError.invalid("Sync source cannot refer to itself")}}
     }
     func encoded()throws->Data {
         try validate();let data=try SyncProtocolLimits.encode(self)
@@ -274,7 +274,11 @@ struct SyncPortableRecord:Codable,Equatable,Sendable {
         }
         func filter(_ value:SyncFilterBody)throws {if let id=value.entity,try !entityScopeIsErased(id) {_=try dependency(id)}}
         switch body {
-        case .source(let value):for entry in value.recap?.sources ?? [] {try link(entry)}
+        case .source(let value):
+            for entry in value.recap?.sources ?? [] {try link(entry)}
+            if let reference=value.recordingDetails?.scope.source {
+                guard try source(reference).kind == .audio else {throw OSwindError.invalid("A recording name must refer to audio evidence")}
+            }
         case .turn(let value):_=try dependency(value.conversation);try filter(value.filter)
         case .conversationCitation(let value):_=try dependency(value.owner);try link(value.link)
         case .recapCitation(let value):

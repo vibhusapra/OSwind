@@ -116,11 +116,14 @@ struct SyncOriginalEvidenceStore {
         let original=try source(value,admit:admit),ref=try original.reference
         guard case .source(let body)=original.body else {throw OSwindError.invalid("Original evidence is not a source")}
         let localPaths=try paths(value.paths),parents=try JSONDecoder().decode([String].self,from:value.parents)
-        guard try SyncProtocolLimits.encode(parents)==value.parents,parents.count==(body.recap?.sources.count ?? 0) else {throw OSwindError.database("Original evidence recap bindings differ")}
+        guard try SyncProtocolLimits.encode(parents)==value.parents,parents.count==body.sourceReferences.count else {throw OSwindError.database("Original evidence recap bindings differ")}
         var evidence=[SyncOriginalEvidence]()
         for (index,parent) in parents.enumerated() {
             let child=try read(parent,visiting:&visiting,remaining:&remaining,audit:&audit,admit:admit,admitMedia:admitMedia)
-            guard child.reference==body.recap!.sources[index].source else {throw OSwindError.database("Original evidence recap version differs")};evidence.append(child)
+            guard child.reference==body.sourceReferences[index] else {throw OSwindError.database("Original evidence recap version differs")};evidence.append(child)
+        }
+        if body.recordingDetails?.scope.source != nil {
+            guard evidence.last?.memory.kind == .audio else {throw OSwindError.invalid("A recording name must refer to audio evidence")}
         }
         try admitMedia(ref,body.media,localPaths)
         var offset=0
@@ -155,7 +158,10 @@ struct SyncOriginalEvidenceStore {
         if code==SQLITE_ROW {var reading=Set<String>();return try read(database.text(existing,0),visiting:&reading,remaining:&remaining,audit:&audit,admit:admit,admitMedia:admitMedia)}
         guard code==SQLITE_DONE,let original=try cache.record(reference,admit:admit),case .source(let body)=original.body else {throw OSwindError.unavailable("Prepare the admitted exact source body before its original evidence projection")}
         var parents=[SyncOriginalEvidence]()
-        for link in body.recap?.sources ?? [] {parents.append(try prepare(link.source,visiting:&visiting,remaining:&remaining,audit:&audit,pathsFor:pathsFor,admit:admit,admitMedia:admitMedia))}
+        for link in body.sourceReferences {parents.append(try prepare(link,visiting:&visiting,remaining:&remaining,audit:&audit,pathsFor:pathsFor,admit:admit,admitMedia:admitMedia))}
+        if body.recordingDetails?.scope.source != nil {
+            guard parents.last?.memory.kind == .audio else {throw OSwindError.invalid("A recording name must refer to audio evidence")}
+        }
         let handle=UUID().uuidString.lowercased(),localPaths=try pathsFor(reference,body.media),encodedPaths=try SyncProtocolLimits.encode(Dictionary(uniqueKeysWithValues:localPaths.map {($0.key.rawValue,$0.value)}));_=try paths(encodedPaths)
         try admitMedia(reference,body.media,localPaths);var offset=0
         let memory=try body.projectedMemory(id:"original-"+handle,paths:localPaths) {expected in

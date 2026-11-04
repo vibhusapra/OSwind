@@ -30,7 +30,7 @@ struct SyncIncomingSourceWriter {
         if let value=try cache.record(reference,admit:admit) {packet=value}
         else {packet=try fetch(reference);guard try packet.reference==reference else {throw OSwindError.invalid("Incoming source dependency is not its requested version")};_=try cache.retain(packet,requiredBy:requestedBy,admit:admit)}
         guard case .source(let body)=packet.body else {throw OSwindError.invalid("Incoming source dependency is not a source")}
-        for parent in body.recap?.sources ?? [] {try prepare(parent.source,requestedBy:packet,fetch:fetch,visiting:&visiting,remaining:&remaining)}
+        for parent in body.sourceReferences {try prepare(parent,requestedBy:packet,fetch:fetch,visiting:&visiting,remaining:&remaining)}
     }
     private func original(_ reference:SyncVersionReference,requestedBy:SyncPortableRecord,fetch:(SyncVersionReference)throws->SyncPortableRecord)throws->HistoricalEvidence {
         var visiting=Set<String>(),remaining=512;try prepare(reference,requestedBy:requestedBy,fetch:fetch,visiting:&visiting,remaining:&remaining)
@@ -98,11 +98,12 @@ struct SyncIncomingSourceWriter {
                 var promotion=try SyncIncomingSourcePromotion.prepare(self,root:local)
                 try admit(record);let paths=try pathsFor(reference,body.media);try verify(reference,body.media,paths)
                 var parents=[HistoricalEvidence]()
-                for link in body.recap?.sources ?? [] {parents.append(try original(link.source,requestedBy:record,fetch:fetchExactSource))}
+                for link in body.sourceReferences {parents.append(try original(link,requestedBy:record,fetch:fetchExactSource))}
+                try body.validateSourceParents(parents.map(\.record))
                 var index=0,memory=try body.projectedMemory(id:local,paths:paths) {ref in
                     guard index<parents.count,try parents[index].reference==ref else {throw OSwindError.invalid("Incoming recap parent order differs")};defer {index+=1};return(parents[index].sourceID,parents[index].memory.evidenceHash)
                 }
-                for i in parents.indices {memory.recap!.sources[i].historicalHandle=parents[i].handle}
+                for i in memory.recap?.sources.indices ?? 0..<0 {memory.recap!.sources[i].historicalHandle=parents[i].handle}
                 let old=promotion.nodes.first {Data($0.before.id.utf8)==Data(local.utf8)}?.packet
                 let recapState=try recapBindings(memory,old:old,new:record)
                 try promotion.apply()

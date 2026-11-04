@@ -1,5 +1,7 @@
 import XCTest
 import CSQLite
+import CryptoKit
+import Darwin
 @testable import OSwindCore
 
 final class RecordingDetailsTests:XCTestCase {
@@ -12,6 +14,38 @@ final class RecordingDetailsTests:XCTestCase {
         try store.insert(value);return value
     }
     private func source(_ id:String)throws->RecordedMeetingSource {try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==id})}
+    func testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation()throws {
+        let env=ProcessInfo.processInfo.environment
+        guard let path=env["OSWIND_RECORDING_PRIOR_WRITER_CLI"],let output=env["OSWIND_RECORDING_WRITER_QA_DIR"] else {throw XCTSkip("Explicit retained pre-metadata CLI and owned output required")}
+        let binary=URL(fileURLWithPath:path),qa=URL(fileURLWithPath:output).appendingPathComponent("metadata-old-client")
+        let expected="ca15100379032784c4013600431630808e680809db2d2b36005566a2c6011541"
+        func digest()throws->String {SHA256.hash(data:try Data(contentsOf:binary)).map {String(format:"%02x",$0)}.joined()}
+        XCTAssertEqual(try digest(),expected);try Paths.ensure(qa)
+        let original=try audio("compatibility-audio",session:nil)
+        var caption=Memory(id:"new-metadata-caption",kind:.recordingMetadata,app:"OSwind",title:"Owned name",text:"User-authored label")
+        caption.recordingDetails = .init(scope:try .init(sourceID:original.id,revision:original.evidenceHash))
+        try caption.validateRecordingDetails()
+        func run(_ label:String,_ input:Memory)throws->Int32 {
+            let file=qa.appendingPathComponent(label+".json");try JSONEncoder().encode([input]).write(to:file,options:.withoutOverwriting)
+            let out=qa.appendingPathComponent(label+".stdout"),err=qa.appendingPathComponent(label+".stderr")
+            XCTAssertTrue(FileManager.default.createFile(atPath:out.path,contents:nil));XCTAssertTrue(FileManager.default.createFile(atPath:err.path,contents:nil))
+            let stdout=try FileHandle(forWritingTo:out),stderr=try FileHandle(forWritingTo:err);defer {try? stdout.close();try? stderr.close()}
+            let process=Process();process.executableURL=binary;process.arguments=["--data",store.root.path,"import",file.path,"--json"];process.standardOutput=stdout;process.standardError=stderr
+            var child=env;child.removeValue(forKey:"DYLD_INSERT_LIBRARIES");process.environment=child
+            try process.run();let deadline=ProcessInfo.processInfo.systemUptime+30
+            while process.isRunning,ProcessInfo.processInfo.systemUptime<deadline {Thread.sleep(forTimeInterval:0.01)}
+            let exceeded=process.isRunning
+            if exceeded {process.terminate();let stop=ProcessInfo.processInfo.systemUptime+3;while process.isRunning,ProcessInfo.processInfo.systemUptime<stop {Thread.sleep(forTimeInterval:0.01)};if process.isRunning {kill(process.processIdentifier,SIGKILL)}}
+            process.waitUntilExit();XCTAssertFalse(exceeded);return process.terminationStatus
+        }
+        XCTAssertEqual(try run("ordinary-audio",original),0)
+        XCTAssertNotEqual(try run("new-recording-metadata",caption),0)
+        XCTAssertNil(try store.get(caption.id));XCTAssertEqual(try store.get(original.id)?.evidenceHash,original.evidenceHash)
+        XCTAssertEqual(try store.stats(includeDiskUsage:false).count,1)
+        let diagnostic=try String(contentsOf:qa.appendingPathComponent("new-recording-metadata.stderr"),encoding:.utf8)
+        XCTAssertTrue(diagnostic.contains("OSwind:"),"The rejected import must report a CLI diagnostic; older versions use a generic decode message")
+        XCTAssertEqual(try digest(),expected)
+    }
     func testRecreatedIdenticalMetadataCannotAcceptItsRetiredEditSnapshot()throws {
         try audio("a");let ref=try source("a"),old=try store.saveRecordedMeetingName("Original",for:ref),body=try XCTUnwrap(store.get(old.id))
         try store.delete(old.id);try store.insert(body)

@@ -19,7 +19,7 @@ extension SyncPortableRecord {
     /// not equivalent to native ON DELETE SET NULL or a missing query scope.
     var retirementParents:[SyncObjectIdentity] {
         switch body {
-        case .source(let value):return (value.recap?.sources ?? []).map { $0.source.identity }
+        case .source(let value):return value.sourceReferences.map(\.identity)
         case .turn(let value):return [value.conversation]
         case .conversationCitation(let value),.recapCitation(let value):return [value.owner,value.link.source.identity]
         case .routineRun(let value):return [value.recipe.routine]

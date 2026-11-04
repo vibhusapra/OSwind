@@ -39,7 +39,7 @@ struct SyncIncomingConversationWriter {
         if let cached=try cache.record(reference,admit:admit) {record=cached}
         else {record=try fetch(reference);guard try record.reference==reference else {throw OSwindError.invalid("Fetched original is not the requested exact version")};_=try cache.retain(record,requiredBy:requestedBy,admit:admit)}
         guard case .source(let body)=record.body else {throw OSwindError.invalid("Incoming original is not a source")}
-        for parent in body.recap?.sources ?? [] {try ensureSource(parent.source,requestedBy:record,fetch:fetch,visiting:&visiting,remaining:&remaining)}
+        for parent in body.sourceReferences {try ensureSource(parent,requestedBy:record,fetch:fetch,visiting:&visiting,remaining:&remaining)}
     }
     private func original(_ ref:SyncVersionReference,requestedBy:SyncPortableRecord,fetch:(SyncVersionReference)throws->SyncPortableRecord)throws->HistoricalEvidence {
         var visiting=Set<String>(),remaining=512;try ensureSource(ref,requestedBy:requestedBy,fetch:fetch,visiting:&visiting,remaining:&remaining)

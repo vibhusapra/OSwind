@@ -25,7 +25,7 @@ enum SyncPeerSourceErasurePlan {
                     }
                     switch record.body {
                     case .conversationCitation(let citation),.recapCitation(let citation):owners[key]=citation.owner
-                    case .source(let source) where source.recap != nil:owners[key]=record.identity
+                    case .source(let source) where source.recap != nil || source.recordingDetails?.scope.source != nil:owners[key]=record.identity
                     default:break
                     }
                 }

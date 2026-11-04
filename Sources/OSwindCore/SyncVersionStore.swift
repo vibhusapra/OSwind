@@ -14,7 +14,7 @@ extension SyncPortableRecord {
         func version(_ ref:SyncVersionReference)->SyncPortableDependency {.init(identity:ref.identity,content:ref.content)}
         func filter(_ f:SyncFilterBody)->[SyncPortableDependency] {(f.entity.map {[object($0)]} ?? [])+(f.recordingScope?.source.map {[version($0)]} ?? [])}
         switch body {
-        case .source(let v):return (v.recap?.sources ?? []).map {version($0.source)}
+        case .source(let v):return v.sourceReferences.map {version($0)}
         case .turn(let v):return [object(v.conversation)]+filter(v.filter)
         case .conversationCitation(let v),.recapCitation(let v):return [object(v.owner),version(v.link.source)]
         case .routineRun(let v):return [.init(identity:v.recipe.routine,content:v.recipe.definition)]+(v.conversation.map {[object($0)]} ?? [])+filter(v.filter)

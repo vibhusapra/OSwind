@@ -142,14 +142,15 @@ struct HistoricalEvidenceStore {
         guard let value=try row(handle) else {throw OSwindError.unavailable("The exact original is unavailable; current text was not substituted")};try ownerExists(value.source)
         let record=try SyncPortableRecord.decode(value.body),ref=try record.reference
         guard case .source(let body)=record.body,try record.identity.key.digest==value.object,ref.content.sha256==value.sha else {throw OSwindError.database("Historical source identity differs")}
-        let paths=try Self.paths(value.paths),parents=try JSONDecoder().decode([String].self,from:value.parents);guard try SyncProtocolLimits.encode(parents)==value.parents,parents.count==(body.recap?.sources.count ?? 0) else {throw OSwindError.database("Historical parent metadata differs")}
+        let paths=try Self.paths(value.paths),parents=try JSONDecoder().decode([String].self,from:value.parents);guard try SyncProtocolLimits.encode(parents)==value.parents,parents.count==body.sourceReferences.count else {throw OSwindError.database("Historical parent metadata differs")}
         let edges=try database.statement("SELECT parent FROM historical_evidence_dependencies WHERE child=?");defer {sqlite3_finalize(edges)};database.bind(edges,1,handle);var actual=Set<String>(),code=sqlite3_step(edges)
         while code==SQLITE_ROW {actual.insert(database.text(edges,0));code=sqlite3_step(edges)};guard code==SQLITE_DONE,actual==Set(parents) else {throw OSwindError.database("Historical erasure dependency graph differs")}
         var children=[HistoricalEvidence]()
-        for (index,parent) in parents.enumerated() {let child=try read(parent,visiting:&visiting,remaining:&remaining,audit:&audit,verifyMedia:verifyMedia);guard try child.reference==body.recap!.sources[index].source else {throw OSwindError.database("Historical recap version differs")};children.append(child)}
+        for (index,parent) in parents.enumerated() {let child=try read(parent,visiting:&visiting,remaining:&remaining,audit:&audit,verifyMedia:verifyMedia);guard try child.reference==body.sourceReferences[index] else {throw OSwindError.database("Historical recap version differs")};children.append(child)}
+        try body.validateSourceParents(children.map(\.record))
         try verifyMedia(ref,body.media,paths);var index=0
         var memory=try body.projectedMemory(id:"original-"+handle,paths:paths) {expected in guard index<children.count,try children[index].reference==expected else {throw OSwindError.invalid("Historical parent order differs")};defer {index+=1};return(children[index].memory.id,children[index].memory.evidenceHash)}
-        for i in children.indices {memory.recap!.sources[i].historicalHandle=children[i].handle}
+        for i in memory.recap?.sources.indices ?? 0..<0 {memory.recap!.sources[i].historicalHandle=children[i].handle}
         guard try fingerprint(memory,handle:handle,source:value.source,record:record)==value.projection else {throw OSwindError.database("Historical projection integrity differs")}
         if let old=audit[handle] {guard old==value else {throw OSwindError.invalid("Historical graph revisited a changed node")}};audit[handle]=value
         memory.originalEvidence = .init(handle:handle,contentSHA256:ref.content.sha256);return .init(record:record,sourceID:value.source,memory:memory)
@@ -173,7 +174,7 @@ struct HistoricalEvidenceStore {
         let code=sqlite3_step(existing)
         if code==SQLITE_ROW {guard Data(database.text(existing,1).utf8)==bytes else {throw OSwindError.invalid("Historical version belongs to another source")};var reading=Set<String>();return try read(database.text(existing,0),visiting:&reading,remaining:&remaining,audit:&audit,verifyMedia:verifyMedia)}
         guard code==SQLITE_DONE else {throw database.error()};var children=[HistoricalEvidence]()
-        for link in body.recap?.sources ?? [] {children.append(try adopt(link.source,cache:cache,visiting:&visiting,remaining:&remaining,audit:&audit,references:&references,pathsFor:pathsFor,admit:admit,verifyMedia:verifyMedia))}
+        for link in body.sourceReferences {children.append(try adopt(link,cache:cache,visiting:&visiting,remaining:&remaining,audit:&audit,references:&references,pathsFor:pathsFor,admit:admit,verifyMedia:verifyMedia))}
         let paths=try pathsFor(reference,body.media);try verifyMedia(reference,body.media,paths)
         let handle=UUID().uuidString.lowercased();try insert(handle:handle,source:source,record:record,paths:paths,parents:children)
         var reading=Set<String>();return try read(handle,visiting:&reading,remaining:&remaining,audit:&audit,verifyMedia:verifyMedia)
@@ -183,10 +184,11 @@ struct HistoricalEvidenceStore {
     func insert(handle:String,source:String,record:SyncPortableRecord,paths:[SyncMediaRole:String],parents:[HistoricalEvidence])throws {
         try context(writing:true);try SyncProtocolLimits.uuid(handle);try ownerExists(source);guard case .source(let body)=record.body else {throw OSwindError.invalid("Historical evidence must be a source")}
         guard try !HistoricalErasureSchema.hasRevokedVersion(database,record) else {throw OSwindError.invalid("This exact original version was erased from this library")}
+        try body.validateSourceParents(parents.map(\.record))
         let encodedPaths=try SyncProtocolLimits.encode(Dictionary(uniqueKeysWithValues:paths.map {($0.key.rawValue,$0.value)}));_=try Self.paths(encodedPaths);var index=0
         var memory=try body.projectedMemory(id:"original-"+handle,paths:paths) {ref in guard index<parents.count,try parents[index].reference==ref else {throw OSwindError.invalid("Historical restored parent differs")};defer {index+=1};return(parents[index].memory.id,parents[index].memory.evidenceHash)}
         guard index==parents.count else {throw OSwindError.invalid("Historical parent count differs")}
-        for i in parents.indices {memory.recap!.sources[i].historicalHandle=parents[i].handle}
+        for i in memory.recap?.sources.indices ?? 0..<0 {memory.recap!.sources[i].historicalHandle=parents[i].handle}
         let row=try database.statement("INSERT INTO historical_evidence VALUES(?,?,?,?,?,?,?,?)");defer {sqlite3_finalize(row)};database.bind(row,1,handle);database.bind(row,2,source);database.bind(row,3,try record.identity.key.digest);database.bind(row,4,try record.reference.content.sha256);bind(row,5,try record.encoded());bind(row,6,encodedPaths);bind(row,7,try SyncProtocolLimits.encode(parents.map(\.handle)));database.bind(row,8,try fingerprint(memory,handle:handle,source:source,record:record));try database.done(row)
         for parent in Set(parents.map(\.handle)) {let edge=try database.statement("INSERT INTO historical_evidence_dependencies VALUES(?,?)");defer {sqlite3_finalize(edge)};database.bind(edge,1,handle);database.bind(edge,2,parent);try database.done(edge)}
     }
@@ -201,6 +203,23 @@ extension HistoricalEvidenceStore {
     }
     func decorating(_ base:SyncPortableReferences,admit:@escaping (SyncPortableRecord)throws->Void,verify:@escaping (HistoricalEvidence)throws->Void)->SyncPortableReferences {
         var result=base
+        result.recordingSource={id,revision in
+            // Resolve only exact, already-retained evidence owned by this live
+            // canonical lifetime. Never use a historical display ID as an owner.
+            let current=try base.source(id,.current)
+            let row=try database.statement("SELECT handle FROM historical_evidence WHERE source_id=? ORDER BY handle LIMIT 513");defer {sqlite3_finalize(row)};database.bind(row,1,id)
+            var handles=[String](),code=sqlite3_step(row)
+            while code==SQLITE_ROW {handles.append(database.text(row,0));code=sqlite3_step(row)}
+            guard code==SQLITE_DONE,handles.count<=512 else {throw OSwindError.unavailable("Recording original lookup exceeds its bound")}
+            var selected:HistoricalEvidence?
+            for handle in handles {
+                let value=try read(handle,sourceID:id,verifyMedia:{_,_,_ in})
+                guard value.record.identity==current.identity,Data(value.memory.evidenceHash.utf8)==Data(revision.utf8) else {continue}
+                guard selected==nil else {throw OSwindError.unavailable("Recording original revision is ambiguous")};selected=value
+            }
+            if let selected {return try wireReference(selected.handle,sourceID:id,admit:admit,verify:verify)}
+            return try base.source(id,.evidence(revision))
+        }
         result.historical={handle,owner in try wireReference(handle,sourceID:owner,admit:admit,verify:verify)}
         result.pin={owner in
             let row=try database.statement("SELECT handle FROM historical_evidence_pins WHERE memory_id=?");defer {sqlite3_finalize(row)};database.bind(row,1,owner);let code=sqlite3_step(row);if code==SQLITE_DONE {return nil};guard code==SQLITE_ROW else {throw database.error()};return try wireReference(database.text(row,0),sourceID:owner,admit:admit,verify:verify)
