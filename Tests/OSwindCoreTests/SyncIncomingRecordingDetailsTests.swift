@@ -2,6 +2,38 @@ import XCTest
 @testable import OSwindCore
 
 extension SyncIncomingSourceTests {
+    func testIncomingRecordingNameChangedOwnerKindKeepsReplacementNoteOutsideAudioScope()throws {
+        let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID)
+        defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID)
+        var audio=Memory(id:"kind-changing-clip",timestamp:now,kind:.audio,app:"Owned",title:"Original capture",text:"Authored original speech")
+        try a.insert(audio);try drain(a,ac)
+        let audioOp=try XCTUnwrap(ac.journal.outbox().first),original=try packet(audioOp,ac)
+        let clipID=try receive(audioOp,original,b,bc,fetch:{_ in original})
+        let source=try XCTUnwrap(a.recordedMeetingPage().sources.first),saved=try a.saveRecordedMeetingName("Original audio label",for:source)
+        try drain(a,ac)
+        let identity=try ac.catalog.localIdentity(.source,primary:[.text(Data(saved.id.utf8))])
+        let nameOp=try XCTUnwrap(ac.journal.outbox().first {$0.key == (try? identity.key)}),name=try packet(nameOp,ac)
+        let nameID=try receive(nameOp,name,b,bc,fetch:{ref in XCTAssertEqual(ref,try original.reference);return original})
+        let nativeName=try XCTUnwrap(b.get(nameID))
+        audio.kind = .note;audio.text="Independent replacement note";try a.insert(audio);try drain(a,ac)
+        let noteOp=try XCTUnwrap(ac.journal.outbox().first {$0.key==audioOp.key && $0.content != audioOp.content}),note=try packet(noteOp,ac)
+        _=try receive(noteOp,note,b,bc,fetch:{_ in original})
+        let current=try XCTUnwrap(b.get(clipID))
+        XCTAssertEqual(current.kind,.note);XCTAssertEqual(current.text,audio.text)
+        XCTAssertEqual(try b.get(nameID),nativeName)
+        XCTAssertFalse(try XCTUnwrap(nativeName.recordingDetails?.scope).matches(current))
+        XCTAssertTrue(try b.recordedMeetingPage().sources.isEmpty)
+        XCTAssertThrowsError(try a.saveRecordedMeetingName("Must not label the replacement note",for:source,replacing:saved))
+        try a.setFavorite(saved.id,value:true);try drain(a,ac)
+        let lateOp=try XCTUnwrap(ac.journal.outbox().first {$0.key==nameOp.key && $0.content != nameOp.content}),late=try packet(lateOp,ac)
+        _=try receive(lateOp,late,b,bc,fetch:{ref in XCTAssertEqual(ref,try original.reference);return original})
+        let lateName=try XCTUnwrap(b.get(nameID))
+        XCTAssertEqual(try b.get(clipID),current,"Late metadata must not rewrite a note into captured audio")
+        XCTAssertFalse(try XCTUnwrap(lateName.recordingDetails?.scope).matches(current))
+        XCTAssertTrue(try b.recordedMeetingPage().sources.isEmpty)
+        XCTAssertEqual(try count(b,"memories"),2)
+        XCTAssertEqual(try bc.resolve(late.identity,content:nil,admit:{_ in}),late)
+    }
     func testIncomingRecordingNameSessionErasureRetiresKnownNameOnlyAfterLastClipWithoutNameTombstone()throws {
         let (a,ac)=try endpoint("producer",producerID),(b,bc)=try endpoint("receiver",receiverID);defer {try? a.close();try? b.close()};try bc.journal.allowPeer(producerID)
         var first=Memory(id:"session-first",timestamp:now,kind:.audio,app:"Owned",title:"First",text:"First authored speech");first.audioSessionID="shared-owned-session"

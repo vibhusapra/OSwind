@@ -121,4 +121,24 @@ extension SyncOutgoingTests {
         XCTAssertNil(try cache.catalog.preparedIdentity(.source,primary:[.text(Data("missing-audio-owner".utf8))]))
         XCTAssertEqual(try store.stats(includeDiskUsage:false).count,1)
     }
+    func testRecordingMetadataChangedOwnerKindNeverSelectsReplacementNote()throws {
+        var (audio,caption)=try namedClip();try install();_=try finish()
+        let original=try recordingPacket(audio.id),association=caption.recordingDetails
+        audio.kind = .note;audio.text="Independent replacement note";try store.insert(audio)
+        try seed("independent-after-kind-change","Unrelated publication still works")
+        try store.setFavorite(caption.id,value:true);_=try finish()
+        let replacement=try recordingPacket(audio.id)
+        guard case .source(let note)=replacement.body,case .source(let metadata)=try recordingPacket(caption.id).body else {return XCTFail("Missing published records")}
+        XCTAssertEqual(note.kind,.note);XCTAssertEqual(note.text,audio.text)
+        XCTAssertEqual(try cache.currentRecordingSource(localID:audio.id,revision:audio.evidenceHash,prepare:{_ in},admit:{_ in}),.unavailable)
+        if let selected=metadata.recordingDetails?.scope.source {
+            XCTAssertEqual(selected,try original.reference);XCTAssertNotEqual(selected,try replacement.reference)
+            guard case .source(let retained)=try XCTUnwrap(cache.record(selected,admit:{_ in})).body else {return XCTFail("Missing exact original")}
+            XCTAssertEqual(retained.kind,.audio)
+        }else {XCTAssertEqual(metadata.recordingDetails?.scope.selector,.unavailable)}
+        XCTAssertEqual(try store.get(caption.id)?.recordingDetails,association)
+        XCTAssertFalse(try XCTUnwrap(association?.scope).matches(audio))
+        XCTAssertTrue(try store.recordedMeetingPage().sources.isEmpty)
+        XCTAssertEqual(try recordingPacket("independent-after-kind-change").identity.table,.source)
+    }
 }
