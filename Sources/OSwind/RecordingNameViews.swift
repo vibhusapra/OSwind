@@ -22,9 +22,13 @@ struct RecordingNameSection:View {
             if names.rows.count>1 {
                 Label("Multiple saved names",systemImage:"exclamationmark.bubble").font(.subheadline.weight(.medium))
                 Text("Review each definition. Remove the ones you no longer want, then edit the remaining name.").font(.caption).foregroundStyle(.secondary)
-                ForEach(names.rows,id:\.revision) {name in
-                    HStack(alignment:.top) {Text(name.name).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading);removeButton(name)}.font(.callout)
-                }
+                ScrollView {
+                    LazyVStack(alignment:.leading,spacing:8) {
+                        ForEach(names.rows,id:\.revision) {name in
+                            HStack(alignment:.top) {Text(name.name).textSelection(.enabled).frame(maxWidth:.infinity,alignment:.leading);removeButton(name)}.font(.callout)
+                        }
+                    }
+                }.frame(maxHeight:160)
             }else if let name=names.rows.first {
                 HStack {Text("Saved recording name").foregroundStyle(.secondary);Spacer();removeButton(name)}.font(.caption)
             }
@@ -40,7 +44,7 @@ struct RecordingNameSection:View {
         }
     }
     private func removeButton(_ name:RecordedMeetingDetailsSnapshot)->some View {
-        Button("Remove name",role:.destructive) {names.requestRemoval(name)}.buttonStyle(.borderless).disabled(names.loading || names.saving || archive.busy)
+        Button("Remove name",role:.destructive) {names.requestRemoval(name)}.buttonStyle(.borderless).disabled(names.loading || names.saving || archive.busy).accessibilityLabel("Remove saved name "+name.name)
     }
 }
 
@@ -48,12 +52,14 @@ struct RecordingNameEditorView:View {
     @ObservedObject var names:RecordingNamesModel
     @ObservedObject var archive:RecordedMeetingsModel
     let review:RecordingNameReview
+    @FocusState private var nameFocused:Bool
     var body:some View {
         VStack(alignment:.leading,spacing:16) {
             Text(review.expected==nil ? "Name this recording":"Rename recording").font(.title2.weight(.semibold))
             Text(review.source.belongsToSession ? "This name follows the clips in this recording session. Original transcripts and dates stay the same.":"This name applies to this clip version. Original transcripts and dates stay the same.").font(.callout).foregroundStyle(.secondary).fixedSize(horizontal:false,vertical:true)
             if let expected=review.expected {Text("Current name: "+expected.name).font(.caption).foregroundStyle(.secondary).textSelection(.enabled).fixedSize(horizontal:false,vertical:true)}
-            TextField("Recording name",text:$names.draft).textFieldStyle(.roundedBorder).disabled(names.saving).accessibilityIdentifier("recording-name-field")
+            TextField("Recording name",text:$names.draft).textFieldStyle(.roundedBorder).disabled(names.saving).focused($nameFocused).accessibilityIdentifier("recording-name-field")
+                .onSubmit {if names.canSave && !archive.busy {names.saveEditor()}}
             Text("\(names.draft.count)/200 characters").font(.caption).foregroundStyle(names.draft.count>200 ? Color.orange:Color.secondary)
             if let error=names.editorError {
                 Label(error,systemImage:"exclamationmark.circle").font(.callout).foregroundStyle(.orange).fixedSize(horizontal:false,vertical:true)
@@ -65,6 +71,6 @@ struct RecordingNameEditorView:View {
                 Button("Cancel") {names.cancelEditor()}.keyboardShortcut(.cancelAction).disabled(names.saving)
                 Button("Save name") {names.saveEditor()}.buttonStyle(.borderedProminent).keyboardShortcut(.defaultAction).disabled(!names.canSave || archive.busy)
             }
-        }.padding(24).frame(width:440).interactiveDismissDisabled(names.saving)
+        }.padding(24).frame(width:440).interactiveDismissDisabled(names.saving).onAppear {nameFocused=true}
     }
 }
