@@ -112,3 +112,29 @@ The normal development app contains **34 files**, passes strict deep ad-hoc sign
 ![Scoped Ask](../assets/recording-scope-v1-scoped-ask-dark.png)
 
 F042 and the full v0 remain unfinished. Names/calendar links, incoming-change UI/frame-cost auditing, native keyboard/VoiceOver/record/import/open/playback, physical speech/device quality, power and current automatic 24h acceptance remain open. The 83-feature ledger, dated 20-offering comparison, earlier benchmark observations and earlier failed broad gates remain unchanged; no ranking is promoted.
+
+## Recording archive publication performance
+
+Source `195b4ad` prepares the merged recording groups in the registry-owned background worker. The main actor retains the current-library, visibility, request-generation, admission and settings guards before assigning results. Immutable per-recording dates, duration union, clip duration and uncertainty flags are computed once per grouping. Cancellation/departure owns the grouping stage as well as the SQL read. No database schema, serialized filter or source membership rule changes.
+
+A benchmark-only definition was committed at `85029ea` with production code identical to `9bdd303`. Its source remains byte-identical in the candidate. Actual optimized baseline and candidate test engines were frozen before the comparison. Each of two original authored corpora was copied into a fresh library for each observation: eight counterbalanced pairs per corpus, **32 separate processes / 656 page measurements**, with no discarded runs or outliers. Original databases and frozen engines stayed unchanged. Every expected source ID, page cardinality, canonical memory-row digest and paired metric checksum matched. Writes and canonical payload reads were denied during timed traversal; derived-cache warmup was measured separately.
+
+| Warm authored corpus / measure | Baseline median ms | Candidate median ms | Baseline p95 ms | Candidate p95 ms |
+|---|---:|---:|---:|---:|
+| 20,000 clips: main-actor publication | 52.742 | 0.757 | 91.133 | 1.587 |
+| 20,000 clips: all-loaded-group metric sweep | 2.353 | 0.00383 | 4.488 | 0.00875 |
+| 20,000 clips: page completion | 67.250 | 50.417 | 105.393 | 75.591 |
+| 256 long transcripts: publication | 6.260 | 0.244 | 6.726 | 0.475 |
+| 256 long transcripts: page completion | 13.541 | 13.394 | 14.323 | 14.670 |
+
+These are pooled page medians and nearest-rank p95s, not independent page replicates. All per-process medians, eight paired reductions, raw values, warmups and maxima remain in the receipt. Across the eight 20k pairs, the median reduction in process-median publication time was 98.585%; completion was 25.848%. The candidate publication maximum was 14.623 ms (baseline 101.978 ms), and a 37.415 ms candidate SQL read remains in the data. SQL medians were essentially unchanged; long-import overall completion was essentially unchanged. No confidence interval or population-wide speedup is claimed.
+
+Publication brackets `busy=false` emission through the loaded-status emission, excluding deferred cleanup and rendering. Completion includes worker, actor scheduling and a 1 ms polling observer. The metric sweep reads every loaded group's metrics, rather than measuring visible layout. This is one Mac17,6 / M5 Max / 128 GiB / macOS 26.6.2 with warm filesystem caches and an older manual-cadence capture soak active; background workloads were not isolated. These results do not establish GUI frame/vsync/input latency, OS-cold startup, speech, power, automatic 24h acceptance or competitor rank.
+
+Current selected optimized and Thread Sanitizer runs each have **563 defined / 546 passed / 17 skipped / 0 failures**, with no race report. They include actual owned APFS retained-page detach, original Keychain/all-13-kind sync, recording scope/backup/restore/erasure/privacy, large indexed Metal retrieval and app-worker lifecycle checks. The 17 skips are nine child entry helpers, three explicit scale opt-ins, two exact prior32-binary opt-ins, two renderer opt-ins and this owned performance fixture. The performance method separately passed in every one of the 32 comparison processes. New blocked-grouping tests verify off-main execution, a changed privacy policy refusing publication, and actual AppSession departure waiting for grouping before store close. All inputs, actual test engines and prior frozen controls remained unchanged.
+
+A fresh normal release development app passed strict deep ad-hoc signature verification, an owned empty-library smoke, and the actual packaged-CLI recording-scope control. All 34 signed app files and modes matched after ZIP extraction, with signature verification passing again. Its normal compiler product excludes `-enable-testing` and is kept separate from both optimized test engines and the earlier 7ab package. No notarization or current live activation is claimed.
+
+[Source/input/performance/test/package receipt](../benchmarks/recording-view-performance-v1.json) · [All raw observations, logs, scripts and source snapshots](../benchmarks/recording-view-performance-raw-v1.zip).
+
+The 83-feature ledger, dated 20-offering research report, earlier comparison data and old failed broad owner/peer gates remain unchanged. F042 names and calendar links, incoming recording-view updates, actual native interaction and accessibility, speech/device quality, energy and current automatic 24h acceptance remain open. This component does not complete v0 or establish parity/top-three placement.
