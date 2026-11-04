@@ -170,7 +170,7 @@ import EventKit
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,localModelSetup:LocalModelLibraryModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,localModelSetup:LocalModelLibraryModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recordingsLocked:@escaping ()->Bool={SessionState.locked}) throws {
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()
@@ -253,7 +253,7 @@ import EventKit
         }
         clipboard.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         tools.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
-        recordedMeetings.allowed = {[weak self] in guard let self else {return false};return self.libraryWorkAvailable && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryTransfer.busy && !SessionState.locked}
+        recordedMeetings.allowed = {[weak self] in guard let self else {return false};return self.libraryWorkAvailable && !self.showOnboarding && !self.libraryWipe.busy && !self.libraryTransfer.busy && !recordingsLocked()}
         recordedMeetings.openSource = {[weak self] source in self?.openRecordedMeetingSource(source)}
         recordedMeetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)
         meetings.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}.store(in:&cancellables)

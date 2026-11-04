@@ -116,7 +116,7 @@ final class RecordedMeetingTests:XCTestCase {
         }
     }
     func testNewEmptyLibraryIsAlreadyReadyAndNeverRebuildsItsFirstWriter()throws {
-        XCTAssertEqual(try indexState().0,"1");XCTAssertEqual(try indexState().1,0)
+        XCTAssertEqual(try indexState().0,"2");XCTAssertEqual(try indexState().1,0)
         try audio("first-writer",100)
         let nonce=try store.withRoutineDatabase {db in
             let row=try db.statement("SELECT revision FROM recorded_meeting_sources WHERE memory_id='first-writer'");defer {sqlite3_finalize(row)}
@@ -134,13 +134,13 @@ final class RecordedMeetingTests:XCTestCase {
             defer {sqlite3_set_authorizer(db.handle,nil,nil)}
             try db.transaction {try RecordedMeetingSchema.install(db)}
         }
-        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,0)
+        XCTAssertEqual(try indexState().0,"pending:2");XCTAssertEqual(try indexState().1,0)
         try store.close();store=try MemoryStore(root:root)
         try audio("new-writer",130);XCTAssertEqual(try indexState().1,1)
         try store.close();store=try MemoryStore(root:root)
-        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,1,"Opening preserves the pending cache's write-through rows")
+        XCTAssertEqual(try indexState().0,"pending:2");XCTAssertEqual(try indexState().1,1,"Opening preserves the pending cache's write-through rows")
         let page=try store.recordedMeetingPage();XCTAssertEqual(Set(page.sources.map(\.memoryID)),["historical","new-writer"])
-        XCTAssertEqual(try indexState().0,"1");let revisions=Dictionary(uniqueKeysWithValues:page.sources.map {($0.memoryID,$0.revision)})
+        XCTAssertEqual(try indexState().0,"2");let revisions=Dictionary(uniqueKeysWithValues:page.sources.map {($0.memoryID,$0.revision)})
         try store.close();store=try MemoryStore(root:root)
         XCTAssertEqual(Dictionary(uniqueKeysWithValues:try store.recordedMeetingPage().sources.map {($0.memoryID,$0.revision)}),revisions,"Ready opens must not rebuild the cache")
     }
@@ -153,8 +153,8 @@ final class RecordedMeetingTests:XCTestCase {
         }
         XCTAssertThrowsError(try store.recordedMeetingPage())
         try store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}
-        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,1,"Deletion before a failed backfill must roll back")
-        XCTAssertEqual(try store.recordedMeetingPage().sources.count,2);XCTAssertEqual(try indexState().0,"1")
+        XCTAssertEqual(try indexState().0,"pending:2");XCTAssertEqual(try indexState().1,1,"Deletion before a failed backfill must roll back")
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,2);XCTAssertEqual(try indexState().0,"2")
     }
     func testCancellationInsideHistoricalSQLRollsBackAndReopenedLibraryCanRetry()async throws {
         for index in 0..<120 {try audio("old-\(index)",Double(index))}
@@ -173,9 +173,9 @@ final class RecordedMeetingTests:XCTestCase {
         let entered=await Task.detached {gate.entered.wait(timeout:.now()+5) == .success}.value
         worker.cancel();gate.release.signal();XCTAssertTrue(entered,"Cancellation must happen inside the backfill SQL, after deleting prior rows")
         do {_ = try await worker.value;XCTFail("Expected first-use cancellation")}catch is CancellationError {}catch {XCTFail("Unexpected failure: \(error)")}
-        XCTAssertEqual(try indexState().0,"pending:1");XCTAssertEqual(try indexState().1,1)
+        XCTAssertEqual(try indexState().0,"pending:2");XCTAssertEqual(try indexState().1,1)
         try store.close();store=try MemoryStore(root:root)
-        XCTAssertEqual(try store.recordedMeetingPage().sources.count,121);XCTAssertEqual(try indexState().0,"1")
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,121);XCTAssertEqual(try indexState().0,"2")
     }
 }
 

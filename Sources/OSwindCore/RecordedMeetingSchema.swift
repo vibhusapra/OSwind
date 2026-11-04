@@ -5,9 +5,13 @@ import CSQLite
 /// canonical source fields; this index stores no transcript or independent copy.
 /// SQL triggers also cover older source writers and erasure/restore adapters.
 enum RecordedMeetingSchema {
+    static let currentVersion="2",pendingVersion="pending:2"
     private static func rows(_ alias:String,_ tail:String)->String {
         let payload="CAST(\(alias).payload AS TEXT)",session="json_extract(\(payload),'$.audioSessionID')"
-        let grouped="json_type(\(payload),'$.audioSessionID')='text' AND length(\(session)) BETWEEN 1 AND 200"
+        // Source admission bounds Swift graphemes, not SQLite codepoints.
+        // BLOB length tests emptiness without truncating at an embedded NUL.
+        // Never normalize, trim or reinterpret an accepted canonical ID here.
+        let grouped="json_type(\(payload),'$.audioSessionID')='text' AND length(CAST(\(session) AS BLOB))>0"
         let end="json_extract(\(payload),'$.endTimestamp')+978307200.0",duration="json_extract(\(payload),'$.transcript.duration')"
         return """
         SELECT \(alias).id,CASE WHEN \(grouped) THEN 1 ELSE 0 END,
@@ -57,7 +61,7 @@ enum RecordedMeetingSchema {
             """)
             let marker=try db.statement("SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'")
             let version=sqlite3_step(marker)==SQLITE_ROW ? db.text(marker,0):nil;sqlite3_finalize(marker)
-            var current=existed && (version=="1" || version=="pending:1")
+            var current=existed && (version==currentVersion || version==pendingVersion)
             for name in triggers.keys.sorted() {
                 let row=try db.statement("SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?");db.bind(row,1,name)
                 if sqlite3_step(row) != SQLITE_ROW || db.text(row,0).trimmingCharacters(in:.whitespacesAndNewlines) != triggers[name]! {current=false}
@@ -73,7 +77,7 @@ enum RecordedMeetingSchema {
                 let status=sqlite3_step(anySource);sqlite3_finalize(anySource)
                 guard status==SQLITE_ROW || status==SQLITE_DONE else {throw db.error()}
                 let empty=status==SQLITE_DONE
-                let state=empty ? "1":"pending:1"
+                let state=empty ? currentVersion:pendingVersion
                 try db.execute("INSERT INTO store_metadata(key,value) VALUES('recorded_meeting_index_version','\(state)') ON CONFLICT(key) DO UPDATE SET value=excluded.value")
             }
             try db.execute("""
@@ -89,15 +93,15 @@ enum RecordedMeetingSchema {
     static func populateIfNeeded(_ db:RoutineDatabase)throws {
         let marker=try db.statement("SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'")
         let version=sqlite3_step(marker)==SQLITE_ROW ? db.text(marker,0):nil;sqlite3_finalize(marker)
-        if version=="1" {return}
-        guard version=="pending:1" else {throw OSwindError.unavailable("Reopen the library to prepare its recording index")}
+        if version==currentVersion {return}
+        guard version==pendingVersion else {throw OSwindError.unavailable("Reopen the library to prepare its recording index")}
         try Task.checkCancellation()
         sqlite3_progress_handler(db.handle,1000,{_ in Task.isCancelled ? 1:0},nil)
         defer {sqlite3_progress_handler(db.handle,0,nil,nil)}
         do {
             try db.execute("DELETE FROM recorded_meeting_sources")
             try db.execute("INSERT INTO recorded_meeting_sources \(rows("m","FROM memories m WHERE m.kind='audio'"))")
-            try db.execute("UPDATE store_metadata SET value='1' WHERE key='recorded_meeting_index_version'")
+            try db.execute("UPDATE store_metadata SET value='\(currentVersion)' WHERE key='recorded_meeting_index_version'")
             try Task.checkCancellation()
         }catch {if Task.isCancelled {throw CancellationError()};throw error}
     }

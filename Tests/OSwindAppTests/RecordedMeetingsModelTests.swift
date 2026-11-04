@@ -67,15 +67,27 @@ import SwiftUI
         XCTAssertTrue(value.sessions.isEmpty)
     }
     func testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles()async throws {
-        let app=try AppModel(root:root,startServices:false);appModels.append(app);app.showOnboarding=false
+        let app=try AppModel(root:root,startServices:false,recordingsLocked:{false});appModels.append(app);app.showOnboarding=false
         let removed=try audio("removed",session:"remove",in:app.store);try audio("kept",session:"keep",in:app.store)
-        let value=app.recordedMeetings;value.activate();try await settle(value);XCTAssertEqual(value.sessions.count,2)
+        let value=app.recordedMeetings
+        XCTAssertTrue(value.allowed(),"Owned unlocked fixture must enter the actual recording workspace")
+        value.activate();try await settle(value);XCTAssertEqual(value.sessions.count,2)
         app.delete(removed)
         let end=SuspendingClock.now.advanced(by:.seconds(15));while app.deletingID != nil,SuspendingClock.now<end {try await Task.sleep(for:.milliseconds(5))}
         XCTAssertNil(app.deletingID);try await settle(value)
         XCTAssertEqual(value.sessions.flatMap(\.sources).map(\.memoryID),["kept"]);XCTAssertNil(try app.store.get("removed"))
         app.pauseForHistoryErasure();XCTAssertTrue(value.sessions.isEmpty);XCTAssertNil(value.selectedID);XCTAssertFalse(value.busy)
         XCTAssertNotNil(try app.store.get("kept"),"Pausing removes previews, not canonical surviving sources")
+    }
+    func testActualAppRecordingsRefuseLockedAdmissionAndCanReloadAfterUnlock()async throws {
+        var locked=true
+        let app=try AppModel(root:root,startServices:false,recordingsLocked:{locked});appModels.append(app);app.showOnboarding=false
+        try audio("owned",in:app.store);let value=app.recordedMeetings
+        value.activate();XCTAssertFalse(value.allowed());XCTAssertFalse(value.busy);XCTAssertTrue(value.sessions.isEmpty)
+        locked=false;XCTAssertTrue(value.allowed());value.refresh();try await settle(value)
+        XCTAssertEqual(value.sessions.flatMap(\.sources).map(\.memoryID),["owned"])
+        locked=true;value.invalidate();XCTAssertFalse(value.allowed());XCTAssertFalse(value.busy);XCTAssertTrue(value.sessions.isEmpty)
+        XCTAssertNotNil(try app.store.get("owned"),"Locking a view does not erase its canonical source")
     }
     func testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances()async throws {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_RECORDED_MEETING_UI_QA_DIR"] else {throw XCTSkip("Explicit generated recording workspace components only")}
