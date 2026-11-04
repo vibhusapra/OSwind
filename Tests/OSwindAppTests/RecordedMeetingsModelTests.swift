@@ -41,6 +41,50 @@ private final class RecordingChangeReadCounter:@unchecked Sendable {
         value.openSource={opened=$0};value.open(source);XCTAssertEqual(opened,source);XCTAssertEqual(try store.recordedMeetingEvidence(source).id,source.memoryID)
         value.deactivate();opened=nil;value.open(source);XCTAssertNil(opened)
     }
+    func testArchiveDisplaysSessionNamesBeforeSelectionWithoutChangingSourceTitles()async throws {
+        try audio("a",session:"first");try audio("b",session:"second")
+        let page=try store.recordedMeetingPage()
+        for ref in page.sources {_=try store.saveRecordedMeetingName(ref.memoryID=="a" ? "First saved name":"Second saved name",for:ref)}
+        let value=model();value.activate();try await settle(value)
+        XCTAssertEqual(value.nameSummaries.count,2)
+        for session in value.sessions {
+            XCTAssertEqual(value.title(for:session),session.sources.first?.memoryID=="a" ? "First saved name":"Second saved name")
+            XCTAssertEqual(session.sources.first?.title,"Planning session")
+        }
+        value.deactivate();XCTAssertTrue(value.nameSummaries.isEmpty)
+    }
+    func testArchiveNamesIncludePinnedSelectionOutsideTheContiguousHeadWindow()async throws {
+        for index in 0..<600 {try audio("named-\(index)",session:"session-\(index)",at:Double(index))}
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{10_000});value.allowed={true};models.append(value)
+        value.activate();try await settle(value);value.loadOlder();try await settle(value)
+        let selected=try XCTUnwrap(value.sessions.first {$0.sources.first?.memoryID=="named-0"}),ref=try XCTUnwrap(selected.sources.first)
+        _=try store.saveRecordedMeetingName("Pinned older session",for:ref);value.selectedID=selected.id
+        for index in 600..<1300 {try audio("named-\(index)",session:"session-\(index)",at:Double(index))}
+        await value.checkForChanges();try await settle(value)
+        XCTAssertEqual(value.selectedID,selected.id);XCTAssertEqual(try value.title(for:XCTUnwrap(value.selected)),"Pinned older session")
+        XCTAssertTrue(value.hasOlder);XCTAssertEqual(value.sessions.flatMap(\.sources).count,1025)
+        value.loadOlder();try await settle(value);XCTAssertFalse(value.hasOlder)
+        XCTAssertEqual(Set(value.sessions.flatMap(\.sources).map(\.memoryID)),Set((0..<1300).map {"named-\($0)"}))
+    }
+    func testNameMutationAfterSummaryPreparationCannotPublishAnObsoleteAlias()async throws {
+        try audio("a");let ref=try XCTUnwrap(store.recordedMeetingPage().sources.first),first=try store.saveRecordedMeetingName("Old alias",for:ref)
+        let gate=ImportWorkerGate(),reads=RecordingChangeReadCounter();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:store,work:work,foreground:{true},pollSeconds:{10_000},readSessionNames:{store,refs,revision in
+            let result=try store.recordedMeetingSessionNames(for:refs,at:revision);reads.increment();if reads.count==1 {try gate.pause()};return result
+        });value.allowed={true};models.append(value);value.activate();await fulfillment(of:[gate.entered],timeout:5)
+        _=try store.saveRecordedMeetingName("Current alias",for:ref,replacing:first);gate.release();try await settle(value)
+        XCTAssertEqual(value.sessions.count,1);XCTAssertEqual(try value.title(for:XCTUnwrap(value.sessions.first)),"Current alias")
+        XCTAssertFalse(value.nameSummaries.values.contains {$0.name=="Old alias"})
+    }
+    func testDepartedArchiveSummaryWorkerStaysJoinedAndCannotRestoreLabels()async throws {
+        try audio("a");_=try store.saveRecordedMeetingName("Private alias",for:XCTUnwrap(store.recordedMeetingPage().sources.first))
+        let gate=ImportWorkerGate();defer {gate.release()}
+        let value=RecordedMeetingsModel(store:store,work:work,readSessionNames:{store,refs,revision in let result=try store.recordedMeetingSessionNames(for:refs,at:revision);try gate.pause();return result})
+        value.allowed={true};models.append(value);value.activate();await fulfillment(of:[gate.entered],timeout:5);value.deactivate()
+        var joined=false;let draining=Task {await work.cancelAndWait();joined=true}
+        await fulfillment(of:[gate.cancelled],timeout:5);XCTAssertFalse(joined)
+        gate.release();await draining.value;XCTAssertTrue(value.sessions.isEmpty);XCTAssertTrue(value.nameSummaries.isEmpty)
+    }
     func testOlderViewDepartureCannotClearANewerAppearance()async throws {
         try audio("a");let value=model(),old=value.activate();try await settle(value)
         let fresh=value.activate();try await settle(value);value.deactivate(old)

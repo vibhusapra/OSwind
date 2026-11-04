@@ -14,6 +14,80 @@ final class RecordingDetailsTests:XCTestCase {
         try store.insert(value);return value
     }
     private func source(_ id:String)throws->RecordedMeetingSource {try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==id})}
+    func testSessionNameSummariesDenyAllPayloadReadsAndDMLAndSkipLegacyInference()throws {
+        try audio("session-audio");try audio("legacy-audio",session:nil)
+        let grouped=try source("session-audio"),legacy=try source("legacy-audio")
+        _=try store.saveRecordedMeetingName("Session label",for:grouped);_=try store.saveRecordedMeetingName("Legacy label",for:legacy)
+        let page=try store.recordedMeetingPage()
+        try store.withRoutineDatabase {db in sqlite3_set_authorizer(db.handle,{_,action,table,column,_,_ in
+            if [SQLITE_INSERT,SQLITE_UPDATE,SQLITE_DELETE].contains(action) {return SQLITE_DENY}
+            if action==SQLITE_READ,let table,let column,String(cString:table)=="memories",String(cString:column)=="payload" {return SQLITE_DENY};return SQLITE_OK
+        },nil)}
+        defer {_ = try? store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}}
+        let names=try store.recordedMeetingSessionNames(for:page.sources,at:page.revision)
+        XCTAssertEqual(names.count,1);XCTAssertEqual(names[grouped.sessionKey]?.name,"Session label")
+        XCTAssertNil(names[legacy.sessionKey],"A legacy source ID alone cannot prove its exact evidence version")
+    }
+    func testSessionNameSummariesKeepByteDifferentSessionIDsDistinct()throws {
+        try audio("a",session:"é");try audio("b",session:"e\u{301}")
+        let a=try source("a"),b=try source("b")
+        _=try store.saveRecordedMeetingName("Composed",for:a);_=try store.saveRecordedMeetingName("Decomposed",for:b)
+        let page=try store.recordedMeetingPage(),names=try store.recordedMeetingSessionNames(for:page.sources,at:page.revision)
+        XCTAssertNotEqual(a.sessionKey,b.sessionKey);XCTAssertEqual(names.count,2)
+        XCTAssertEqual(names[a.sessionKey]?.name,"Composed");XCTAssertEqual(names[b.sessionKey]?.name,"Decomposed")
+    }
+    func testSessionNameSummaryNeverPicksOneOfTwoIdenticalDefinitions()throws {
+        try audio("a");let target=try source("a"),first=try store.saveRecordedMeetingName("Equal names",for:target)
+        var second=try XCTUnwrap(store.get(first.id));second.id="second-definition";try store.insert(second)
+        let page=try store.recordedMeetingPage(),summary=try XCTUnwrap(store.recordedMeetingSessionNames(for:page.sources,at:page.revision)[target.sessionKey])
+        XCTAssertTrue(summary.hasConflicts);XCTAssertNil(summary.name)
+    }
+    func testArchiveSummaryWorkStaysBoundedWithThousandsOfConflictingDefinitions()throws {
+        try audio("a");let target=try source("a"),first=try store.saveRecordedMeetingName("First",for:target)
+        let body=try XCTUnwrap(store.get(first.id))
+        final class Steps {var count=0}
+        func measure()throws->Int {
+            let revision=try store.recordedMeetingRevision(),steps=Steps()
+            return try store.withRoutineDatabase {db in
+                sqlite3_progress_handler(db.handle,1,{context in
+                    if let context {Unmanaged<Steps>.fromOpaque(context).takeUnretainedValue().count+=1};return 0
+                },Unmanaged.passUnretained(steps).toOpaque())
+                defer {sqlite3_progress_handler(db.handle,0,nil,nil)}
+                let values=try store.recordedMeetingSessionNames(for:[target],at:revision)
+                XCTAssertEqual(values.count,1);return steps.count
+            }
+        }
+        let before=try measure()
+        try store.withRoutineDatabase {db in try db.transaction {
+            for index in 0..<2000 {var value=body;value.id="conflict-\(index)";value.title="Conflicting definition \(index)";try store.insert(value)}
+        }}
+        let after=try measure()
+        XCTAssertLessThanOrEqual(after,before+1000,"Archive lookup must stop at two definitions, not scan the conflict set")
+        let summary=try XCTUnwrap(store.recordedMeetingSessionNames(for:[target],at:store.recordedMeetingRevision())[target.sessionKey])
+        XCTAssertTrue(summary.hasConflicts);XCTAssertNil(summary.name)
+    }
+    func testSessionNameSummaryAppliesCurrentNameAndAudioPrivacy()throws {
+        try audio("a");let target=try source("a");_=try store.saveRecordedMeetingName("Private label",for:target)
+        var settings=AppSettings();settings.privacy.excludedApps.append("com.oswind.desktop");try settings.save(root:store.root)
+        let current=try store.recordedMeetingRevision()
+        XCTAssertTrue(try store.recordedMeetingSessionNames(for:[target],at:current).isEmpty)
+        settings.privacy.excludedApps=["owned.audio"];try settings.save(root:store.root)
+        XCTAssertTrue(try store.recordedMeetingSessionNames(for:[target],at:store.recordedMeetingRevision()).isEmpty)
+    }
+    func testSessionNameSummariesRefuseStaleRevisionOrRepresentative()throws {
+        try audio("a");let target=try source("a"),saved=try store.saveRecordedMeetingName("Before",for:target),page=try store.recordedMeetingPage()
+        _=try store.saveRecordedMeetingName("After",for:target,replacing:saved)
+        XCTAssertThrowsError(try store.recordedMeetingSessionNames(for:page.sources,at:page.revision))
+        try store.setFavorite("a",value:true)
+        XCTAssertThrowsError(try store.recordedMeetingSessionNames(for:[target],at:store.recordedMeetingRevision()))
+    }
+    func testSessionNameSummariesRefuseForeignLibraryAndOversizedBatch()throws {
+        try audio("a");let target=try source("a"),revision=try store.recordedMeetingRevision()
+        XCTAssertThrowsError(try store.recordedMeetingSessionNames(for:Array(repeating:target,count:513),at:revision))
+        let other=try MemoryStore(root:root.appendingPathComponent("other"));defer {try? other.close()}
+        XCTAssertThrowsError(try other.recordedMeetingSessionNames(for:[target],at:other.recordedMeetingRevision()))
+        XCTAssertThrowsError(try other.recordedMeetingSessionNames(for:[],at:revision))
+    }
     func testUnnamedSelectedDetailsAvoidPayloadReadsAndAllSQLWrites()throws {
         try audio("unnamed");let target=try source("unnamed")
         try store.withRoutineDatabase {db in

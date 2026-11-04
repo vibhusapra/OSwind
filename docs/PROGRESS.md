@@ -1,8 +1,14 @@
 # OSwind delivery ledger
 
+## 2026-11-04 — bounded recording names in the archive sidebar
+
+Saved names and conflict indicators now appear for loaded explicit sessions before selection, including older pinned selections. Source titles remain unchanged. The bounded batch reads at most two definitions per session and publishes labels with the current page revision/privacy guard. The current Debug selection passes **90 methods / zero skips or failures**; a separate test-only 2,000-conflict work-bound check passes. Eight changed archive layouts are reviewed; six editor layouts are byte-identical to prior reviewed renders.
+
+The new warm authored 5,000-row benchmark retains every observation and both actual engines. Batching cuts populated lookup statements from 1,033 to 10; timings are mixed (sparse 4.692 → 4.885 ms, dense 9.304 → 9.006 ms). No broad speedup or competitor ranking is claimed. The initial two privacy error-reporting failures are retained, and their unchanged controls now pass. Optimized/sanitizer, legacy exact-version labels, complete transport/original recovery, calendar and physical/power/automatic24h gates remain open. [Details and TODOs](RECORDING-DETAILS-WIP.md#archive-session-aliases-in-development) · [Receipt](../benchmarks/recording-session-names-v1.json).
+
 ## 2026-11-04 — selected recording names, conflicts and draft recovery
 
-The selected-recording editor now supports creating/renaming a label, explicit individual conflict removal and draft-preserving review after a concurrent edit. Reads/writes belong to the app work registry; name publication is read-only and nonwaiting. Unnamed selection avoids transcript hydration. Original audio is unchanged. Archive-wide name aliases, complete transport/session/original-recovery behavior, calendar review, current optimized/sanitizer/performance, full interactive/physical/power/24h and distribution gates remain open.
+The selected-recording editor now supports creating/renaming a label, explicit individual conflict removal and draft-preserving review after a concurrent edit. Reads/writes belong to the app work registry; name publication is read-only and nonwaiting. Unnamed selection avoids transcript hydration. Original audio is unchanged. Legacy exact-version aliases, complete transport/session/original-recovery behavior, calendar review, current optimized/sanitizer/performance, full interactive/physical/power/24h and distribution gates remain open.
 
 The editor's Core selection passes **131 methods / two explicit skips / zero failures**. UI v5 passes **39 methods / zero skips or failures**, including two actual owned encrypted APFS read/write shutdown/reopen controls. The same retained v5 binary, without rebuilding, passes **655 broader methods / 23 explicit skips / zero failures**; counts overlap. Fourteen name/editor layouts are inspected. The warning-contrast follow-up has a passing actual render check: both changed error rasters are reviewed and the other 12 are byte-identical to v5. An earlier two-method native fixture admission failure is retained and explicitly distinguished from the corrected owned-fixture controls.
 

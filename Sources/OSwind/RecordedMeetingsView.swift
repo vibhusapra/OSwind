@@ -55,12 +55,13 @@ struct RecordedMeetingsView:View {
                                 let countLabel=String(session.sources.count)+(session.sources.count==1 ? " clip loaded":" clips loaded")
                                 Button {model.selectedID=session.id} label: {
                                     VStack(alignment:.leading,spacing:6) {
-                                        Text(session.title).font(.headline).lineLimit(2)
+                                        Text(model.title(for:session)).font(.headline).lineLimit(2)
+                                        if model.nameSummaries[session.id]?.hasConflicts==true {Label("Review saved names",systemImage:"exclamationmark.bubble").font(.caption2).foregroundStyle(.secondary)}
                                         Text(session.first,format:.dateTime.month(.abbreviated).day().hour().minute()).font(.caption).foregroundStyle(.secondary)
                                         Text(countLabel+(session.hasUnobservedTimes ? " · saved dates":"")).font(.caption2).foregroundStyle(.secondary)
                                     }.frame(maxWidth:.infinity,alignment:.leading).padding(12)
                                         .background(model.selectedID==session.id ? OSwindTheme.accent.opacity(0.12):Color.clear,in:RoundedRectangle(cornerRadius:10))
-                                }.buttonStyle(.plain).disabled(model.busy).accessibilityLabel(session.title+", "+countLabel)
+                                }.buttonStyle(.plain).disabled(model.busy).accessibilityLabel(model.title(for:session)+", "+countLabel)
                             }
                             if model.hasOlder {Button("Load older recordings") {model.loadOlder()}.disabled(model.busy).padding(.vertical,10)}
                         }.padding(.trailing,10)

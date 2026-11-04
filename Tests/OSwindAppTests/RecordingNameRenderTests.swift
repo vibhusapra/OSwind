@@ -46,6 +46,9 @@ import SwiftUI
                 archive.activate()
                 try await render(RecordedMeetingsView(model:archive).environmentObject(app),size:size,dark:dark,to:output.appendingPathComponent(state+"-"+suffix+(dark ? "-dark.png":"-light.png"))) {
                     try await self.settle(archive);XCTAssertEqual(archive.names.rows.count,expected);XCTAssertTrue(archive.names.loaded)
+                    let session=try XCTUnwrap(archive.sessions.first)
+                    XCTAssertEqual(archive.nameSummaries[session.id]?.hasConflicts,expected>1)
+                    XCTAssertEqual(archive.title(for:session),expected==1 ? "Planning review and launch checklist":"Original studio capture")
                 }
                 archive.deactivate()
             }}
