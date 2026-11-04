@@ -3,15 +3,21 @@ import CryptoKit
 import CSQLite
 
 public struct RecordedMeetingSource:Identifiable,Equatable,Sendable {
-    public let memoryID:String,sessionKey:String,title:String,app:String,revision:String
-    public var id:String {Self.key(grouped:false,id:memoryID)}
+    public let memoryID:String,sessionKey:String,title:String,app:String,revision:String,id:String
     public let timestamp:Date,observedEnd:Date?,duration:Double
     public var belongsToSession:Bool {grouped}
     public var hasObservedInterval:Bool {observedEnd != nil}
     let owner:UUID,grouped:Bool,recordingID:String
+    init(memoryID:String,sessionKey:String,title:String,app:String,revision:String,timestamp:Date,observedEnd:Date?,duration:Double,owner:UUID,grouped:Bool,recordingID:String) {
+        self.memoryID=memoryID;self.sessionKey=sessionKey;self.title=title;self.app=app;self.revision=revision;self.id=Self.key(grouped:false,id:memoryID)
+        self.timestamp=timestamp;self.observedEnd=observedEnd;self.duration=duration;self.owner=owner;self.grouped=grouped;self.recordingID=recordingID
+    }
     static func key(grouped:Bool,id:String)->String {
         let prefix=grouped ? "recording\u{0}":"single-source\u{0}"
-        return SHA256.hash(data:Data(prefix.utf8)+Data(id.utf8)).map {String(format:"%02x",$0)}.joined()
+        let digest=SHA256.hash(data:Data(prefix.utf8)+Data(id.utf8)),digits=Array("0123456789abcdef".utf8)
+        var bytes=[UInt8]();bytes.reserveCapacity(64)
+        for byte in digest {bytes.append(digits[Int(byte>>4)]);bytes.append(digits[Int(byte&15)])}
+        return String(decoding:bytes,as:UTF8.self)
     }
 }
 public struct RecordedMeetingCursor:Sendable {

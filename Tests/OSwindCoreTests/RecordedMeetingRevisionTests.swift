@@ -1,5 +1,7 @@
 import XCTest
 import CSQLite
+import CryptoKit
+import Darwin
 @testable import OSwindCore
 
 private final class RecordingDatabaseGate:@unchecked Sendable {
@@ -105,6 +107,35 @@ final class RecordedMeetingRevisionTests:XCTestCase {
         var settings=AppSettings();settings.privacy.excludedApps.append("Owned audio");try settings.save(root:root)
         let changed=try store.recordedMeetingRevision();XCTAssertNotEqual(before,changed);XCTAssertEqual(before.value,changed.value);XCTAssertFalse(before.hasSamePrivacy(as:changed))
         XCTAssertTrue(try store.recordedMeetingPage().sources.isEmpty)
+    }
+    func testActualRetainedPriorCLIImportAdvancesAudioNonceWithoutReinstallingItsTriggers()throws {
+        let env=ProcessInfo.processInfo.environment
+        guard let path=env["OSWIND_RECORDING_PRIOR_WRITER_CLI"],let output=env["OSWIND_RECORDING_WRITER_QA_DIR"] else {throw XCTSkip("Explicit retained prior recording-writer CLI and owned output required")}
+        let binary=URL(fileURLWithPath:path),qa=URL(fileURLWithPath:output)
+        func hash()throws->String {SHA256.hash(data:try Data(contentsOf:binary)).map {String(format:"%02x",$0)}.joined()}
+        XCTAssertEqual(try hash(),"ca15100379032784c4013600431630808e680809db2d2b36005566a2c6011541")
+        try Paths.ensure(qa);let before=try store.recordedMeetingRevision(),page=try store.recordedMeetingPage()
+        var memory=Memory(id:"old-writer-audio",timestamp:Date(timeIntervalSince1970:1_793_738_000),kind:.audio,app:"Authored earlier writer",title:"Owned JSON audio import",text:"Authored earlier writer words")
+        memory.audioSessionID="old-writer-session";memory.transcript = .init(text:memory.text,duration:30,segments:[.init(start:0,end:30,text:memory.text)],model:"Authored fixture, no ASR claim")
+        let input=root.appendingPathComponent("owned-import.json");try JSONEncoder().encode([memory]).write(to:input,options:.withoutOverwriting)
+        let process=Process(),stdout=Pipe(),stderr=Pipe();process.executableURL=binary;process.arguments=["--data",root.path,"import",input.path,"--json"];process.standardOutput=stdout;process.standardError=stderr
+        var childEnvironment=env;childEnvironment.removeValue(forKey:"DYLD_INSERT_LIBRARIES");process.environment=childEnvironment
+        try process.run();let deadline=ProcessInfo.processInfo.systemUptime+30
+        while process.isRunning,ProcessInfo.processInfo.systemUptime<deadline {Thread.sleep(forTimeInterval:0.01)}
+        let exceeded=process.isRunning
+        if exceeded {process.terminate();let stop=ProcessInfo.processInfo.systemUptime+3;while process.isRunning,ProcessInfo.processInfo.systemUptime<stop {Thread.sleep(forTimeInterval:0.01)};if process.isRunning {kill(process.processIdentifier,SIGKILL)}}
+        process.waitUntilExit();let out=stdout.fileHandleForReading.readDataToEndOfFile(),err=stderr.fileHandleForReading.readDataToEndOfFile()
+        try out.write(to:qa.appendingPathComponent("old-writer.stdout"),options:.withoutOverwriting);try err.write(to:qa.appendingPathComponent("old-writer.stderr"),options:.withoutOverwriting)
+        XCTAssertFalse(exceeded);XCTAssertEqual(process.terminationStatus,0)
+        XCTAssertNotEqual(try store.recordedMeetingRevision().value,before.value);XCTAssertEqual(try store.get(memory.id)?.kind,.audio)
+        XCTAssertEqual(try store.recordedMeetingPage().sources.map(\.memoryID),[memory.id]);XCTAssertThrowsError(try store.withCurrentRecordedMeetingPage(page) {})
+        try store.withRoutineDatabase {db in
+            for (name,expected) in RecordedMeetingRevisionSchema.triggers {
+                let row=try db.statement("SELECT sql FROM sqlite_master WHERE name=?");db.bind(row,1,name);defer {sqlite3_finalize(row)}
+                XCTAssertEqual(sqlite3_step(row),SQLITE_ROW);XCTAssertEqual(db.text(row,0),expected)
+            }
+        }
+        XCTAssertEqual(try hash(),"ca15100379032784c4013600431630808e680809db2d2b36005566a2c6011541")
     }
     func testForeignAndClosedWindowReferencesRefuse()throws {
         try audio(0);let ref=try XCTUnwrap(store.recordedMeetingPage().sources.first),other=try MemoryStore(root:root.appendingPathComponent("other"));defer {try? other.close()}

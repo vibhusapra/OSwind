@@ -174,6 +174,22 @@ private final class RecordingChangeReadCounter:@unchecked Sendable {
         await value.checkForChanges();await fulfillment(of:[gate.entered],timeout:5);XCTAssertTrue(value.busy);XCTAssertTrue(value.sessions.isEmpty)
         gate.release();try await settle(value);XCTAssertTrue(value.sessions.isEmpty);XCTAssertNil(value.error)
     }
+    func testPrivacyHiddenHeadStillOffersOlderAllowedRecordings()async throws {
+        let location=root.appendingPathComponent("hidden-head");var settings=AppSettings();settings.captureOnLaunch=false;settings.apiEnabled=false;settings.routinesEnabled=false;settings.entityAutomaticIndex=false;settings.automaticMaintenance=false;settings.privacy.excludedApps.append("owned.meeting");try settings.save(root:location)
+        let app=try AppModel(root:location,startServices:false,recordingsLocked:{false});app.showOnboarding=false;appModels.append(app)
+        var kept=try audio("older-allowed",session:"allowed",at:0,in:app.store);kept.bundleID="owned.allowed";kept.app="Allowed fixture";kept.title="Older allowed recording";try app.store.insert(kept)
+        for index in 0..<512 {try audio("hidden-\(index)",at:Double(index+100),title:"Hidden authored clip",in:app.store)}
+        let value=app.recordedMeetings;value.activate();try await settle(value);XCTAssertTrue(value.sessions.isEmpty);XCTAssertTrue(value.hasOlder)
+        if let path=ProcessInfo.processInfo.environment["OSWIND_RECORDED_MEETING_UI_QA_DIR"] {
+            let output=URL(fileURLWithPath:path);try Paths.ensure(output)
+            for dark in [false,true] {try await render(RecordedMeetingsView(model:value).environmentObject(app),size:.init(width:900,height:650),dark:dark,model:value,expected:0,to:output.appendingPathComponent("hidden-head-\(dark ? "dark":"light").png"))}
+        }
+        // The render helper closes its hosting window and retires that
+        // appearance. Reactivate before exercising the next user action.
+        value.activate();try await settle(value);XCTAssertTrue(value.hasOlder);XCTAssertTrue(value.sessions.isEmpty)
+        value.loadOlder();try await settle(value);XCTAssertNil(value.error);XCTAssertFalse(value.hasOlder)
+        XCTAssertEqual(value.sessions.flatMap(\.sources).map(\.memoryID),["older-allowed"])
+    }
     func testRenderQuietRefreshKeepsSelectedRecordingInBothAppearances()async throws {
         guard let path=ProcessInfo.processInfo.environment["OSWIND_RECORDED_MEETING_UI_QA_DIR"] else {throw XCTSkip("Explicit generated recording refresh components only")}
         let output=URL(fileURLWithPath:path);try Paths.ensure(output)

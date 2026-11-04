@@ -41,9 +41,11 @@ struct RecordedMeetingsView:View {
             if let error=model.error {Label(error,systemImage:"exclamationmark.circle").foregroundStyle(.orange).font(.callout)}
             if model.sessions.isEmpty {
                 ContentUnavailableView {
-                    Label("Your recordings will appear here",systemImage:"waveform")
+                    Label(model.hasOlder ? "Recent recordings are hidden":"Your recordings will appear here",systemImage:"waveform")
                 } description: {
-                    Text("Record with your chosen microphone or system-audio settings, or import a file. Calendar access is optional. Recording IDs keep clips together; nearby timestamps do not merge separate conversations.")
+                    Text(model.hasOlder ? "Your privacy rules hide the newest clips. Older recordings may still be available.":"Record with your chosen microphone or system-audio settings, or import a file. Calendar access is optional. Recording IDs keep clips together; nearby timestamps do not merge separate conversations.")
+                } actions: {
+                    if model.hasOlder {Button("Load older recordings") {model.loadOlder()}.disabled(model.busy)}
                 }.frame(maxWidth:.infinity,maxHeight:.infinity)
             }else {
                 HStack(alignment:.top,spacing:16) {
