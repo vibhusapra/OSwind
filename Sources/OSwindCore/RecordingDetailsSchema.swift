@@ -88,4 +88,26 @@ enum RecordingDetailsSchema {
         guard sqlite3_step(row)==SQLITE_ROW else {throw OSwindError.unavailable("The saved recording name changed. Refresh before editing.")}
         return db.text(row,0)
     }
+    /// Erasure must remove stale private labels even if a rebuildable row was
+    /// corrupted to point at a different canonical owner. Healthy projections
+    /// incur no writes; repair reads only bounded name records, not transcripts.
+    static func reconcileAfterErasure(_ db:RoutineDatabase)throws {
+        let sql="""
+        SELECT EXISTS(
+            SELECT 1 FROM recorded_meeting_details d LEFT JOIN memories m ON m.id=d.memory_id
+            WHERE m.kind IS NOT 'recording-metadata' OR d.name IS NOT m.title OR d.app IS NOT m.app
+                OR d.bundle_id IS NOT COALESCE(json_extract(CAST(m.payload AS TEXT),'$.bundleID'),'')
+                OR d.selector IS NOT json_extract(CAST(m.payload AS TEXT),'$.recordingDetails.scope.selector')
+                OR d.scope_id IS NOT json_extract(CAST(m.payload AS TEXT),'$.recordingDetails.scope.id')
+                OR d.evidence_revision IS NOT json_extract(CAST(m.payload AS TEXT),'$.recordingDetails.scope.revision')
+                OR d.details IS NOT json_extract(CAST(m.payload AS TEXT),'$.recordingDetails')
+            UNION ALL SELECT 1 FROM memories m LEFT JOIN recorded_meeting_details d ON d.memory_id=m.id
+                WHERE m.kind='recording-metadata' AND d.memory_id IS NULL
+        )
+        """
+        if try db.eraseCount(sql)==1 {
+            try db.execute("UPDATE store_metadata SET value='\(pendingVersion)' WHERE key='\(key)'")
+            try prepare(db,managesProgressHandler:false)
+        }
+    }
 }

@@ -215,6 +215,7 @@ public final class MemoryStore: @unchecked Sendable {
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try RecordedMeetingSchema.install(RoutineDatabase(handle:db!))
         try RecordingAffiliationStore.install(RoutineDatabase(handle:db!))
+        try RecordingRelationshipIndexes.install(RoutineDatabase(handle:db!))
         try SyncIncomingEntitySchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try exec(EntitySchema.sql)
@@ -351,6 +352,9 @@ public final class MemoryStore: @unchecked Sendable {
         do {
         try validateRecapInsertion(memory,deferred:deferRecapLinks)
         let previous=try get(memory.id)
+        if memory.kind == .recordingMetadata,memory.recordingDetails?.scope.selector == .session {
+            try RecordingRelationshipIndexes.ensureSessions(RoutineDatabase(handle:db!))
+        }
         if let before=previous,before.kind == .recordingMetadata,memory.kind == .recordingMetadata,
            let a=before.recordingDetails?.scope,let b=memory.recordingDetails?.scope,RecordingDetails.sameTarget(a,b) {
             try RecordingAffiliationStore.rememberProjection(RoutineDatabase(handle:db!),memory:before)

@@ -135,24 +135,23 @@ extension RoutineDatabase {
     func expandErasureSelection() throws {
         var recordingEdge=""
         if try eraseCount("SELECT EXISTS(SELECT 1 FROM memories WHERE kind='recording-metadata' LIMIT 1)")==1 {
-            guard try eraseCount("SELECT count(*) FROM sqlite_master WHERE name='recorded_meeting_details'")==1 else {throw OSwindError.database("Prepare recording names before reviewing related erasure")}
-            try RecordingDetailsSchema.prepare(self,managesProgressHandler:false)
+            try RecordingRelationshipIndexes.ensureNames(self)
+            let selector=RecordingRelationshipIndexes.selector("n"),target=RecordingRelationshipIndexes.scopeID("n")
             recordingEdge="""
-            UNION SELECT 0,n.memory_id FROM recorded_meeting_details n JOIN linked l ON l.kind=0 AND n.selector='source' AND n.scope_id=l.id COLLATE BINARY
+            UNION SELECT 0,n.id FROM memories n INDEXED BY memory_recording_names_v1
+                JOIN linked l ON l.kind=0 AND n.kind='recording-metadata' AND \(selector)='source' AND \(target)=l.id COLLATE BINARY
                 JOIN memories a ON a.id=l.id AND a.kind='audio'
             """
-            if try eraseCount("SELECT EXISTS(SELECT 1 FROM recorded_meeting_details WHERE selector='session')")==1 {
-                // Only libraries with session labels need the recording index.
-                // Its repair/backfill stays in this owned cancellable worker;
-                // ordinary erasure does not hydrate the transcript archive.
-                try RecordedMeetingSchema.populateIfNeeded(self,managesProgressHandler:false)
+            if try eraseCount("SELECT EXISTS(SELECT 1 FROM memories n INDEXED BY memory_recording_names_v1 WHERE n.kind='recording-metadata' AND \(selector)='session')")==1 {
+                try RecordingRelationshipIndexes.ensureSessions(self)
+                let session=RecordingRelationshipIndexes.sessionID("a")
                 try execute("""
                 INSERT OR IGNORE INTO temp.erasure_ids
-                SELECT n.memory_id FROM recorded_meeting_details n WHERE n.selector='session'
-                AND EXISTS(SELECT 1 FROM recorded_meeting_sources a JOIN temp.erasure_ids e ON e.id=a.memory_id
-                    WHERE a.grouped=1 AND a.recording_id=n.scope_id COLLATE BINARY)
-                AND NOT EXISTS(SELECT 1 FROM recorded_meeting_sources a WHERE a.grouped=1 AND a.recording_id=n.scope_id COLLATE BINARY
-                    AND a.memory_id NOT IN (SELECT id FROM temp.erasure_ids))
+                SELECT n.id FROM memories n INDEXED BY memory_recording_names_v1 WHERE n.kind='recording-metadata' AND \(selector)='session'
+                AND EXISTS(SELECT 1 FROM memories a INDEXED BY memory_recording_sessions_v1 JOIN temp.erasure_ids e ON e.id=a.id
+                    WHERE a.kind='audio' AND \(session)=\(target) COLLATE BINARY)
+                AND NOT EXISTS(SELECT 1 FROM memories a INDEXED BY memory_recording_sessions_v1 WHERE a.kind='audio' AND \(session)=\(target) COLLATE BINARY
+                    AND a.id NOT IN (SELECT id FROM temp.erasure_ids))
                 """)
             }
         }
@@ -181,6 +180,7 @@ extension RoutineDatabase {
         let result=ErasedCounts(sources:try eraseCount("SELECT COUNT(*) FROM temp.erasure_ids"),turns:try eraseCount("SELECT COUNT(*) FROM (\(Self.affectedTurns))"),historical:try eraseCount("SELECT COUNT(*) FROM temp.erasure_historical_ids"))
         try HistoricalErasureSchema.revokeSelected(self,additionalObject:revokingObject)
         try execute("UPDATE chat_sessions SET title='Conversation' WHERE id IN (SELECT session_id FROM chat_turns WHERE id IN (SELECT id FROM temp.erasure_explicit_turn_ids)); DELETE FROM chat_turns WHERE id IN (SELECT id FROM temp.erasure_explicit_turn_ids); DELETE FROM historical_evidence WHERE handle IN (\(Self.historicalErasureIDs)); DELETE FROM memories WHERE id IN (SELECT id FROM temp.erasure_ids)")
+        if try eraseCount("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name='recorded_meeting_details')")==1 {try RecordingDetailsSchema.reconcileAfterErasure(self)}
         if result.sources>0 || result.historical>0 {try execute("UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='identity'")}
         return result
     }

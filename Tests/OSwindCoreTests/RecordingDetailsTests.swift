@@ -14,6 +14,38 @@ final class RecordingDetailsTests:XCTestCase {
         try store.insert(value);return value
     }
     private func source(_ id:String)throws->RecordedMeetingSource {try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==id})}
+    func testCanonicalRecordingRelationshipsUseExpressionIndexes()throws {
+        try audio("indexed-audio");_=try store.saveRecordedMeetingName("Indexed session",for:source("indexed-audio"))
+        try store.withRoutineDatabase {db in
+            for (name,query) in [
+                (RecordingRelationshipIndexes.names,"SELECT n.id FROM memories n INDEXED BY memory_recording_names_v1 WHERE n.kind='recording-metadata' AND \(RecordingRelationshipIndexes.selector("n"))='session' AND \(RecordingRelationshipIndexes.scopeID("n"))='session'"),
+                (RecordingRelationshipIndexes.sessions,"SELECT a.id FROM memories a INDEXED BY memory_recording_sessions_v1 WHERE a.kind='audio' AND \(RecordingRelationshipIndexes.sessionID("a"))='session'")
+            ] {
+                let row=try db.statement("EXPLAIN QUERY PLAN "+query);defer {sqlite3_finalize(row)}
+                var details=[String](),code=sqlite3_step(row)
+                while code==SQLITE_ROW {details.append(db.text(row,3));code=sqlite3_step(row)}
+                XCTAssertEqual(code,SQLITE_DONE);XCTAssertTrue(details.contains {$0.contains("SEARCH") && $0.contains(name)},details.joined(separator:"; "))
+            }
+        }
+    }
+    func testExistingAudioArchiveDefersSessionIndexUntilFirstSessionName()throws {
+        let original=try audio("legacy-audio")
+        try store.withRoutineDatabase {db in
+            try db.execute("DROP INDEX memory_recording_sessions_v1");try RecordingRelationshipIndexes.install(db)
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),0)
+        }
+        _=try store.saveRecordedMeetingName("First session label",for:source(original.id))
+        try store.withRoutineDatabase {db in
+            XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM sqlite_master WHERE name='memory_recording_sessions_v1'"),1)
+        }
+        XCTAssertEqual(try store.get(original.id),original)
+    }
+    func testChangedCanonicalRelationshipIndexIsRejected()throws {
+        try store.withRoutineDatabase {db in
+            try db.execute("DROP INDEX memory_recording_names_v1; CREATE INDEX memory_recording_names_v1 ON memories(id)")
+            XCTAssertThrowsError(try RecordingRelationshipIndexes.ensureNames(db))
+        }
+    }
     func testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation()throws {
         let env=ProcessInfo.processInfo.environment
         guard let path=env["OSWIND_RECORDING_PRIOR_WRITER_CLI"],let output=env["OSWIND_RECORDING_WRITER_QA_DIR"] else {throw XCTSkip("Explicit retained pre-metadata CLI and owned output required")}
