@@ -1,0 +1,281 @@
+{
+  "source": "e01c94b7f558b0fd43f04ec5c6d52e3dee196065",
+  "baseline": "9caf13eb52789eb378d24a32ea8b72c23f61fadd",
+  "steps": 101,
+  "changedSteps": [
+    {
+      "job": "native",
+      "name": "Verify recorded meeting workspace and retained-page vault detach",
+      "before": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR=\"$RUNNER_TEMP/oswind-recorded-meeting-ui\" swift test --filter 'RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts'",
+      "after": "OSWIND_TEST_NATIVE_VAULT=1 OSWIND_TEST_NATIVE_SYNC_KEYCHAIN=1 OSWIND_RECORDED_MEETING_UI_QA_DIR=\"$RUNNER_TEMP/oswind-recorded-meeting-ui\" OSWIND_RECORDING_SCOPE_UI_DIR=\"$RUNNER_TEMP/oswind-recorded-meeting-ui\" swift test --filter 'RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|NativeRecordedMeetingTests|SyncIncomingSourceTests.testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts|RecordingScopeTests|SyncIncomingSourceTests.testRecordingSessionScopeSurvivesIncomingOriginRemappingAndReexport|SyncIncomingSourceTests.testSingleRecordingVersionScopeSurvivesExactIncomingProjection|SyncIncomingSourceTests.testRecordingScopedRunPreservesQuietRestoreAndRefusesLostSessionProvenance'"
+    }
+  ],
+  "allOtherParsedFieldsUnchanged": true,
+  "workflowSHA256": "15f8dae2a83e6452801a58dc2dd8c9072561a02eb0ec083f46f3ee3ba8049160",
+  "parser": "System Ruby YAML",
+  "scope": "Static parsed YAML comparison only; no hosted CI result.",
+  "stepCountBasis": "101 total steps across all jobs; historical 87 is the native macOS job only",
+  "currentRuntimeSource": "7ab704b475b367b2ca1acaeab9cfb583e01e6147",
+  "workflowUnchangedSinceOriginalStaticReview": true,
+  "nativeSteps": 87,
+  "benchmarkHarnessSteps": 14,
+  "currentSelectedDefinitions": 51,
+  "selectedLocalOptimizedMethods": [
+    {
+      "name": "-[OSwindCoreTests.NativeRecordedMeetingTests testRetainedMetadataPageDoesNotPinOwnedEncryptedImageAfterStoreClose]",
+      "status": "passed",
+      "seconds": 4.842
+    },
+    {
+      "name": "-[OSwindCoreTests.PersonalSyncMembershipUpdateTests testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts]",
+      "status": "passed",
+      "seconds": 29.032
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingIdentifierTests testCanonicalGraphemeLimitedIdentifierGroupsAndOpensEverySource]",
+      "status": "passed",
+      "seconds": 0.06
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingIdentifierTests testNULAndByteDistinctIdentifiersNeverSplitOrMergeAndSurviveReopen]",
+      "status": "passed",
+      "seconds": 0.119
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingIdentifierTests testPriorCacheCannotBeConsumedUntilReopenRepairsItsGroupingSemantics]",
+      "status": "passed",
+      "seconds": 0.1
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingIdentifierTests testSourceAdmissionStillRejectsEmptyAndOverLimitGraphemeIdentifiers]",
+      "status": "passed",
+      "seconds": 0.05
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingPortabilityTests testBackupRestoreRebuildsPendingMetadataAndKeepsCanonicalSessionFields]",
+      "status": "passed",
+      "seconds": 0.346
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingPortabilityTests testReviewedHistoryErasureRemovesDerivedRowsAndRefusesRetainedReferences]",
+      "status": "passed",
+      "seconds": 0.101
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testCancellationInsideHistoricalSQLRollsBackAndReopenedLibraryCanRetry]",
+      "status": "passed",
+      "seconds": 0.321
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testChangingAudioToNoteRemovesItsProjectionAndRestoringItGetsANewReference]",
+      "status": "passed",
+      "seconds": 0.06
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testEqualTimestampPaginationAndUnicodeIdentifiersKeepEverySource]",
+      "status": "passed",
+      "seconds": 0.063
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testExplicitRecordingGroupsPreserveSourcesAndUnionChannelsWithoutFillingGaps]",
+      "status": "passed",
+      "seconds": 0.07
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testFirstUseFailureRollsBackRowsAndReadinessBeforeRetry]",
+      "status": "passed",
+      "seconds": 0.067
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testImportDateDoesNotBecomeAnObservedMeetingSpanOrMergeNearbyFiles]",
+      "status": "passed",
+      "seconds": 0.063
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testLegacyClipWithoutAnIntervalKeepsItsRecordingTimeUnknown]",
+      "status": "passed",
+      "seconds": 0.058
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testLegacySQLPayloadMutationMaintainsThinIndexAndReopenRepairsDroppedTrigger]",
+      "status": "passed",
+      "seconds": 0.099
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testNewEmptyLibraryIsAlreadyReadyAndNeverRebuildsItsFirstWriter]",
+      "status": "passed",
+      "seconds": 0.056
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testOpeningAndRepairDoNotReadTranscriptsAndPendingReopenKeepsNewWriters]",
+      "status": "passed",
+      "seconds": 0.167
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testPageReadsNoTranscriptPayloadAndProducesBoundedMetadata]",
+      "status": "passed",
+      "seconds": 0.05
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testPrivacyExclusionsStillAdvanceCursorAndCurrentPolicyRefusesRetainedReference]",
+      "status": "passed",
+      "seconds": 0.056
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testSettingsChangeBeforePublicationRefusesWithoutPublishingOldMetadata]",
+      "status": "passed",
+      "seconds": 0.053
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordedMeetingTests testSourceUpdateDeletionRecreationRegroupingAndForeignStoreRefuseStaleReferences]",
+      "status": "passed",
+      "seconds": 0.103
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testActualAppDeletionRefreshesRecordingsAndErasurePauseClearsVisibleTitles]",
+      "status": "passed",
+      "seconds": 0.106
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testActualAppDepartureJoinsBlockedRecordingPageBeforeStoreClose]",
+      "status": "passed",
+      "seconds": 0.114
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testActualAppRecordingsRefuseLockedAdmissionAndCanReloadAfterUnlock]",
+      "status": "passed",
+      "seconds": 0.1
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testForeignPageCannotPublishInAnotherLibrary]",
+      "status": "passed",
+      "seconds": 0.118
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testLoadGroupsAndOpensExactCurrentSourceReference]",
+      "status": "passed",
+      "seconds": 0.063
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testNewerRecordingRequestWinsWhenEarlierScopeReadFinishesLast]",
+      "status": "passed",
+      "seconds": 0.247
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testOlderViewDepartureCannotClearANewerAppearance]",
+      "status": "passed",
+      "seconds": 0.066
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testPendingRecordingRequestCannotReplaceNewChatHistoryOrDepartedSection]",
+      "status": "passed",
+      "seconds": 0.252
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testPrivacyChangeAfterReadBeforePublicationHidesOldRows]",
+      "status": "passed",
+      "seconds": 0.061
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRecordingAskRouteAndSavedChatFollowupRetainExactScope]",
+      "status": "passed",
+      "seconds": 0.112
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRecordingRecapShortcutIncludesOlderRecordingAndPreservesScopedFollowup]",
+      "status": "passed",
+      "seconds": 0.102
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances]",
+      "status": "skipped",
+      "seconds": 0.051
+    },
+    {
+      "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRenderScopedRecordingActionsAndAskBadge]",
+      "status": "skipped",
+      "seconds": 0.049
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testActualCLIRecordingFollowupExcludesNeighborAgainstRetainedUnscopedControl]",
+      "status": "passed",
+      "seconds": 0.866
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testActualPriorReaderShowsPlainChatAndRefusesRecordingScopedChat]",
+      "status": "passed",
+      "seconds": 0.453
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testCalendarSerializationAndVectorMaskCacheKeepRecordingRestriction]",
+      "status": "passed",
+      "seconds": 0.051
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testCodecRoundTripAndOlderStringKindReaderRefusesRestriction]",
+      "status": "passed",
+      "seconds": 0.05
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testEvidenceOnlyAnswerAndSavedHistoryKeepScopeWithoutModelCalls]",
+      "status": "passed",
+      "seconds": 0.055
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testQuietBackupRestoreKeepsScopedHistoryAndEvidenceVersion]",
+      "status": "passed",
+      "seconds": 0.318
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testReadyRecordingScopeReadsWhileOtherConnectionOwnsCaptureWriteTransaction]",
+      "status": "passed",
+      "seconds": 0.094
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testScopedCalendarIntersectsTagAndEvidenceValidationCanJoinOwnedTransaction]",
+      "status": "passed",
+      "seconds": 0.059
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testScopedMCPAndHTTPQueriesIntersectRecordingAndRejectUnavailableOrMalformedScope]",
+      "status": "passed",
+      "seconds": 0.056
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testScopeRecheckedAfterRegroupingAndSavedAnswerCannotBroadenIt]",
+      "status": "passed",
+      "seconds": 0.054
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testSessionSelectsAllMatchingClipsAndNeverNeighborsWithSameTimeTitleOrWords]",
+      "status": "passed",
+      "seconds": 0.944
+    },
+    {
+      "name": "-[OSwindCoreTests.RecordingScopeTests testSingleSourceVersionDoesNotFollowAnEditedOrReplacedClip]",
+      "status": "passed",
+      "seconds": 0.055
+    },
+    {
+      "name": "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingRecordingProjectionKeepsOriginSessionSeparateAndDeletionRemovesMetadata]",
+      "status": "passed",
+      "seconds": 0.303
+    },
+    {
+      "name": "-[OSwindCoreTests.SyncIncomingSourceTests testRecordingScopedRunPreservesQuietRestoreAndRefusesLostSessionProvenance]",
+      "status": "passed",
+      "seconds": 1.437
+    },
+    {
+      "name": "-[OSwindCoreTests.SyncIncomingSourceTests testRecordingSessionScopeSurvivesIncomingOriginRemappingAndReexport]",
+      "status": "passed",
+      "seconds": 0.464
+    },
+    {
+      "name": "-[OSwindCoreTests.SyncIncomingSourceTests testSingleRecordingVersionScopeSurvivesExactIncomingProjection]",
+      "status": "passed",
+      "seconds": 0.449
+    }
+  ],
+  "selectionCaveat": "Local broader qualification sets exact old/current CLI fixture paths but leaves two renderer flags off. The recorded CI step enables both renderer flags and has no retained local comparator binaries. Static selection is not hosted success."
+}

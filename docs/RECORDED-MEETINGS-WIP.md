@@ -25,13 +25,15 @@ At that stage, an upstream merge changed an unrelated peer test and documentatio
 
 ## Remaining work
 
-- [ ] Named recording sessions, durable reviewed calendar-occurrence links and session-scoped Ask/recaps with exact source scope.
+- [ ] Named recording sessions and durable reviewed calendar-occurrence links.
+- [x] Exact session/source-version Ask, bounded recording recaps, saved-history scope and portable filter adapters with selected regression.
+- [ ] Fresh sync enrollment after quiet restore of grouped peer audio needs its original session bindings; current code refuses to rehash a projection.
 - [x] Measure first-open/first-use metadata costs and move historical backfill into the cancellable Recordings load; retain all process latency/RSS observations.
 - [x] Generated portable backup/restore, incoming-origin projection/deletion and current privacy/erasure regression for the derived index.
 - [x] Selected optimized/sanitizer regression; ac5bf82 also has strict ad-hoc development packaging. Current identifier checks are scoped below; whole-current-suite and hosted qualification remain open.
 - [x] Controlled grapheme/NUL/byte-distinct session IDs, admission limits and prior-cache repair.
 - [ ] Incoming-change UI invalidation and actual list-publication/frame-cost audit.
-- [ ] Current normal-release package after the identifier change; earlier package evidence is pinned to ac5bf82.
+- [x] Current normal release/ad-hoc development package at 7ab704b, packaged CLI scope control and exact ZIP/signature round trip. Native interaction and release acceptance remain open.
 - [ ] Recorded/Upcoming wrapper interaction, keyboard/VoiceOver and actual native record/import/open/playback flows.
 - [ ] Physical microphone/system-audio, permission/device switching, transcription quality and power acceptance.
 
@@ -87,3 +89,26 @@ The first fixed selection also exposed an adjacent app-fixture admission failure
 [Identifier source/input/test receipt](../benchmarks/recorded-meetings-identifiers-v1.json) · [Original controls, diagnostics and raw evidence](../benchmarks/recorded-meetings-identifiers-raw-v1.zip) · [CI selection review](../benchmarks/recorded-meetings-ci-selection-v3.json).
 
 The broader 319-method runs, 290 performance observations and normal development package above remain pinned to ac5bf82. No new timings, normal package, whole-current-suite, physical/power/automatic 24-hour acceptance or ranking is claimed for this change. Feature statuses remain unchanged. Named sessions, durable calendar links and exact session Ask/recaps remain next product work.
+
+## Exact recording-scoped Ask and portable history
+
+Source `7ab704b` adds **Ask about recording** and **Recap** to the selected recording. Session queries follow all current matching canonical clips, including clips beyond the 512 loaded rows. An ungrouped clip follows one exact evidence version. Nearby dates, matching titles, shared words or speaker labels do not establish membership. App and CLI follow-ups retain the saved restriction; Core admission refuses a dropped or changed recording scope.
+
+The Ask banner shows the restriction and offers an explicit new general chat. Recording recap shortcuts use All time rather than silently applying Today. Recaps disclose their distributed source sample and bounded excerpts; they are not complete transcripts. Source membership is rechecked after hydration and again before saving. Ready recording queries and evidence checks can read while another connection holds the capture writer reservation. Scope keys distinguish byte-different Unicode IDs on the real indexed Metal path.
+
+Native and portable filters use a typed known-field discriminator so older String-kind decoders reject the restriction. An actual retained prior CLI reads a plain conversation and refuses its scoped counterpart. A separate actual retained development CLI reproduces an unscoped follow-up including a neighboring recording; the corrected current and normal packaged CLIs exclude that neighbor and retain scope. These are codec/CLI controls, not prior GUI acceptance.
+
+Quiet backup/restore retains native history and scope. Incoming scopes preserve the source origin's session namespace or exact source-version binding; local same-ID sessions remain separate. Generic retained-run adapters are tested too, although the routine editor does not offer recording-scoped schedules. After a quiet restore removes sync bindings, grouped peer audio explicitly refuses fresh-catalog re-export without original session provenance; local scoped queries remain available. The single-source path re-exports. No title/time matching or projection rehash substitutes for the missing original.
+
+**Current selected optimized and Thread Sanitizer runs each have 520 defined / 504 passed / 16 skipped / 0 failures, with no race report.** The 16 skips are nine child entry helpers, three explicit scale probes, two exact prior32-binary probes and two renderer opt-ins. This includes actual encrypted APFS detach, original Keychain/all-13-kind graph invariants, real 20k-vector Metal scope switching/regrouping, backup/erasure/privacy, API handler and incoming/outgoing sync regression. The complete current suite and hosted CI are separate gates.
+
+All 13 current recording-model Debug methods pass with no skips. Twelve current light/dark populated, compact, empty, setup-refusal and scoped-Ask components were manually inspected. Delayed-read controls first reproduced two failed methods/eight issues; request identity, originating section and selected-source revision now prevent old completion from replacing a new chat, selected history or a newer recording. Earlier blank renders, compile errors, vector/run fixture errors, lock refusal and provenance refusal remain in the raw evidence. No successful frozen engines or earlier observations were rebuilt for metadata.
+
+The normal development app contains **34 files**, passes strict deep ad-hoc signature verification, an owned empty-library smoke and an actual packaged-CLI scoped follow-up control. Its ZIP was extracted and all file bytes/modes and signature verified. It is a normal compiler product without `-enable-testing`, separate from optimized test engines. This does not establish notarization, live GUI/audio/physical acceptance or release readiness.
+
+[Source/input/test/package receipt](../benchmarks/recording-scope-v1.json) · [All original controls, logs, source snapshots and renders](../benchmarks/recording-scope-raw-v1.zip) · [Static CI selection review](../benchmarks/recorded-meetings-ci-selection-v4.json).
+
+![Recording actions](../assets/recording-scope-v1-recording-actions-light.png)
+![Scoped Ask](../assets/recording-scope-v1-scoped-ask-dark.png)
+
+F042 and the full v0 remain unfinished. Names/calendar links, incoming-change UI/frame-cost auditing, native keyboard/VoiceOver/record/import/open/playback, physical speech/device quality, power and current automatic 24h acceptance remain open. The 83-feature ledger, dated 20-offering comparison, earlier benchmark observations and earlier failed broad gates remain unchanged; no ranking is promoted.

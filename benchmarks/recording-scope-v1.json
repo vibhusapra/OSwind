@@ -1,0 +1,600 @@
+{
+  "format": "Recording-scoped Ask and portable history qualification v1",
+  "source": "7ab704b475b367b2ca1acaeab9cfb583e01e6147",
+  "review": {
+    "source": "7ab704b475b367b2ca1acaeab9cfb583e01e6147",
+    "inputs": 1756,
+    "sourceAndComparatorsUnchanged": true,
+    "coreAndCLIIdenticalTo": "e01c94b7f558b0fd43f04ec5c6d52e3dee196065",
+    "results": {
+      "optimized": {
+        "run": {
+          "command": [
+            "swift",
+            "test",
+            "-c",
+            "release",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|RecordingScopeTests|NativeRecordedMeetingTests|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts|LibraryBackupTests|LibraryRestoreTests|HistoryErasureTests|AudioPrivacyTests|LimitlessImportTests|SyncIncomingSourceTests|SyncPortableRecordTests|SyncOutgoingTests|ConversationTests|QueryScopeTests|QueryScopeIntegrationTests|SearchScopeTests|VectorSearchTests|MetalRetrievalTests|ActivityCalendarTests|ActivityCalendarIntegrationTests|NativeVaultActivityCalendarTests|PrivacyAndIntegrationTests|UnavailableEntityScopeTests"
+          ],
+          "source": "7ab704b475b367b2ca1acaeab9cfb583e01e6147",
+          "exitCode": 0,
+          "elapsedSeconds": 298.4662408749573,
+          "inputsUnchanged": true,
+          "comparatorsUnchanged": true,
+          "logSHA256": "6d6960bb0a63a28d21aa63ac791671c27a1a18f975999b90d5b7f0c2dcdd9103"
+        },
+        "methods": {
+          "defined": 520,
+          "passed": 504,
+          "skipped": 16,
+          "failed": 0,
+          "testWallSeconds": 248.144,
+          "raceReports": 0,
+          "skipCategories": {
+            "childEntryOnly": 9,
+            "explicitScaleOptIn": 3,
+            "exactPrior32BinaryRequired": 2,
+            "generatedUIOptIn": 2
+          },
+          "skipReasons": [
+            {
+              "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances]",
+              "reason": "Explicit generated recording workspace components only"
+            },
+            {
+              "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRenderScopedRecordingActionsAndAskBadge]",
+              "reason": "Explicit generated scoped recording components only"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker]",
+              "reason": "Only run as owned retirement crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker]",
+              "reason": "Only run as owned incoming-run crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker]",
+              "reason": "Only run as owned incoming-source crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker]",
+              "reason": "Only run as owned late-dependency crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker]",
+              "reason": "Only run as owned optional-conversation crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale]",
+              "reason": "Explicit owned routine-scale output required"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale]",
+              "reason": "Explicit owned incoming-source scale output required"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale]",
+              "reason": "Explicit owned fanout output required"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker]",
+              "reason": "Only run as owned publication crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation]",
+              "reason": "Requires the exact qualified prior32 executable"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation]",
+              "reason": "Requires the exact qualified prior32 executable"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker]",
+              "reason": "Only run as owned publication-queue crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker]",
+              "reason": "Only run as owned source-withdrawal crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker]",
+              "reason": "Only run as owned unavailable-scope crash child"
+            }
+          ]
+        }
+      },
+      "tsan": {
+        "run": {
+          "command": [
+            "swift",
+            "test",
+            "--sanitize",
+            "thread",
+            "--jobs",
+            "4",
+            "--filter",
+            "RecordedMeetingTests|RecordedMeetingIdentifierTests|RecordedMeetingPortabilityTests|RecordedMeetingsModelTests|RecordingScopeTests|NativeRecordedMeetingTests|PersonalSyncMembershipUpdateTests.testOwnedNativeThreePublicSessionsPreserveThirteenKindsAndOriginalAccounts|LibraryBackupTests|LibraryRestoreTests|HistoryErasureTests|AudioPrivacyTests|LimitlessImportTests|SyncIncomingSourceTests|SyncPortableRecordTests|SyncOutgoingTests|ConversationTests|QueryScopeTests|QueryScopeIntegrationTests|SearchScopeTests|VectorSearchTests|MetalRetrievalTests|ActivityCalendarTests|ActivityCalendarIntegrationTests|NativeVaultActivityCalendarTests|PrivacyAndIntegrationTests|UnavailableEntityScopeTests"
+          ],
+          "source": "7ab704b475b367b2ca1acaeab9cfb583e01e6147",
+          "exitCode": 0,
+          "elapsedSeconds": 705.6877634581178,
+          "inputsUnchanged": true,
+          "comparatorsUnchanged": true,
+          "logSHA256": "a2abf1e2e3e31165aa91f714cb08eef9a240e110b38288d7c72e0026561b3356"
+        },
+        "methods": {
+          "defined": 520,
+          "passed": 504,
+          "skipped": 16,
+          "failed": 0,
+          "testWallSeconds": 628.711,
+          "raceReports": 0,
+          "skipCategories": {
+            "childEntryOnly": 9,
+            "explicitScaleOptIn": 3,
+            "exactPrior32BinaryRequired": 2,
+            "generatedUIOptIn": 2
+          },
+          "skipReasons": [
+            {
+              "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRenderRecordingsCompactEmptyAndSetupFailureInBothAppearances]",
+              "reason": "Explicit generated recording workspace components only"
+            },
+            {
+              "name": "-[OSwindAppTests.RecordedMeetingsModelTests testRenderScopedRecordingActionsAndAskBadge]",
+              "reason": "Explicit generated scoped recording components only"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker]",
+              "reason": "Only run as owned retirement crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker]",
+              "reason": "Only run as owned incoming-run crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker]",
+              "reason": "Only run as owned incoming-source crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker]",
+              "reason": "Only run as owned late-dependency crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker]",
+              "reason": "Only run as owned optional-conversation crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale]",
+              "reason": "Explicit owned routine-scale output required"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale]",
+              "reason": "Explicit owned incoming-source scale output required"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale]",
+              "reason": "Explicit owned fanout output required"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker]",
+              "reason": "Only run as owned publication crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation]",
+              "reason": "Requires the exact qualified prior32 executable"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation]",
+              "reason": "Requires the exact qualified prior32 executable"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker]",
+              "reason": "Only run as owned publication-queue crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker]",
+              "reason": "Only run as owned source-withdrawal crash child"
+            },
+            {
+              "name": "-[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker]",
+              "reason": "Only run as owned unavailable-scope crash child"
+            }
+          ]
+        }
+      }
+    },
+    "frozenEngines": [
+      {
+        "manifest": "frozen-development-v10.json",
+        "sha256": "587ea73fdfd043b6864388fb944c4dc95a20bb7698af1b8ca8d6b36164f459eb",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-development-v11.json",
+        "sha256": "8f8a730387ad755e5ef9444cc8cde8b4d8e017e079621ad18735b538bd30cf20",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-development-v8.json",
+        "sha256": "3d9886e4a89caed3df9560b7c090e960c3320ecb417bd3c5dc78641ce3516fd4",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-development-v9.json",
+        "sha256": "99948be64699046413ac675e9fced87d6fc0da1bc04031bbf87538f49757fe0f",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-navigation-fixed-v14.json",
+        "sha256": "22d8a9dcb6d0d9b6dc073af6221d0b3ab530efe577b5dea30b8ba4ff90593069",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-navigation-negative-v12.json",
+        "sha256": "ac7cbe81f882e9e6013996ac49ec8dae230efb90504a23b28aa7292b451554f8",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-optimized-v1.json",
+        "sha256": "da2a52b2c48af476255dd045ecca66fa6bb6d3e2935e28b49f20ec5791bc6f5e",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-optimized-v2.json",
+        "sha256": "51c2676536584f9b9d665e0e82cc3083816c7268400459a17e64059493c7782f",
+        "files": 5
+      },
+      {
+        "manifest": "frozen-tsan-v2.json",
+        "sha256": "0ad4bf39e54827ba59916ae74bafc7d61a7cc65fe6e2ab58449a22611ff81fd8",
+        "files": 5
+      }
+    ],
+    "debugEvidence": "development-v11:26pass; navigation-fixed-v14:13pass, each12manuallyreviewed components; exactsource/input/result manifests retained. No physical/interactive acceptance.",
+    "negativeNavigation": "Two failed methods/eight assertion issues, original engines/source/log preserved; current guarded13-model selection passes.",
+    "protectedHistoricalArtifacts": 640,
+    "scope": "Selected source-pinned optimized/TSAN and owned APFS/Keychain/GPU/portable fixtures only. Other broad failed WIP gates, physical/native interactions, audio quality, power, automatic24h and competitive ranking are not superseded."
+  },
+  "package": {
+    "source": "7ab704b475b367b2ca1acaeab9cfb583e01e6147",
+    "command": [
+      "bash",
+      "scripts/build-app.sh",
+      "release"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 171.15718999993987,
+    "logSHA256": "1401e3d276a36b397c052163dc3da30370c76ddf5c3c41aa4c8f37fb5bf21efc",
+    "scope": "Normal release, local ad-hoc development app and owned empty-library CLI smoke. Separate from optimized-test engines; no notarization, physical/native interaction, power, automatic24h or release-readiness claim.",
+    "signature": {
+      "exitCode": 0,
+      "output": ""
+    },
+    "sourceAndPackageInputsUnchanged": true,
+    "allHistoricalFrozenEnginesUnchanged": true,
+    "files": [
+      {
+        "path": "Contents/Info.plist",
+        "bytes": 2780,
+        "sha256": "0e53a26dfc87f4c174737fb59c4420a5655b6f2fe922d1ec7f9b42320c609f5a",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/MacOS/OSwind",
+        "bytes": 46855456,
+        "sha256": "42a0f7a9fddf22c12c0178c5c1008b9f5ba6f4f4749a9ebd84ef8ed93ebfef13",
+        "mode": "0o755"
+      },
+      {
+        "path": "Contents/MacOS/oswind-preparation-guardian",
+        "bytes": 53376,
+        "sha256": "c158c5f79fc2fb60eefec889a07d0451e89646c3fc54427bf7035fc34b6cdebb",
+        "mode": "0o755"
+      },
+      {
+        "path": "Contents/MacOS/oswindctl",
+        "bytes": 35504032,
+        "sha256": "dd2b3620b35f7b47369e76092d7ef135cb49cb51a83790535ae4b16bc355d1ae",
+        "mode": "0o755"
+      },
+      {
+        "path": "Contents/Resources/OSwind.icns",
+        "bytes": 447716,
+        "sha256": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/Apache-2.0.txt",
+        "bytes": 11357,
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md",
+        "bytes": 16008,
+        "sha256": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE",
+        "bytes": 1267,
+        "sha256": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE",
+        "bytes": 11339,
+        "sha256": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE",
+        "bytes": 11357,
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md",
+        "bytes": 2932,
+        "sha256": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md",
+        "bytes": 1770,
+        "sha256": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md",
+        "bytes": 1431,
+        "sha256": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md",
+        "bytes": 10541,
+        "sha256": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/NOTICES.txt",
+        "bytes": 4912,
+        "sha256": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE",
+        "bytes": 1073,
+        "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt",
+        "bytes": 1077,
+        "sha256": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt",
+        "bytes": 961,
+        "sha256": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE",
+        "bytes": 1453,
+        "sha256": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md",
+        "bytes": 1062,
+        "sha256": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt",
+        "bytes": 11359,
+        "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt",
+        "bytes": 11751,
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE",
+        "bytes": 11347,
+        "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE",
+        "bytes": 11347,
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE",
+        "bytes": 11347,
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE",
+        "bytes": 1084,
+        "sha256": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/models/siglip2-source.json",
+        "bytes": 1381,
+        "sha256": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/scripts/convert-visual-model.py",
+        "bytes": 14825,
+        "sha256": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/scripts/convert-visual-model.py.lock",
+        "bytes": 82078,
+        "sha256": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0",
+        "mode": "0o644"
+      },
+      {
+        "path": "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy",
+        "bytes": 398,
+        "sha256": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0",
+        "mode": "0o444"
+      },
+      {
+        "path": "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json",
+        "bytes": 234,
+        "sha256": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7",
+        "mode": "0o444"
+      },
+      {
+        "path": "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json",
+        "bytes": 20746,
+        "sha256": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f",
+        "mode": "0o444"
+      },
+      {
+        "path": "Contents/_CodeSignature/CodeResources",
+        "bytes": 11090,
+        "sha256": "76ea3bb126664c68ec5cfa64c15e2cd4d7d04d24837059d5e803a5206eaf74ec",
+        "mode": "0o644"
+      }
+    ],
+    "smoke": {
+      "command": [
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-scope-v1/package-v1/OSwind.app/Contents/MacOS/oswindctl",
+        "stats",
+        "--data",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-scope-v1/package-v1/owned-package-smoke"
+      ],
+      "exitCode": 0,
+      "stdoutSHA256": "f909d80c156f1a9a214d9a8fd4b070dd5b7c7a146dbe913d3a72dd7a5ee574bb",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sources": 0,
+      "audio": 0
+    },
+    "packagedScopeControl": {
+      "command": [
+        "xcrun",
+        "xctest",
+        "-XCTest",
+        "OSwindCoreTests.RecordingScopeTests/testActualCLIRecordingFollowupExcludesNeighborAgainstRetainedUnscopedControl",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-scope-v1/frozen-optimized-v2/OSwindPackageTests.xctest"
+      ],
+      "exitCode": 0,
+      "logSHA256": "a6654c698b5d343ab79ee1e719eb7f935951b3c3bffa915036af5d3ff38e833c",
+      "testEngineManifest": "frozen-optimized-v2.json",
+      "normalPackageCLI": "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-scope-v1/package-v1/OSwind.app/Contents/MacOS/oswindctl",
+      "scope": "Reuses actual frozen current optimized Core test engine; its fixture invokes actual normal packaged CLI and retained v10 negative control. No rebuild or resignation of frozen engines."
+    },
+    "normalPackageCLIHash": "dd2b3620b35f7b47369e76092d7ef135cb49cb51a83790535ae4b16bc355d1ae",
+    "optimizedTestCLIHash": "6207020ed1c59d784152a708a025e0b985631835849e3931209dae209d0e93f8",
+    "buildProductCLIHash": "3e2767c514263937cb068866b62b252a4fa664f1f7a05ba174401bb7508d7631",
+    "normalCoreCommands": [
+      {
+        "name": "C.OSwindCore-arm64-apple-macosx-release.module",
+        "enableTesting": false
+      }
+    ],
+    "developmentArchive": {
+      "path": "package-v1/OSwind-development-7ab704b.zip",
+      "bytes": 24810941,
+      "sha256": "b0d17a11bdd1a8f21274b27e191d7f01466f20441475f37ba8ca479da2effdad",
+      "allExtractedFilesAndModesMatch": true,
+      "signatureAfterRoundTripExitCode": 0,
+      "scope": "Local ad-hoc development archive; independent exact signed-app round trip verified, no notarization or live activation."
+    },
+    "reviewedUTC": "2026-11-04T02:04:14.919565+00:00"
+  },
+  "assets": [
+    {
+      "path": "assets/recording-scope-v1-compact-dark.png",
+      "sha256": "764ddceda76cfff8a45697405543115e26cb4b908bb9d35f4821932339464096"
+    },
+    {
+      "path": "assets/recording-scope-v1-compact-light.png",
+      "sha256": "c7a950d25836585381e7db39d2bde546f1ada83cc34a87346d92fe7266c3683d"
+    },
+    {
+      "path": "assets/recording-scope-v1-empty-dark.png",
+      "sha256": "60fec5e06d92a189865b5f53ea6967d1505a1cde975a0a589e34edd3958e58fc"
+    },
+    {
+      "path": "assets/recording-scope-v1-empty-light.png",
+      "sha256": "0a4d3ed23663e6fc35b9508acfe6f2e833b4c689a8715153a33d4828039ece4e"
+    },
+    {
+      "path": "assets/recording-scope-v1-recording-actions-dark.png",
+      "sha256": "f754827d1999469a96bd0063316255b6ec024efdca897bd24843dd6f667a0899"
+    },
+    {
+      "path": "assets/recording-scope-v1-recording-actions-light.png",
+      "sha256": "66787537b04e45a20d0c4210ec333b66db56a90da6a48d92ce3231f5c985a26b"
+    },
+    {
+      "path": "assets/recording-scope-v1-recordings-dark.png",
+      "sha256": "5fee94f814962dc49e176eb1ab8fc5245a18a6ddb40605fbfde1b51b14001fa7"
+    },
+    {
+      "path": "assets/recording-scope-v1-recordings-light.png",
+      "sha256": "d951d5a990cc7aac9808cbffe9ed7095528f0b50fc2ccef433ce03859447788a"
+    },
+    {
+      "path": "assets/recording-scope-v1-scoped-ask-dark.png",
+      "sha256": "d192ae2cf496efee7cc7a6c6abac268fd14cf766e07e66b052de2997a9ff34a7"
+    },
+    {
+      "path": "assets/recording-scope-v1-scoped-ask-light.png",
+      "sha256": "e663797766b736b1b5fc9a0c1e863f8b7fecd39466783eeba1467075e5a6d3ec"
+    },
+    {
+      "path": "assets/recording-scope-v1-setup-failure-dark.png",
+      "sha256": "71753335f37dec06277d2115eac6747a5b9b26d0e0f1ab451db692ffca066e1d"
+    },
+    {
+      "path": "assets/recording-scope-v1-setup-failure-light.png",
+      "sha256": "ff7ae329262596d864dc1c1760f2262ef1ce049d5df16e8e303882b00aa6c190"
+    }
+  ],
+  "developmentNotes": [
+    "core-v1/core-v2 and development-v4/v7 were compile-only failures. core-v3 was a six-case development pass without a contemporaneously frozen engine/source qualification; it is not promoted.",
+    "development-v5 passed 11 behavioral cases but failed visual review: both recording-action panels were blank. The original four renders and failed review remain retained. A plain HStack layout corrected the authored panels; later renders were inspected.",
+    "development-v8 had 14 passed/one failed method with three assertion issues in the expanded real Metal fixture. The fetched payload omitted separately stored vectors. The corrected fixture explicitly supplies its original vectors and asserts 20k; no production Metal fix is claimed. v9 and v10 real GPU methods then passed. All original source/log/engine controls remain.",
+    "development-v9 had 16 passed/one unexpectedly failed method because an authored run filter discarded its required bounds. The fixture now preserves the real claimed bounds; restore validation was not weakened.",
+    "development-v10 had 24 passed/two failed methods: a render asserted Whisper setup while its retained image shows Locked / audio suspended, and fresh sync after quiet restore refused a lost original peer session binding. An owned unlocked audio startup is now injected only in the render fixture. Production lock defaults remain real. The portability test checks the exact grouped-session refusal, local restored scope and safe single-source re-export.",
+    "development-v11 passed 26 cases with no skips and 12 reviewed components, including actual prior-reader refusal and actual current-versus-retained-v10 CLI followup controls.",
+    "navigation-negative-v12 reproduced two failed methods/eight assertion issues using delayed real scope reads. New chat/history/navigation and newer recording selections were overwritten by older completions. Original source, inputs, log and actual engines remain frozen. Current request UUID, originating section and selected source revision guards fix this; navigation-fixed-v14 passes all 13 model methods and 12 reviewed scenes.",
+    "navigation-fixed-v13 was a compile-only SwiftUI type-checker failure in a count label. Splitting a local countLabel expression corrected it before v14; the failed source/log remain retained.",
+    "qualification-v1 belongs to e01c94b: 518 defined, 502 passed, 16 skipped, zero failures. Current 7ab704b changes only App navigation/count labels and their tests; Core/CLI are byte-identical. Both current v2 runs have 520 defined, 504 passed, 16 explicit skips, zero failures and no race report."
+  ],
+  "rawArchive": {
+    "path": "benchmarks/recording-scope-raw-v1.zip",
+    "bytes": 6820522,
+    "members": 327,
+    "sha256": "602434938f7f6fa1d49e8dbc4fe5a73267b618d87d48e4ddca29972a9838509e"
+  },
+  "scope": "Selected correctness/portability/native fixtures and local normal development packaging. No full current-suite, hosted, native interaction, physical audio, model factual-quality, power, automatic24h, feature-complete or ranking claim. Earlier failed owner/peer broad gates and historical benchmarks remain separate."
+}
