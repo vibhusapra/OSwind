@@ -67,6 +67,7 @@ final class RecordingDetailsTests:XCTestCase {
             XCTAssertEqual(try db.eraseCount("SELECT count(*) FROM memories WHERE kind='recording-metadata'"),1)
         }
         XCTAssertNotNil(try store.get(saved.id))
+        XCTAssertEqual(try store.stats(includeDiskUsage:false).count,1001)
         XCTAssertEqual(try store.recordedMeetingPage().sources.count,512)
     }
     func testCanonicalRecordingRelationshipsUseExpressionIndexes()throws {

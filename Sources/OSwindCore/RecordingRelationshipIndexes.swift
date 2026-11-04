@@ -22,11 +22,11 @@ enum RecordingRelationshipIndexes {
     static func install(_ db:RoutineDatabase)throws {
         try ensureNames(db)
         // Fresh libraries maintain this from their first audio row. Existing
-        // large audio archives defer its one-time build until a session label
-        // actually needs the relationship, on the owning background writer.
+        // large audio archives defer its one-time build until session erasure
+        // needs it, inside erasure's cancellable transaction. Saving a name or
+        // reopening a named archive must not parse every audio payload.
         if try db.eraseCount("SELECT EXISTS(SELECT 1 FROM sqlite_master WHERE name='\(sessions)')")==1 ||
-           db.eraseCount("SELECT EXISTS(SELECT 1 FROM memories WHERE kind='audio' LIMIT 1)")==0 ||
-           db.eraseCount("SELECT EXISTS(SELECT 1 FROM memories m WHERE m.kind='recording-metadata' AND \(selector("m"))='session')")==1 {
+           db.eraseCount("SELECT EXISTS(SELECT 1 FROM memories WHERE kind='audio' LIMIT 1)")==0 {
             try ensureSessions(db)
         }
     }
