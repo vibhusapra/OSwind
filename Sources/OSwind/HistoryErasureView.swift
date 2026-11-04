@@ -78,7 +78,7 @@ struct HistoryErasureView:View {
                     if let preview=model.preview {
                         GroupBox {
                             VStack(alignment:.leading,spacing:10) {
-                                if preview.linkedRecaps>0 {Text("\(preview.matchedSources) matching sources + \(preview.linkedRecaps) linked recaps outside these filters").font(.callout).foregroundStyle(.secondary)}
+                                if preview.linkedRecords>0 {Text("\(preview.matchedSources) matching sources + \(preview.linkedRecords) linked records outside these filters").font(.callout).foregroundStyle(.secondary)}
                                 Text("\(preview.sources) current sources · \(preview.historicalVersions) original versions · \(preview.conversationTurns) dependent answers · \(preview.mediaReferences) media references").font(.headline)
                                 ForEach(preview.samples,id:\.id) {sample in VStack(alignment:.leading,spacing:2) {Text(sample.title).lineLimit(2);Text("\(sample.app) · \(sample.timestamp.formatted())").font(.caption).foregroundStyle(.secondary)}}
                                 if preview.sources>preview.samples.count {Text("Showing the latest \(preview.samples.count) of \(preview.sources) sources.").font(.caption).foregroundStyle(.secondary)}
@@ -99,7 +99,7 @@ struct HistoryErasureView:View {
                             ForEach(result.warnings,id:\.self) {Text($0).foregroundStyle(.orange)}
                         }.padding(12).frame(maxWidth:.infinity,alignment:.leading).background(.quaternary,in:RoundedRectangle(cornerRadius:10))
                     }
-                    Text("This cannot be undone. Exports, backups and other copies remain. Earlier independent recap copies remain unless they match these filters. Source-linked recaps follow their originals. This removes live history and invalidates search caches; it does not securely overwrite SSD blocks. Capture stays paused until you resume it.").font(.caption).foregroundStyle(.secondary)
+                    Text("This cannot be undone. Exports, backups and other copies remain. Earlier independent recap copies remain unless they match these filters. Linked recording names and recaps follow their originals. This removes live history and invalidates search caches; it does not securely overwrite SSD blocks. Capture stays paused until you resume it.").font(.caption).foregroundStyle(.secondary)
                 }.padding(2)
             }
         }.padding(24).frame(width:720,height:760)

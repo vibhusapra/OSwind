@@ -30,20 +30,25 @@ struct SyncIncomingSourceWriter {
         if let value=try cache.record(reference,admit:admit) {packet=value}
         else {packet=try fetch(reference);guard try packet.reference==reference else {throw OSwindError.invalid("Incoming source dependency is not its requested version")};_=try cache.retain(packet,requiredBy:requestedBy,admit:admit)}
         guard case .source(let body)=packet.body else {throw OSwindError.invalid("Incoming source dependency is not a source")}
-        for parent in body.recap?.sources ?? [] {try prepare(parent.source,requestedBy:packet,fetch:fetch,visiting:&visiting,remaining:&remaining)}
+        for parent in body.sourceReferences {try prepare(parent,requestedBy:packet,fetch:fetch,visiting:&visiting,remaining:&remaining)}
     }
     private func original(_ reference:SyncVersionReference,requestedBy:SyncPortableRecord,fetch:(SyncVersionReference)throws->SyncPortableRecord)throws->HistoricalEvidence {
         var visiting=Set<String>(),remaining=512;try prepare(reference,requestedBy:requestedBy,fetch:fetch,visiting:&visiting,remaining:&remaining)
         return try history.adopt(reference,cache:cache,pathsFor:pathsFor,admit:admit,verifyMedia:verify)
     }
     func references(_ record:SyncPortableRecord,local:String,paths:[SyncMediaRole:String])->SyncPortableReferences {
-        let base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{memory in
+        var base=SyncPortableReferences(identity:{try cache.catalog.localIdentity($0,primary:$1)},source:{try cache.sourceVersion(localID:$0,revision:$1,admit:admit)},media:{memory in
             guard Data(memory.id.utf8)==Data(local.utf8),case .source(let body)=record.body else {throw OSwindError.invalid("Incoming source media binding differs")}
             var actual=[SyncMediaRole:String]();actual[.image]=memory.imagePath;actual[.audio]=memory.audioPath;actual[.video]=memory.videoPath
             guard actual==paths else {throw OSwindError.invalid("Incoming source paths changed")};return body.media
         },recipe:{try cache.recipeVersion(localID:$0,ordinal:$1,admit:admit)},session:{memory in
             guard Data(memory.id.utf8)==Data(local.utf8),case .source(let body)=record.body else {throw OSwindError.invalid("Incoming source session binding differs")};return body.audioSession
         })
+        base.recordingSourceBinding={memory in
+            guard Data(memory.id.utf8)==Data(local.utf8),case .source(let body)=record.body,let details=body.recordingDetails else {throw OSwindError.invalid("Incoming recording affiliation owner differs")}
+            if let source=details.scope.source {return .available(source)}
+            return details.scope.selector == .unavailable ? .unavailable:nil
+        }
         return history.decorating(base,admit:admit,verify:{value in
             guard case .source(let body)=value.record.body else {throw OSwindError.invalid("Incoming original source differs")}
             var paths=[SyncMediaRole:String]();paths[.image]=value.memory.imagePath;paths[.audio]=value.memory.audioPath;paths[.video]=value.memory.videoPath
@@ -98,11 +103,12 @@ struct SyncIncomingSourceWriter {
                 var promotion=try SyncIncomingSourcePromotion.prepare(self,root:local)
                 try admit(record);let paths=try pathsFor(reference,body.media);try verify(reference,body.media,paths)
                 var parents=[HistoricalEvidence]()
-                for link in body.recap?.sources ?? [] {parents.append(try original(link.source,requestedBy:record,fetch:fetchExactSource))}
+                for link in body.sourceReferences {parents.append(try original(link,requestedBy:record,fetch:fetchExactSource))}
+                try body.validateSourceParents(parents.map(\.record))
                 var index=0,memory=try body.projectedMemory(id:local,paths:paths) {ref in
                     guard index<parents.count,try parents[index].reference==ref else {throw OSwindError.invalid("Incoming recap parent order differs")};defer {index+=1};return(parents[index].sourceID,parents[index].memory.evidenceHash)
                 }
-                for i in parents.indices {memory.recap!.sources[i].historicalHandle=parents[i].handle}
+                for i in memory.recap?.sources.indices ?? 0..<0 {memory.recap!.sources[i].historicalHandle=parents[i].handle}
                 let old=promotion.nodes.first {Data($0.before.id.utf8)==Data(local.utf8)}?.packet
                 let recapState=try recapBindings(memory,old:old,new:record)
                 try promotion.apply()
@@ -123,7 +129,7 @@ struct SyncIncomingSourceWriter {
                 guard try SyncProtocolLimits.encode(library.get(local))==SyncProtocolLimits.encode(memory),try cache.resolve(record.identity,content:nil,admit:{_ in}).encoded()==record.encoded() else {throw OSwindError.invalid("Incoming source changed during projection")}
                 let after=try cache.journal.state(for:record.identity.key)
                 guard !after.isDeleted,after.heads.count==1,after.heads.first?.content==reference.content else {throw OSwindError.invalid("Incoming source head changed during projection")}
-                try SyncIncomingDependencyAudit.check([record]+promotion.nodes.map(\.packet),cache:cache)
+                try SyncIncomingDependencyAudit.check([record]+promotion.requiredPackets,cache:cache)
                 try promotion.audit()
                 // No caller callbacks after this point: re-read every newly
                 // adopted dependency after the last mutable policy/media hook.

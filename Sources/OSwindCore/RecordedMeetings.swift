@@ -6,6 +6,7 @@ public struct RecordedMeetingSource:Identifiable,Equatable,Sendable {
     public let memoryID:String,sessionKey:String,title:String,app:String,revision:String,id:String
     public let timestamp:Date,observedEnd:Date?,duration:Double
     public var belongsToSession:Bool {grouped}
+    public func isFromSameOpenLibrary(as other:Self)->Bool {owner==other.owner}
     public var hasObservedInterval:Bool {observedEnd != nil}
     let owner:UUID,grouped:Bool,recordingID:String
     init(memoryID:String,sessionKey:String,title:String,app:String,revision:String,timestamp:Date,observedEnd:Date?,duration:Double,owner:UUID,grouped:Bool,recordingID:String) {
@@ -133,6 +134,17 @@ public extension MemoryStore {
             try RecordedMeetingRevisionSchema.read(db,owner:recordedMeetingOwner,settings:snapshot.settings)
         }}
     }
+    /// Publish separately prepared name values only at their exact revision.
+    /// This is a nonwaiting, read-only admission check for the main actor.
+    func withCurrentRecordedMeetingRevision<T>(_ revision:RecordedMeetingRevision,_ publish:()throws->T)throws->T {
+        guard revision.owner==recordedMeetingOwner else {throw RecordedMeetingRefreshError.changed}
+        let current=try LibrarySettingsSnapshot.capture(root:root,waitForLock:false);defer {current.release()}
+        guard current.settings==revision.settings else {throw RecordedMeetingRefreshError.changed}
+        return try withAvailableRoutineSnapshot {db in
+            guard try RecordedMeetingRevisionSchema.read(db,owner:recordedMeetingOwner,settings:current.settings)==revision else {throw RecordedMeetingRefreshError.changed}
+            return try current.withCurrent(root:root,policy:current.settings.privacy,waitForLock:false,publish)
+        }
+    }
     /// A value page retains no file/media handles. Recheck semantic settings at
     /// UI publication under a nonwaiting, read-only SQL/settings snapshot.
     /// Freshness is as of that read; a later commit is a subsequent change.
@@ -153,18 +165,23 @@ public extension MemoryStore {
         guard source.owner==recordedMeetingOwner else {throw OSwindError.unavailable("Refresh recordings in this library before opening a source")}
         let snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()};let policy=snapshot.settings.privacy
         return try withRoutineDatabase {db in try db.transaction {try snapshot.withCurrent(root:root,policy:policy) {
+            try recordedMeetingEvidence(source,db:db,policy:policy)
+        }}}
+    }
+    internal func recordedMeetingEvidence(_ source:RecordedMeetingSource,db:RoutineDatabase,policy:PrivacyPolicy)throws->Memory {
+        guard source.owner==recordedMeetingOwner else {throw OSwindError.unavailable("Refresh recordings in this library before opening a source")}
             let row=try db.statement("SELECT revision FROM recorded_meeting_sources WHERE memory_id=?");defer {sqlite3_finalize(row)};db.bind(row,1,source.memoryID)
             guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==source.revision,let memory=try get(source.memoryID),memory.kind == .audio else {throw OSwindError.unavailable("This recording changed. Refresh before opening it.")}
             let group=memory.audioSessionID != nil,id=memory.audioSessionID ?? memory.id
             guard RecordedMeetingSource.key(grouped:group,id:id)==source.sessionKey,policy.exclusion(app:memory.bundleID.isEmpty ? memory.app:memory.bundleID,title:memory.title,url:memory.url)==nil else {throw OSwindError.unavailable("This recording is no longer in the selected session or privacy scope")}
             return memory
-        }}}
     }
 }
 
 private enum RecordedMeetingReader {
     static let columns="memory_id,grouped,recording_id,started,observed_end,duration,title,app,bundle_id,url,revision"
     static func prepare(_ db:RoutineDatabase)throws {
+        try RecordingDetailsSchema.prepare(db)
         let row=try db.statement("SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'")
         let ready=sqlite3_step(row)==SQLITE_ROW && db.text(row,0)==RecordedMeetingSchema.currentVersion;sqlite3_finalize(row)
         if !ready {try db.transaction {try RecordedMeetingSchema.populateIfNeeded(db)}}

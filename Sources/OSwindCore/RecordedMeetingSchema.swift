@@ -84,6 +84,7 @@ enum RecordedMeetingSchema {
             CREATE INDEX IF NOT EXISTS recorded_meeting_time ON recorded_meeting_sources(started DESC,memory_id DESC);
             CREATE INDEX IF NOT EXISTS recorded_meeting_group ON recorded_meeting_sources(grouped,recording_id,started,memory_id);
             """)
+            try RecordingDetailsSchema.install(db)
             try RecordedMeetingRevisionSchema.install(db)
             try Task.checkCancellation()
         }catch {if Task.isCancelled {throw CancellationError()};throw error}
@@ -108,14 +109,16 @@ enum RecordedMeetingSchema {
     }
 }
 
-/// Only the rebuildable audio projection changes this nonce. Built-in SQL
+/// The rebuildable audio and user-metadata projections change this nonce. SQL
 /// triggers also observe compatible older writers and incoming projection.
 /// It is local cache state, never a canonical/synchronized record or row ID.
 enum RecordedMeetingRevisionSchema {
     static let key="recorded_meeting_revision_v1"
-    static let triggers:[String:String]=Dictionary(uniqueKeysWithValues:["INSERT","DELETE","UPDATE"].map {op in
-        let name="recorded_meeting_revision_"+op.lowercased()
-        return (name,"CREATE TRIGGER \(name) AFTER \(op) ON recorded_meeting_sources BEGIN UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='\(key)'; END")
+    static let triggers:[String:String]=Dictionary(uniqueKeysWithValues:[("recorded_meeting_sources","recorded_meeting_revision_"),("recorded_meeting_details","recorded_meeting_details_revision_")].flatMap {entry in
+        ["INSERT","DELETE","UPDATE"].map {op in
+            let name=entry.1+op.lowercased()
+            return (name,"CREATE TRIGGER \(name) AFTER \(op) ON \(entry.0) BEGIN UPDATE store_metadata SET value=lower(hex(randomblob(16))) WHERE key='\(key)'; END")
+        }
     })
     static func install(_ db:RoutineDatabase)throws {
         var repaired=false
@@ -133,10 +136,10 @@ enum RecordedMeetingRevisionSchema {
         value.utf8.count==32 && value.utf8.allSatisfy({(48...57).contains($0)||(97...102).contains($0)})
     }
     static func read(_ db:RoutineDatabase,owner:UUID,settings:AppSettings)throws->RecordedMeetingRevision {
-        let row=try db.statement("SELECT (SELECT value FROM store_metadata WHERE key='\(key)'),(SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version')");defer {sqlite3_finalize(row)}
+        let row=try db.statement("SELECT (SELECT value FROM store_metadata WHERE key='\(key)'),(SELECT value FROM store_metadata WHERE key='recorded_meeting_index_version'),(SELECT value FROM store_metadata WHERE key='\(RecordingDetailsSchema.key)')");defer {sqlite3_finalize(row)}
         guard sqlite3_step(row)==SQLITE_ROW else {throw db.error()}
-        let nonce=db.text(row,0),state=db.text(row,1)
-        guard validNonce(nonce),[RecordedMeetingSchema.currentVersion,RecordedMeetingSchema.pendingVersion].contains(state) else {throw OSwindError.unavailable("Reopen the library to repair its recording revision")}
-        return .init(owner:owner,value:state+":"+nonce,settings:settings)
+        let nonce=db.text(row,0),state=db.text(row,1),details=db.text(row,2)
+        guard validNonce(nonce),[RecordedMeetingSchema.currentVersion,RecordedMeetingSchema.pendingVersion].contains(state),[RecordingDetailsSchema.currentVersion,RecordingDetailsSchema.pendingVersion].contains(details) else {throw OSwindError.unavailable("Reopen the library to repair its recording revision")}
+        return .init(owner:owner,value:state+":details:"+details+":"+nonce,settings:settings)
     }
 }

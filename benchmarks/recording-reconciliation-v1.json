@@ -1,0 +1,1993 @@
+{
+  "format": "oswind-recording-reconciliation",
+  "version": 1,
+  "createdUTC": "2026-11-04T17:14:27.980694+00:00",
+  "feature": "F042 recording names/calendar/exact-source erasure reconciliation",
+  "status": "Selected software qualification and development package; F042 and full v0 incomplete",
+  "runtimeDefinitionCommit": "58ed3b0797224eaa21b1f502b8dc45d555fd8650",
+  "testInputBaseSource": "62d2ad0b13f40524d24908c980e538967a1265fa",
+  "qualifiedProductionPackagingModelInputs": 565,
+  "productionInputsByteIdenticalTo846MethodSnapshot": true,
+  "testTreeScope": "846-method invocations precede two added methods in one test file. Those two new controls execute separately on the retained optimized engine. Production sources/package/model inputs are unchanged; prior runs are not relabelled as a whole current test-tree run.",
+  "implementation": [
+    "One bounded operational scan marker in existing store_metadata, marked inside original erasure transaction without work allocation.",
+    "Existing canonical recording-name expression index and UTF8 two-field cursor select bounded batches. Native caption/current audio remain unchanged; current revoked heads/checked exact affiliations requeue ordinary fully admitted export.",
+    "Work-budget denial/cancellation preserve cursor and work atomically; second erasure resets cursor. Ordinary complete idle reads no canonical memory payload and performs no DML.",
+    "Encrypted folder supersession retains authenticated opaque old headers and future replacement proof without old bodies. Incoming final audit checks admitted replacement, live non-root recaps and every actually preserved original; uncited replaced root snapshot is not retained evidence."
+  ],
+  "nativeSchemaVersion": 33,
+  "canonicalSyncTables": 13,
+  "wireFormatChanged": false,
+  "focused": {
+    "command": [
+      "swift",
+      "test",
+      "--jobs",
+      "4",
+      "--filter",
+      "SyncOutgoingTests.testRecordingOriginalRecovery|SyncOutgoingTests.testRecordingNameRecovers|SyncOutgoingTests.testRecordingNativeTranscript|SyncIncomingSourceTests.testRecordingOriginalRecovery|SyncOutgoingTests.testRecordingReassignment|SyncOutgoingTests.testRecordingAffiliationScopeChangeAndNativeDeleteInvalidateItsLifetime|SyncOutgoingTests.testRecordingMetadataExplicitDifferentNativeTargetCannotReuseOldAffiliation"
+    ],
+    "exitCode": 0,
+    "commandWallSeconds": 21.719792666845024,
+    "counts": {
+      "passed": 36,
+      "skipped": 0,
+      "failed": 0
+    },
+    "defined": 36,
+    "logSHA256": "a9fbbf541b63ce53f6a5a77884e4b05fcdb7bba8320dc8ee6fc788cfd4ed49a8",
+    "sourceAndPriorActualFilesAndCorporaUnchanged": true,
+    "scope": "Prototype revalidation: focused recovery/reassignment plus no-edit head, real encrypted-folder supersession, quota/reopen, policy retry, actual marker-write failure rollback/retry, indexed canonical selection/read-only idle, long/byte-distinct Unicode cursor, second actual erasure restarting a partial scan, actual partial-cursor/work reopen and cancellation gated at exact canonical statement controls. Broader lifecycle, scale, current optimized/TSAN/native, real devices/provider and full v0 remain unqualified.",
+    "actualEngineFrozen": true
+  },
+  "broadDebug": {
+    "sourceBase": "62d2ad0b13f40524d24908c980e538967a1265fa",
+    "command": [
+      "xcrun",
+      "xctest",
+      "-XCTest",
+      "OSwindAppTests.LibraryOpeningTests,OSwindAppTests.MeetingsModelTests,OSwindAppTests.OwnerAdditionAppSessionTests,OSwindAppTests.PeerMembershipAppSessionTests,OSwindAppTests.RecordedMeetingsModelTests,OSwindAppTests.RecordingCalendarModelTests,OSwindAppTests.RecordingCalendarRenderTests,OSwindAppTests.RecordingNameRenderTests,OSwindAppTests.RecordingNamesModelTests,OSwindAppTests.SourceWorkSessionTests,OSwindAppTests.VaultSessionTests,OSwindCoreTests.HistoricalErasureCrashTests,OSwindCoreTests.HistoricalErasureMigrationTests,OSwindCoreTests.HistoricalErasureScopeTests,OSwindCoreTests.HistoricalRecapTests,OSwindCoreTests.HistoryErasureTests,OSwindCoreTests.MeetingContextTests,OSwindCoreTests.MeetingRequestTests,OSwindCoreTests.NativeRecordedMeetingTests,OSwindCoreTests.RecordedMeetingIdentifierTests,OSwindCoreTests.RecordedMeetingPortabilityTests,OSwindCoreTests.RecordedMeetingRevisionTests,OSwindCoreTests.RecordedMeetingTests,OSwindCoreTests.RecordingCalendarLinkTests,OSwindCoreTests.RecordingDetailsTests,OSwindCoreTests.RecordingScopeTests,OSwindCoreTests.SyncHistoricalCitationTests,OSwindCoreTests.SyncIncomingSourceTests,OSwindCoreTests.SyncOriginalEvidenceTests,OSwindCoreTests.SyncOutgoingTests,OSwindCoreTests.SyncPortableRecordTests,OSwindCoreTests.SyncRecordingDetailsTests,OSwindCoreTests.SyncVersionStoreTests,OSwindCoreTests.SyncSignedFolderTests",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/recording-original-reconciliation-progress-v1/actual-engine/OSwindPackageTests.xctest"
+    ],
+    "exitCode": 0,
+    "commandWallSeconds": 589.4622162920423,
+    "rebuild": false,
+    "actualEngine": "recording-original-reconciliation-progress-v1/actual-engine",
+    "inputsAndActualEnginesUnchanged": true,
+    "defined": 846,
+    "counts": {
+      "passed": 826,
+      "skipped": 20,
+      "failed": 0
+    },
+    "logSHA256": "6f2db227b4e65012e6080337b3fe4daba93f57451f5bc0c838b1d624e0585587",
+    "classes": {
+      "OSwindAppTests.LibraryOpeningTests": {
+        "passed": 8,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.MeetingsModelTests": {
+        "passed": 21,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.OwnerAdditionAppSessionTests": {
+        "passed": 29,
+        "skipped": 1,
+        "failed": 0
+      },
+      "OSwindAppTests.PeerMembershipAppSessionTests": {
+        "passed": 17,
+        "skipped": 2,
+        "failed": 0
+      },
+      "OSwindAppTests.RecordedMeetingsModelTests": {
+        "passed": 32,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.RecordingCalendarModelTests": {
+        "passed": 15,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.RecordingCalendarRenderTests": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.RecordingNameRenderTests": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.RecordingNamesModelTests": {
+        "passed": 8,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.SourceWorkSessionTests": {
+        "passed": 30,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindAppTests.VaultSessionTests": {
+        "passed": 41,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.HistoricalErasureCrashTests": {
+        "passed": 2,
+        "skipped": 1,
+        "failed": 0
+      },
+      "OSwindCoreTests.HistoricalErasureMigrationTests": {
+        "passed": 25,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.HistoricalErasureScopeTests": {
+        "passed": 14,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.HistoricalRecapTests": {
+        "passed": 8,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.HistoryErasureTests": {
+        "passed": 17,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.MeetingContextTests": {
+        "passed": 24,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.MeetingRequestTests": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.NativeRecordedMeetingTests": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.RecordedMeetingIdentifierTests": {
+        "passed": 4,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.RecordedMeetingPortabilityTests": {
+        "passed": 2,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.RecordedMeetingRevisionTests": {
+        "passed": 12,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.RecordedMeetingTests": {
+        "passed": 18,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.RecordingCalendarLinkTests": {
+        "passed": 7,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.RecordingDetailsTests": {
+        "passed": 40,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.RecordingScopeTests": {
+        "passed": 10,
+        "skipped": 2,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncHistoricalCitationTests": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncIncomingSourceTests": {
+        "passed": 227,
+        "skipped": 14,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncOriginalEvidenceTests": {
+        "passed": 24,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncOutgoingTests": {
+        "passed": 110,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncPortableRecordTests": {
+        "passed": 25,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncRecordingDetailsTests": {
+        "passed": 9,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncVersionStoreTests": {
+        "passed": 33,
+        "skipped": 0,
+        "failed": 0
+      },
+      "OSwindCoreTests.SyncSignedFolderTests": {
+        "passed": 9,
+        "skipped": 0,
+        "failed": 0
+      }
+    },
+    "skips": [
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/HistoricalErasureCrashTests.swift:74: -[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker] : Test skipped - Only run as owned historical erasure crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:372: -[OSwindAppTests.OwnerAdditionAppSessionTests testRenderActualOwnerReviewAndResponseInBothAppearances] : Test skipped - Explicit authored component raster QA; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:623: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderExpandedGroupFolderPreviewAndDefaultGate] : Test skipped - Explicit generated folder-setup components; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:609: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderPeerRequestReviewAndOwnerExportInBothAppearances] : Test skipped - Explicit generated peer component raster QA; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:59: -[OSwindCoreTests.RecordingScopeTests testActualCLIRecordingFollowupExcludesNeighborAgainstRetainedUnscopedControl] : Test skipped - Explicit current CLI and retained development-v10 control required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:141: -[OSwindCoreTests.RecordingScopeTests testActualPriorReaderShowsPlainChatAndRefusesRecordingScopedChat] : Test skipped - Explicit frozen prior reader required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncDerivedRetirementCrashTests.swift:83: -[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker] : Test skipped - Only run as owned retirement crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunCrashTests.swift:84: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker] : Test skipped - Only run as owned incoming-run crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceCrashTests.swift:50: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker] : Test skipped - Only run as owned incoming-source crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncLateDependencyCrashTests.swift:77: -[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker] : Test skipped - Only run as owned late-dependency crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncOptionalReferenceTests.swift:232: -[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker] : Test skipped - Only run as owned optional-conversation crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunScaleTests.swift:10: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale] : Test skipped - Explicit owned routine-scale output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceScaleTests.swift:11: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale] : Test skipped - Explicit owned incoming-source scale output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncMutationFanoutScaleTests.swift:23: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale] : Test skipped - Explicit owned fanout output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker] : Test skipped - Only run as owned publication crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift:93: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker] : Test skipped - Only run as owned publication-queue crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift:109: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker] : Test skipped - Only run as owned source-withdrawal crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncUnavailableScopeCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker] : Test skipped - Only run as owned unavailable-scope crash child"
+    ],
+    "assertionDiagnostics": [],
+    "scope": "Current unpublished no-edit recording reconciliation and incoming required-graph audit snapshot.34 Core/App classes including signed folders, real owned APFS/Keychain lifecycle, source graphs/erasure/crashes and generated recording/name/calendar components, on the exact retained36-pass engine without rebuild. Not whole-suite/physical/live EventKit/provider/fullv0/ranking acceptance."
+  },
+  "optimized": {
+    "mode": "optimized",
+    "sourceBase": "62d2ad0b13f40524d24908c980e538967a1265fa",
+    "command": [
+      "xcrun",
+      "xctest",
+      "-XCTest",
+      "OSwindAppTests.LibraryOpeningTests,OSwindAppTests.MeetingsModelTests,OSwindAppTests.OwnerAdditionAppSessionTests,OSwindAppTests.PeerMembershipAppSessionTests,OSwindAppTests.RecordedMeetingsModelTests,OSwindAppTests.RecordingCalendarModelTests,OSwindAppTests.RecordingCalendarRenderTests,OSwindAppTests.RecordingNameRenderTests,OSwindAppTests.RecordingNamesModelTests,OSwindAppTests.SourceWorkSessionTests,OSwindAppTests.VaultSessionTests,OSwindCoreTests.HistoricalErasureCrashTests,OSwindCoreTests.HistoricalErasureMigrationTests,OSwindCoreTests.HistoricalErasureScopeTests,OSwindCoreTests.HistoricalRecapTests,OSwindCoreTests.HistoryErasureTests,OSwindCoreTests.MeetingContextTests,OSwindCoreTests.MeetingRequestTests,OSwindCoreTests.NativeRecordedMeetingTests,OSwindCoreTests.RecordedMeetingIdentifierTests,OSwindCoreTests.RecordedMeetingPortabilityTests,OSwindCoreTests.RecordedMeetingRevisionTests,OSwindCoreTests.RecordedMeetingTests,OSwindCoreTests.RecordingCalendarLinkTests,OSwindCoreTests.RecordingDetailsTests,OSwindCoreTests.RecordingScopeTests,OSwindCoreTests.SyncHistoricalCitationTests,OSwindCoreTests.SyncIncomingSourceTests,OSwindCoreTests.SyncOriginalEvidenceTests,OSwindCoreTests.SyncOutgoingTests,OSwindCoreTests.SyncPortableRecordTests,OSwindCoreTests.SyncRecordingDetailsTests,OSwindCoreTests.SyncVersionStoreTests,OSwindCoreTests.SyncSignedFolderTests",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/recording-original-reconciliation-release-build-v1/actual-engine/OSwindPackageTests.xctest"
+    ],
+    "exitCode": 0,
+    "commandWallSeconds": 549.6980042080395,
+    "testExecution": true,
+    "inputsAndPriorActualFilesUnchanged": true,
+    "defined": 846,
+    "counts": {
+      "passed": 828,
+      "skipped": 18,
+      "failed": 0
+    },
+    "logSHA256": "280c7c1edd11cc1dce9953bae5369efb3a1c775e3cf80af1dfb10aac4475358c",
+    "skips": [
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/HistoricalErasureCrashTests.swift:74: -[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker] : Test skipped - Only run as owned historical erasure crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:372: -[OSwindAppTests.OwnerAdditionAppSessionTests testRenderActualOwnerReviewAndResponseInBothAppearances] : Test skipped - Explicit authored component raster QA; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:623: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderExpandedGroupFolderPreviewAndDefaultGate] : Test skipped - Explicit generated folder-setup components; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:609: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderPeerRequestReviewAndOwnerExportInBothAppearances] : Test skipped - Explicit generated peer component raster QA; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncDerivedRetirementCrashTests.swift:83: -[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker] : Test skipped - Only run as owned retirement crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunCrashTests.swift:84: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker] : Test skipped - Only run as owned incoming-run crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceCrashTests.swift:50: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker] : Test skipped - Only run as owned incoming-source crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncLateDependencyCrashTests.swift:77: -[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker] : Test skipped - Only run as owned late-dependency crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncOptionalReferenceTests.swift:232: -[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker] : Test skipped - Only run as owned optional-conversation crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunScaleTests.swift:10: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale] : Test skipped - Explicit owned routine-scale output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceScaleTests.swift:11: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale] : Test skipped - Explicit owned incoming-source scale output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncMutationFanoutScaleTests.swift:23: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale] : Test skipped - Explicit owned fanout output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker] : Test skipped - Only run as owned publication crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift:93: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker] : Test skipped - Only run as owned publication-queue crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift:109: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker] : Test skipped - Only run as owned source-withdrawal crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncUnavailableScopeCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker] : Test skipped - Only run as owned unavailable-scope crash child"
+    ],
+    "diagnostics": [],
+    "actualEngine": "../recording-original-reconciliation-release-build-v1/actual-engine",
+    "scope": "Current no-edit erasure reconciliation and incoming required-graph audit source snapshot. 34 Core/App classes; optimized enables 2 actual CLI controls. TSan includes native vault/Keychain. No physical/provider/full-v0/ranking acceptance."
+  },
+  "threadSanitizer": {
+    "mode": "thread-sanitizer",
+    "sourceBase": "62d2ad0b13f40524d24908c980e538967a1265fa",
+    "command": [
+      "swift",
+      "test",
+      "--sanitize",
+      "thread",
+      "--scratch-path",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/calendar-integration-v1/tsan-build",
+      "--jobs",
+      "4",
+      "--filter",
+      "OSwindAppTests.LibraryOpeningTests|OSwindAppTests.MeetingsModelTests|OSwindAppTests.OwnerAdditionAppSessionTests|OSwindAppTests.PeerMembershipAppSessionTests|OSwindAppTests.RecordedMeetingsModelTests|OSwindAppTests.RecordingCalendarModelTests|OSwindAppTests.RecordingCalendarRenderTests|OSwindAppTests.RecordingNameRenderTests|OSwindAppTests.RecordingNamesModelTests|OSwindAppTests.SourceWorkSessionTests|OSwindAppTests.VaultSessionTests|OSwindCoreTests.HistoricalErasureCrashTests|OSwindCoreTests.HistoricalErasureMigrationTests|OSwindCoreTests.HistoricalErasureScopeTests|OSwindCoreTests.HistoricalRecapTests|OSwindCoreTests.HistoryErasureTests|OSwindCoreTests.MeetingContextTests|OSwindCoreTests.MeetingRequestTests|OSwindCoreTests.NativeRecordedMeetingTests|OSwindCoreTests.RecordedMeetingIdentifierTests|OSwindCoreTests.RecordedMeetingPortabilityTests|OSwindCoreTests.RecordedMeetingRevisionTests|OSwindCoreTests.RecordedMeetingTests|OSwindCoreTests.RecordingCalendarLinkTests|OSwindCoreTests.RecordingDetailsTests|OSwindCoreTests.RecordingScopeTests|OSwindCoreTests.SyncHistoricalCitationTests|OSwindCoreTests.SyncIncomingSourceTests|OSwindCoreTests.SyncOriginalEvidenceTests|OSwindCoreTests.SyncOutgoingTests|OSwindCoreTests.SyncPortableRecordTests|OSwindCoreTests.SyncRecordingDetailsTests|OSwindCoreTests.SyncVersionStoreTests|OSwindCoreTests.SyncSignedFolderTests"
+    ],
+    "exitCode": 0,
+    "commandWallSeconds": 1023.2163888330106,
+    "testExecution": true,
+    "inputsAndPriorActualFilesUnchanged": true,
+    "defined": 846,
+    "counts": {
+      "passed": 826,
+      "skipped": 20,
+      "failed": 0
+    },
+    "logSHA256": "f6dd1c82edd77fe577a3d2173d3f96ee1d004ff76aa9939db2b569d6de401734",
+    "skips": [
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/HistoricalErasureCrashTests.swift:74: -[OSwindCoreTests.HistoricalErasureCrashTests testCrashWorker] : Test skipped - Only run as owned historical erasure crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:372: -[OSwindAppTests.OwnerAdditionAppSessionTests testRenderActualOwnerReviewAndResponseInBothAppearances] : Test skipped - Explicit authored component raster QA; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:623: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderExpandedGroupFolderPreviewAndDefaultGate] : Test skipped - Explicit generated folder-setup components; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindAppTests/OwnerAdditionAppSessionTests.swift:609: -[OSwindAppTests.PeerMembershipAppSessionTests testRenderPeerRequestReviewAndOwnerExportInBothAppearances] : Test skipped - Explicit generated peer component raster QA; no desktop capture",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:59: -[OSwindCoreTests.RecordingScopeTests testActualCLIRecordingFollowupExcludesNeighborAgainstRetainedUnscopedControl] : Test skipped - Explicit current CLI and retained development-v10 control required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingScopeTests.swift:141: -[OSwindCoreTests.RecordingScopeTests testActualPriorReaderShowsPlainChatAndRefusesRecordingScopedChat] : Test skipped - Explicit frozen prior reader required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncDerivedRetirementCrashTests.swift:83: -[OSwindCoreTests.SyncIncomingSourceTests testDerivedRetirementCrashWorker] : Test skipped - Only run as owned retirement crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunCrashTests.swift:84: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingRunCrashWorker] : Test skipped - Only run as owned incoming-run crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceCrashTests.swift:50: -[OSwindCoreTests.SyncIncomingSourceTests testIncomingSourceCrashWorker] : Test skipped - Only run as owned incoming-source crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncLateDependencyCrashTests.swift:77: -[OSwindCoreTests.SyncIncomingSourceTests testLateDependencyCrashWorker] : Test skipped - Only run as owned late-dependency crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncOptionalReferenceTests.swift:232: -[OSwindCoreTests.SyncIncomingSourceTests testOptionalConversationCrashWorker] : Test skipped - Only run as owned optional-conversation crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingRunScaleTests.swift:10: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingRunProjectionAtBoundedScale] : Test skipped - Explicit owned routine-scale output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncIncomingSourceScaleTests.swift:11: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedIncomingSourceProjectionAtBoundedScale] : Test skipped - Explicit owned incoming-source scale output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncMutationFanoutScaleTests.swift:23: -[OSwindCoreTests.SyncIncomingSourceTests testOwnedSyncMutationFanoutAtBoundedScale] : Test skipped - Explicit owned fanout output required",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationCrashWorker] : Test skipped - Only run as owned publication crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesRetractionLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationOldClientTests.swift:9: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueActualOld32FreshClientRefusesSourceErasureLibraryWithoutMutation] : Test skipped - Requires the exact qualified prior32 executable",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationQueueCrashTests.swift:93: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueCrashWorker] : Test skipped - Only run as owned publication-queue crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncPublicationSourceCrashTests.swift:109: -[OSwindCoreTests.SyncIncomingSourceTests testPublicationQueueSourceCrashWorker] : Test skipped - Only run as owned source-withdrawal crash child",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/SyncUnavailableScopeCrashTests.swift:74: -[OSwindCoreTests.SyncIncomingSourceTests testUnavailableScopeCrashWorker] : Test skipped - Only run as owned unavailable-scope crash child"
+    ],
+    "diagnostics": [
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+      " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }"
+    ],
+    "actualEngine": null,
+    "scope": "Current no-edit erasure reconciliation and incoming required-graph audit source snapshot. 34 Core/App classes; optimized enables 2 actual CLI controls. TSan includes native vault/Keychain. No physical/provider/full-v0/ranking acceptance.",
+    "actualEngineFrozen": true
+  },
+  "exactOriginalDriverExit": {
+    "handle": 45229,
+    "exitCode": 0,
+    "observation": "Original exact PTY completed; no restart, rebuild or test replay."
+  },
+  "diagnosticClassification": {
+    "optimized": {
+      "originalLogAndResultPreserved": true,
+      "originalCandidateEntries": 0,
+      "compilerSourceExcerpts": [],
+      "actualDiagnostics": [],
+      "raceReports": []
+    },
+    "thread-sanitizer": {
+      "originalLogAndResultPreserved": true,
+      "originalCandidateEntries": 25,
+      "compilerSourceExcerpts": [
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }"
+      ],
+      "actualDiagnostics": [],
+      "raceReports": []
+    }
+  },
+  "nativeMetadataEnvelopeControl": {
+    "sourceBase": "62d2ad0b13f40524d24908c980e538967a1265fa",
+    "command": [
+      "swift",
+      "test",
+      "--jobs",
+      "4",
+      "--filter",
+      "SyncIncomingSourceTests.testRecordingOriginalRecoveryOversizedMetadataRefusesNativeWriteWithoutBlockingErasure"
+    ],
+    "exitCode": 0,
+    "commandWallSeconds": 10.890241749817505,
+    "inputsPriorActualEnginesAndCorporaUnchanged": true,
+    "defined": 1,
+    "counts": {
+      "passed": 1,
+      "skipped": 0,
+      "failed": 0
+    },
+    "logSHA256": "c14102e1316c642436d7e98469e9e964d6b9f80fcebff6c61ade5a589d0e57fd",
+    "diagnostics": [],
+    "scope": "Distinct native-write32KiB refusal/atomicity and continued real original-only erasure control; not a passed large-ID cursor acceptance test. Completed846-method production Sources unchanged; dense measurement method added but not enabled by this selection.",
+    "actualEngineFrozen": true
+  },
+  "newOptimizedControls": {
+    "command": [
+      "xcrun",
+      "xctest",
+      "-XCTest",
+      "OSwindCoreTests.SyncIncomingSourceTests/testRecordingOriginalRecoveryOversizedMetadataRefusesNativeWriteWithoutBlockingErasure,OSwindCoreTests.SyncIncomingSourceTests/testRecordingOriginalRecoveryNoEditBoundedCanonicalScanAtAuthoredScale",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/recording-reconciliation-bounded-scale-v1/actual-engine/OSwindPackageTests.xctest"
+    ],
+    "exitCode": 0,
+    "commandWallSeconds": 28.088301207870245,
+    "testExecution": true,
+    "build": {
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--jobs",
+        "2",
+        "list"
+      ],
+      "exitCode": 0,
+      "commandWallSeconds": 91.71382824983448,
+      "testExecution": false
+    },
+    "sourceAndPriorActualEnginesAndCorporaAndFrozenCurrentEngineUnchanged": true,
+    "defined": 2,
+    "counts": {
+      "passed": 2,
+      "skipped": 0,
+      "failed": 0
+    },
+    "logSHA256": "b1a02338180f18089eaebd92c6e675183149b4448abceb2bbba0136f50cd634c",
+    "diagnostics": [],
+    "scope": "Actual optimized two new controls only: native32KiB refusal/atomicity/continued erasure and authored2001label64candidate bounded reconciliation measurement. ProductionSources unchanged from completed846-method Debug/optimized/TSAN snapshot; no replay of unchanged broader native suites merely for provenance. Not power/physical/provider/competitor/fullv0 acceptance.",
+    "childEnvironment": "Minimal explicit system/build allowlist, no inherited provider credentials."
+  },
+  "selectionsOverlap": true,
+  "wholeCurrentSuiteExecuted": false,
+  "currentDiscoveredMethods": 3113,
+  "boundedAuthoredMeasurement": {
+    "affectedLabels": 1,
+    "batchLimit": 64,
+    "erasureSeconds": 0.37774774990975857,
+    "observations": [
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.03083216678351164
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.038145750062540174
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.028627749998122454
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.031058749882504344
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.04873470822349191
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.028441166738048196
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.03146662493236363
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.02150108339264989
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01984791667200625
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.0200957499910146
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.021234999876469374
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.022190999938175082
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.03316458337940276
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.03275895840488374
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.024597000097855926
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.028065833495929837
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.02542141661979258
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01909950003027916
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.019178083399310708
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.018989708507433534
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01879033329896629
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.018605333287268877
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.018723291577771306
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01927141658961773
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01887087500654161
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.018442458473145962
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01868941681459546
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.018607458332553506
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01826649997383356
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.018172583309933543
+      },
+      {
+        "markerBytes": 134,
+        "phase": "revalidation",
+        "queued": 0,
+        "scanned": 64,
+        "seconds": 0.01812599995173514
+      },
+      {
+        "markerBytes": 64,
+        "phase": "revalidation",
+        "queued": 1,
+        "scanned": 17,
+        "seconds": 0.00543245836161077
+      },
+      {
+        "phase": "ordinary-work",
+        "seconds": 0.01204979163594544
+      },
+      {
+        "phase": "idle",
+        "seconds": 0.00044670840725302696
+      }
+    ],
+    "queued": 1,
+    "reconciliationSeconds": 0.7671191666740924,
+    "scanned": 2001,
+    "scope": "Authored single-host two-local-endpoint bounded canonical reconciliation, not power/provider/competitor measurement",
+    "setupSeconds": 25.18797704158351,
+    "unaffectedLabels": 2000
+  },
+  "measurementSummary": {
+    "scanBatches": 32,
+    "medianScanMilliseconds": 19.971833331510425,
+    "p95NearestRankMilliseconds": 38.14575006254017,
+    "maxScanMilliseconds": 48.73470822349191,
+    "maxMarkerBytes": 134
+  },
+  "failedIterationsPreserved": {
+    "recording-original-reconciliation-negative-v1": {
+      "command": [
+        "swift",
+        "test",
+        "--jobs",
+        "4",
+        "--filter",
+        "SyncIncomingSourceTests.testRecordingOriginalRecoveryOriginalOnlyErasureReconcilesHeadWithoutCaptionEdit"
+      ],
+      "exitCode": 1,
+      "commandWallSeconds": 10.789180542109534,
+      "counts": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 1
+      },
+      "defined": 1,
+      "logSHA256": "157d36a25a813d2e5705022ab27bde0c7977cfb93c49ec15fb17a4851204b25f",
+      "sourceAndPriorActualFilesAndCorporaUnchanged": true,
+      "scope": "Desired no-edit derived metadata-head reconciliation after original-only erasure. Published9805 Core unchanged; one new authored 2-local-endpoint/PCM test. Not complete transport/outbox or real-device/provider acceptance.",
+      "actualEngineFrozen": true
+    },
+    "recording-original-reconciliation-core-v1": {
+      "command": [
+        "swift",
+        "test",
+        "--jobs",
+        "4",
+        "--filter",
+        "SyncOutgoingTests.testRecordingOriginalRecovery|SyncOutgoingTests.testRecordingNameRecovers|SyncOutgoingTests.testRecordingNativeTranscript|SyncIncomingSourceTests.testRecordingOriginalRecovery|SyncOutgoingTests.testRecordingReassignment|SyncOutgoingTests.testRecordingAffiliationScopeChangeAndNativeDeleteInvalidateItsLifetime|SyncOutgoingTests.testRecordingMetadataExplicitDifferentNativeTargetCannotReuseOldAffiliation"
+      ],
+      "exitCode": 1,
+      "commandWallSeconds": 23.983127958141267,
+      "counts": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      },
+      "defined": 0,
+      "logSHA256": "a24658818d78b1e1c83d51aeb3eec405c82bc5581f344932f0e0c727e7cbaf4e",
+      "sourceAndPriorActualFilesAndCorporaUnchanged": true,
+      "scope": "Prototype constant-size erasure rescan marker and bounded canonical-index cursor; focused original/reassignment plus desired no-edit head controls. Real transport/outbox/rollback/scale/restart matrix remains unqualified."
+    },
+    "recording-original-reconciliation-guards-v1": {
+      "command": [
+        "swift",
+        "test",
+        "--jobs",
+        "4",
+        "--filter",
+        "SyncOutgoingTests.testRecordingOriginalRecovery|SyncOutgoingTests.testRecordingNameRecovers|SyncOutgoingTests.testRecordingNativeTranscript|SyncIncomingSourceTests.testRecordingOriginalRecovery|SyncOutgoingTests.testRecordingReassignment|SyncOutgoingTests.testRecordingAffiliationScopeChangeAndNativeDeleteInvalidateItsLifetime|SyncOutgoingTests.testRecordingMetadataExplicitDifferentNativeTargetCannotReuseOldAffiliation"
+      ],
+      "exitCode": 1,
+      "commandWallSeconds": 17.450994624989107,
+      "counts": {
+        "passed": 31,
+        "skipped": 0,
+        "failed": 2
+      },
+      "defined": 33,
+      "logSHA256": "190917f8785655ed7700a9150995dda0ac81e03b47e516c231f3f3ec6c9ab05d",
+      "sourceAndPriorActualFilesAndCorporaUnchanged": true,
+      "scope": "Prototype revalidation: focused recovery/reassignment plus no-edit head, real encrypted-folder supersession, quota/reopen, policy retry, outer rollback, indexed canonical selection/read-only idle and long/byte-distinct Unicode cursor controls. Broader lifecycle, scale, current optimized/TSAN/native, real devices/provider and full v0 remain unqualified.",
+      "actualEngineFrozen": true
+    },
+    "recording-original-reconciliation-diagnostic-v1": {
+      "command": [
+        "swift",
+        "test",
+        "--jobs",
+        "4",
+        "--filter",
+        "SyncIncomingSourceTests.testRecordingOriginalRecoveryNoEditErasureOuterRollback|SyncIncomingSourceTests.testRecordingOriginalRecoveryNoEditErasureUsesRealEncrypted"
+      ],
+      "exitCode": 1,
+      "commandWallSeconds": 9.95084087504074,
+      "counts": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 2
+      },
+      "defined": 2,
+      "logSHA256": "180aa1883222fc7f313aa29565c167aec26a87f260f3f15499153bc4fe6e77d5",
+      "sourceAndPriorActualFilesAndCorporaUnchanged": true,
+      "scope": "Prototype revalidation: focused recovery/reassignment plus no-edit head, real encrypted-folder supersession, quota/reopen, policy retry, outer rollback, indexed canonical selection/read-only idle and long/byte-distinct Unicode cursor controls. Broader lifecycle, scale, current optimized/TSAN/native, real devices/provider and full v0 remain unqualified.",
+      "actualEngineFrozen": true
+    },
+    "recording-reconciliation-cursor-negative-v1": {
+      "sourceBase": "62d2ad0b13f40524d24908c980e538967a1265fa",
+      "command": [
+        "swift",
+        "test",
+        "--jobs",
+        "4",
+        "--filter",
+        "SyncIncomingSourceTests.testRecordingOriginalRecoveryNoEditCursorHandlesAcceptedLargeGraphemeTarget"
+      ],
+      "exitCode": 1,
+      "commandWallSeconds": 13.51390774990432,
+      "inputsPriorActualEnginesAndCorporaUnchanged": true,
+      "defined": 1,
+      "counts": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 1
+      },
+      "logSHA256": "ee7e732d4023f2015b7ca0d03885381fdcfaebc8777bc991b2219da04bf78f96",
+      "diagnostics": [
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/RecordingDetails.swift:65: error: -[OSwindCoreTests.SyncIncomingSourceTests testRecordingOriginalRecoveryNoEditCursorHandlesAcceptedLargeGraphemeTarget] : failed: caught error: \"invalid(\"Recording metadata exceeds 32 KiB\")\""
+      ],
+      "scope": "Desired native-valid large target outgoing preparation and subsequent cursor progress; distinguish earlier operational admission from a new cursor failure. No production source edits from completed846-method qualification.",
+      "actualEngineFrozen": true
+    }
+  },
+  "failedHypothesis": "Oversized scope constructor acceptance did not establish admissible native metadata: actual insertion rejects the full metadata at 32 KiB before outgoing/cursor. One failed method/one unexpected failure retained. Distinct later refusal/atomicity control passes; compact cursor proposal and row-address test were never applied.",
+  "failedHarnessChecks": [
+    "Premature focused driver launch exits2 before script creation;0tests. Setup exact52431 then0; original actual negative75293 is separate.",
+    "All46component byte-equality assertion failed forTSan2x output; no originals altered or tests replayed. Optimized46match at1x."
+  ],
+  "renderComponents": {
+    "optimized": {
+      "name-components": {
+        "currentPNGCount": 14,
+        "previousPNGCount": 14,
+        "allRelativeNamesAndPixelsSHA256Equal": true,
+        "current": {
+          "editor-dark.png": "303c7b0e28d995ba072db5ca8fe0d693fbd6ab485dd90b96b782bb65eca3f46f",
+          "named-regular-light.png": "b903ae29697cd3584035dc27748243bf4fd93366071011590e5e6e6900eb0e9d",
+          "conflicts-compact-dark.png": "32abfe4d250bcb3ec4d166bc17ec5a80a182c5f9befd72fd696dad2595f92d2a",
+          "saving-dark.png": "78f6a4297ac4b9575632cc971018cd245c9a8466cb9a20e00cce55f175a3af29",
+          "stale-draft-dark.png": "5be62f235a94569a658cdc58b01932e69defd6639ad23a7c76bd1479ae775019",
+          "conflicts-compact-light.png": "557e6c01438b60785d7f2df42f52a161a1d97d20650c70512dd8e4abc1771e92",
+          "conflicts-regular-dark.png": "847ec51ee413a44e504edf7c55e770a75c5195bb88c98f2d5845b2e471fa93b4",
+          "named-compact-light.png": "066c21bcf3235bbc0e15c47d384aa707c89b3cdf649ada5d6a4cef038a4f8c00",
+          "named-compact-dark.png": "5f1acc4799336a93da5988df4aa5ec5b78d575413332b40318eb41dfd85db097",
+          "stale-draft-light.png": "1015771a63fd76db4d1e90dc8e83b7f174c5fb8252c52ae11da1dc47741c1a7b",
+          "conflicts-regular-light.png": "46a4a88725e1d46b13a1ccfe3a547d49ad64ea4b419ecfd3810df9de4b748a7f",
+          "editor-light.png": "19c698aa243d85661f3c047aeb05fd156fa46618b010d961295c9b722d05ff0d",
+          "named-regular-dark.png": "ce935896fa6a31df271ac51b4d55dcab4872c66501a620d22621058431ec85d3",
+          "saving-light.png": "13c9ceaa7fafdebc892a46a020d9b2976539f5bcd6002bec2e9a67e7e5691b97"
+        }
+      },
+      "calendar-components": {
+        "currentPNGCount": 12,
+        "previousPNGCount": 12,
+        "allRelativeNamesAndPixelsSHA256Equal": true,
+        "current": {
+          "changed-light.png": "7ae3cbf6dc2b30885287205939fb23a153ab1dbd30e7b00fed10ff804a67e634",
+          "denied-dark.png": "adb966f527cbfc4f5b8159b3b062d56f9be999c11d839d15dfda16941126cfe7",
+          "saving-dark.png": "61f503d5eebf12f8c69a700549f0c29d259c09bd9bd3a92efbdc5c7cc9644c4b",
+          "unnamed-dark.png": "b84ac95ae694a0c1dfe8ff6662d5d3994678cc10595a5458f91a5011d8a48c6c",
+          "denied-light.png": "b4569b23fe171741acc27cdced4f6f5c6dc58f0f97617143bd7035c44d908b4d",
+          "populated-dark.png": "cbfd07d2ae68834bd5a6687d2543529d64da806a3316cb83a95a7c94a96fd441",
+          "empty-light.png": "7d3b5d97dc6b65639a462745d02fbf597d72fd11d5fec169c3d5a3096aa911c6",
+          "empty-dark.png": "fd094779dfdab73c15392ada1de3b1404ca4effe089c9fb18f59f55b6818a523",
+          "changed-dark.png": "c59b885b37e82bad3cda16913be8f4eb953d05c75fc46b8f94ad7eb064429e0b",
+          "unnamed-light.png": "099f7fd1e506f23d00f249adf2b41359ef539d2a7a57b19fb57ad518d93a5d59",
+          "populated-light.png": "d472a54e033bfba390e6cfcc782269c8b918a907d04bd11d98d7a773799761a1",
+          "saving-light.png": "120890904cacb39c4653a4a8fd547a6882a1a0c9f2de2bd245dd6074b8d815ae"
+        }
+      },
+      "scope-components": {
+        "currentPNGCount": 4,
+        "previousPNGCount": 4,
+        "allRelativeNamesAndPixelsSHA256Equal": true,
+        "current": {
+          "recording-actions-light.png": "66013b7752a42cd3dd9570feb39afed9a0c4b0737dcfbfe507c406e3ce8d6dd2",
+          "scoped-ask-light.png": "e663797766b736b1b5fc9a0c1e863f8b7fecd39466783eeba1467075e5a6d3ec",
+          "recording-actions-dark.png": "93d533d71ba58b9f167c33f520d92ba4bfbbfd60d9b74db1df6f59add86824ed",
+          "scoped-ask-dark.png": "d192ae2cf496efee7cc7a6c6abac268fd14cf766e07e66b052de2997a9ff34a7"
+        }
+      },
+      "recording-components": {
+        "currentPNGCount": 12,
+        "previousPNGCount": 12,
+        "allRelativeNamesAndPixelsSHA256Equal": true,
+        "current": {
+          "setup-failure-dark.png": "7f43c6b0e4c2f55ad90540c53b4e1544879ac58e5a021a7768bf33c6f1eda5fb",
+          "recordings-light.png": "e6006a2800c29723f35b658d75dfaad25e6eaa8cbbb5834f0fb330a494fcbecc",
+          "compact-dark.png": "2e092cd15d4ffefa88410f08d0484cd62715f6b7e705b2f11418b9806abc9577",
+          "hidden-head-light.png": "284ffeee8d3c835138d71788382e7ecd229014452e7ec9bdfccaed2f48549cc3",
+          "empty-light.png": "7987748681b13d646a6183b1649b268f9521333be8e60ee491bf7e14b1cddcb4",
+          "recordings-dark.png": "95eb35ca2b9e7bfcb9c262b1e3e15f925c0bb62a507698dc469d10fdb8f6cfcc",
+          "empty-dark.png": "7f15c79dd47078080b20dbb5d419a9663cc6a4f71b69e9d65a6dda54b706d113",
+          "hidden-head-dark.png": "1efb0cfd47376a5793f52cbe1ae2eb365628d7929f2bce040e20a88f4e1c0ec3",
+          "updating-light.png": "7d73be0031722338a40e20a3c7e1e8ebb378e7b1804f9bbecd9ad2b1900222d7",
+          "setup-failure-light.png": "58fa01c43e0486fbc703925b0dc98271598f2614da86a1b2b65934390504dd80",
+          "compact-light.png": "71ec2d1f2ad90e362660f8b9d77205c2e32dfa976d5e5a25cc7406c48743dbd7",
+          "updating-dark.png": "c77fa8d3b1627b7738ce22ad8f4adcc38d0c0f1d434af1e3388b4af229e2aef1"
+        }
+      }
+    },
+    "sanitizer": {
+      "actualImagesUnchanged": true,
+      "priorAllPixelMatchAssertionFailed": true,
+      "allDimensionsDouble": true,
+      "images": [
+        {
+          "path": "thread-sanitizer/name-components/conflicts-compact-dark.png",
+          "size": [
+            1800,
+            1320
+          ],
+          "priorSize": [
+            900,
+            660
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/conflicts-compact-light.png",
+          "size": [
+            1800,
+            1320
+          ],
+          "priorSize": [
+            900,
+            660
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/conflicts-regular-dark.png",
+          "size": [
+            2240,
+            1600
+          ],
+          "priorSize": [
+            1120,
+            800
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/conflicts-regular-light.png",
+          "size": [
+            2240,
+            1600
+          ],
+          "priorSize": [
+            1120,
+            800
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/editor-dark.png",
+          "size": [
+            1000,
+            860
+          ],
+          "priorSize": [
+            500,
+            430
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/editor-light.png",
+          "size": [
+            1000,
+            860
+          ],
+          "priorSize": [
+            500,
+            430
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/named-compact-dark.png",
+          "size": [
+            1800,
+            1320
+          ],
+          "priorSize": [
+            900,
+            660
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/named-compact-light.png",
+          "size": [
+            1800,
+            1320
+          ],
+          "priorSize": [
+            900,
+            660
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/named-regular-dark.png",
+          "size": [
+            2240,
+            1600
+          ],
+          "priorSize": [
+            1120,
+            800
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/named-regular-light.png",
+          "size": [
+            2240,
+            1600
+          ],
+          "priorSize": [
+            1120,
+            800
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/saving-dark.png",
+          "size": [
+            1000,
+            860
+          ],
+          "priorSize": [
+            500,
+            430
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/saving-light.png",
+          "size": [
+            1000,
+            860
+          ],
+          "priorSize": [
+            500,
+            430
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/stale-draft-dark.png",
+          "size": [
+            1000,
+            1080
+          ],
+          "priorSize": [
+            500,
+            540
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/name-components/stale-draft-light.png",
+          "size": [
+            1000,
+            1080
+          ],
+          "priorSize": [
+            500,
+            540
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/changed-dark.png",
+          "size": [
+            1040,
+            496
+          ],
+          "priorSize": [
+            520,
+            248
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/changed-light.png",
+          "size": [
+            1040,
+            496
+          ],
+          "priorSize": [
+            520,
+            248
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/denied-dark.png",
+          "size": [
+            1040,
+            526
+          ],
+          "priorSize": [
+            520,
+            263
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/denied-light.png",
+          "size": [
+            1040,
+            526
+          ],
+          "priorSize": [
+            520,
+            263
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/empty-dark.png",
+          "size": [
+            1040,
+            526
+          ],
+          "priorSize": [
+            520,
+            263
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/empty-light.png",
+          "size": [
+            1040,
+            526
+          ],
+          "priorSize": [
+            520,
+            263
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/populated-dark.png",
+          "size": [
+            1040,
+            1026
+          ],
+          "priorSize": [
+            520,
+            513
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/populated-light.png",
+          "size": [
+            1040,
+            1026
+          ],
+          "priorSize": [
+            520,
+            513
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/saving-dark.png",
+          "size": [
+            1040,
+            438
+          ],
+          "priorSize": [
+            520,
+            219
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/saving-light.png",
+          "size": [
+            1040,
+            438
+          ],
+          "priorSize": [
+            520,
+            219
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/unnamed-dark.png",
+          "size": [
+            1040,
+            1118
+          ],
+          "priorSize": [
+            520,
+            559
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/calendar-components/unnamed-light.png",
+          "size": [
+            1040,
+            1118
+          ],
+          "priorSize": [
+            520,
+            559
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/scope-components/recording-actions-dark.png",
+          "size": [
+            1540,
+            1140
+          ],
+          "priorSize": [
+            770,
+            570
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/scope-components/recording-actions-light.png",
+          "size": [
+            1540,
+            1140
+          ],
+          "priorSize": [
+            770,
+            570
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/scope-components/scoped-ask-dark.png",
+          "size": [
+            2000,
+            1440
+          ],
+          "priorSize": [
+            1000,
+            720
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/scope-components/scoped-ask-light.png",
+          "size": [
+            2000,
+            1440
+          ],
+          "priorSize": [
+            1000,
+            720
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/compact-dark.png",
+          "size": [
+            1540,
+            1140
+          ],
+          "priorSize": [
+            770,
+            570
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/compact-light.png",
+          "size": [
+            1540,
+            1140
+          ],
+          "priorSize": [
+            770,
+            570
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/empty-dark.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/empty-light.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/hidden-head-dark.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/hidden-head-light.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/recordings-dark.png",
+          "size": [
+            2200,
+            1440
+          ],
+          "priorSize": [
+            1100,
+            720
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/recordings-light.png",
+          "size": [
+            2200,
+            1440
+          ],
+          "priorSize": [
+            1100,
+            720
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/setup-failure-dark.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/setup-failure-light.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/updating-dark.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        },
+        {
+          "path": "thread-sanitizer/recording-components/updating-light.png",
+          "size": [
+            1800,
+            1300
+          ],
+          "priorSize": [
+            900,
+            650
+          ],
+          "dimensionsExactlyDouble": true
+        }
+      ],
+      "manualInspection": [
+        "thread-sanitizer/name-components/named-regular-light.png"
+      ],
+      "scope": "Actual currentTSan46PNGs rendered at2x dimensions with different color-profile chunks, while prior/current optimized46PNGs match byte-for-byte at1x. One currentTSan2x image inspected and populated; no blanket pixel-equality or full46manual-review claim. SourceUI unchanged; no replay or rewritten originals."
+    }
+  },
+  "normalDevelopmentPackage": {
+    "source": "58ed3b0797224eaa21b1f502b8dc45d555fd8650",
+    "testInputBaseSource": "62d2ad0b13f40524d24908c980e538967a1265fa",
+    "testInputManifestSHA256": "cd8057e406200a8983cd454d8540101519c5789085b71804a0ff5c9e3a12ca68",
+    "broaderProductionQualificationManifestSHA256": "d3aa17749962ab294f6ed3a31b4512e22a87b7adc6e9b8135d6a538aebef1d50",
+    "scope": "Fresh normal release app packaging with strict ad-hoc signing; not notarized distribution or physical/interactive acceptance. This normal build has a packaging purpose, not a provenance rebuild of earlier tests.",
+    "command": [
+      "bash",
+      "scripts/build-app.sh",
+      "release"
+    ],
+    "exitCode": 0,
+    "elapsedSeconds": 184.68248458299786,
+    "inputsAndAllPriorActualEnginesUnchanged": true,
+    "buildLogSHA256": "e4c44a1467fde8220a680cb6c2911b56609ba7899487f50f83a6d21c9ce37c35",
+    "app": "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/normal-recording-reconciliation-package-v1/OSwind.app",
+    "executables": {
+      "OSwind": {
+        "packagedSHA256": "5c0f9ea22296dee66567d42ebd4ce6ab554c1ca40838ffce25a5eadb45ce1e5b",
+        "unsignedActualCanonicalBuildProductSHA256": "93b94aa389ed6148e6f4364643fe868d2272fc7ad9726e2aa932319f4a451499",
+        "textSection": {
+          "bytes": 18790108,
+          "sha256": "5e8fcb2192e4a32423a7f2cbe7ab632c956de5d790c0d145024c0b4ef078e26e"
+        },
+        "packagedBytes": 48475232,
+        "matchesOwnActualCanonicalBuild": true
+      },
+      "oswindctl": {
+        "packagedSHA256": "6a3d55022e75df27eca2ffd70f62e9b479d267c38b6f9c0cbf762179edfa9e03",
+        "unsignedActualCanonicalBuildProductSHA256": "e2ff68ecb105bdcb0c322d6756b78a5a41880faee292ace00baacd94f08c2b7b",
+        "textSection": {
+          "bytes": 15959060,
+          "sha256": "f5aea2bcf1e44bbf07bc18aa3d7e652d94ee2ae43a498af0b39bc68759577924"
+        },
+        "packagedBytes": 36259408,
+        "matchesOwnActualCanonicalBuild": true
+      },
+      "oswind-preparation-guardian": {
+        "packagedSHA256": "b11850d869ab66699346286d5d4c44b28bb5930de473b36c79a9cc2f922a49d5",
+        "unsignedActualCanonicalBuildProductSHA256": "844c41eefa2b15f13c2b3e474dec5ee904636218d41ecc003bde0404470169da",
+        "textSection": {
+          "bytes": 1196,
+          "sha256": "2d8bf06c64bf813e8e9dc736f22e0bc2dccca94af17e99b622b2f3f328844502"
+        },
+        "packagedBytes": 53472,
+        "matchesOwnActualCanonicalBuild": true
+      }
+    },
+    "smoke": {
+      "emptyStats": {
+        "exitCode": 0,
+        "elapsedSeconds": 0.6022126250900328,
+        "stdoutSHA256": "174dc95cebe1161f10de453d3c997dc29e4cc1827fc9238201d6f68f74069390",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "authoredNote": {
+        "exitCode": 0,
+        "elapsedSeconds": 0.07782895909622312,
+        "stdoutSHA256": "a6b41329e72f9fd4cb4f5c5eb60809fe526b92b5ac3f3c4daef9538220cf4667",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "literalKeyword": {
+        "exitCode": 0,
+        "elapsedSeconds": 0.027178749907761812,
+        "stdoutSHA256": "0153e12fd41f1e15688348d9560c3c447165a0dc6b68715f43eb732c26af2a64",
+        "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "sourceCount": 1,
+      "exactAuthoredIDMatchesKeywordResult": true
+    },
+    "resources": [
+      {
+        "path": "Contents/Resources/OSwind.icns",
+        "bytes": 447716,
+        "sha256": "98ce5909def3822e43ab45307b1f352cbdffd0e6429d830d1fe438b92cb49a48"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/Apache-2.0.txt",
+        "bytes": 11357,
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/JapaneseG2P-LICENSE.md",
+        "bytes": 16008,
+        "sha256": "cb82031f608b056ffb378073d15fd840e070a1dd3063f8975556f9536d447103"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/NOTICE",
+        "bytes": 1267,
+        "sha256": "bd1d8a43ff19e060124063c53f9dcd315e4766a745157d87a51e67d9a0efd8e4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/conversion-LICENSE",
+        "bytes": 11339,
+        "sha256": "f29080b0389b53eb15c81fd882c3c71dcbf92b99c5d94ea51df9d7d877fd9fe4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroANE-v3/mattmireles-LICENSE",
+        "bytes": 11357,
+        "sha256": "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/KokoroAneSpanishFrenchG2P-LICENSE.md",
+        "bytes": 2932,
+        "sha256": "82b80894661fb61209fc39f91bb50b2ed5d0c8628f9d1460ccc853b8bcf12043"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/NemoTextProcessing-LICENSE.md",
+        "bytes": 1770,
+        "sha256": "300a31d86c7c5d809f0adc00ef7d35259226acc7e412b9767cd3029a3395c50e"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/fastcluster-LICENSE.md",
+        "bytes": 1431,
+        "sha256": "67594dbe4a7477719c8160373e7767c2c319ef966a6042f76846a18af02cde0a"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/FluidAudio/vbx-LICENSE.md",
+        "bytes": 10541,
+        "sha256": "08e57fdb5187c816e937916f1e176aadb400ca76f4b3b493d69730ec8f10dd80"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/NOTICES.txt",
+        "bytes": 4912,
+        "sha256": "f537f9df915771143cae1084ffdfe375b7d839022ccd7ac23e14847a7c47b375"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/ONNXRuntime/LICENSE",
+        "bytes": 1073,
+        "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualPreparation/UV-LICENSE-MIT.txt",
+        "bytes": 1077,
+        "sha256": "860e3d7a86b84e6a7012c7a635fc64df475cebc6cce34dfeb73a5982ec58176c"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/PINNED.txt",
+        "bytes": 961,
+        "sha256": "fa811b1bad496d911bf315e69b5efe3ec38e418ba2f54b76a2a5fc4805a4acad"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/Pillow-LICENSE",
+        "bytes": 1453,
+        "sha256": "17f240ae101143707e5e7303a5d800450d9ccc7475b463cedb555cefdb3c6ece"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/eventsource/LICENSE.md",
+        "bytes": 1062,
+        "sha256": "2f9b695627d569a3ce452b2c03fdd34310df78c8ea94edfafd9ce38381e5b502"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-asn1/LICENSE.txt",
+        "bytes": 11359,
+        "sha256": "8c6db340475136df3c1201d458fa5755698eace76e510471ecc9d857d6083dac"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-collections/LICENSE.txt",
+        "bytes": 11751,
+        "sha256": "770af8291f708538d8ff885a0bbc4e045cd700531741c4f99528d435c14d7f55"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-crypto/LICENSE.txt",
+        "bytes": 11358,
+        "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-huggingface/LICENSE",
+        "bytes": 11347,
+        "sha256": "4d6ad72952a8329063a71de28329b493de96cf57459e2ac217110d1a6a5f84ae"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-jinja/LICENSE",
+        "bytes": 11347,
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/swift-transformers/LICENSE",
+        "bytes": 11347,
+        "sha256": "648b81e6c6f9975c3b6cf6d630229b6c8d6f1ddaef55f5770f576adda19f3495"
+      },
+      {
+        "path": "Contents/Resources/ThirdParty/VisualRuntime/yyjson/LICENSE",
+        "bytes": 1084,
+        "sha256": "45e384d3d52c73cba3a64d6e6c25d47cd738cd8a55c30629e3201046eda62947"
+      },
+      {
+        "path": "Contents/Resources/models/siglip2-source.json",
+        "bytes": 1381,
+        "sha256": "b6e3ef1f37968fe7fbe517f0e2ffcd8acb78bfbde1547be58e23d65fd2cd3b6a"
+      },
+      {
+        "path": "Contents/Resources/scripts/convert-visual-model.py",
+        "bytes": 14825,
+        "sha256": "eb4ca0de71df7bf84789c1dd664171681fff36118258dc4f2e120dc69d90f250"
+      },
+      {
+        "path": "Contents/Resources/scripts/convert-visual-model.py.lock",
+        "bytes": 82078,
+        "sha256": "4b0eceedb78b2cb7a9c152be0ee400c59583d326f51d18d485c0072f415489d0"
+      },
+      {
+        "path": "Contents/Resources/swift-crypto_Crypto.bundle/PrivacyInfo.xcprivacy",
+        "bytes": 398,
+        "sha256": "42fb8a30dd8d7ba0900e1bf17fe64ed8c12cfdb8a9c791ab6b4e1eceb0f299c0"
+      },
+      {
+        "path": "Contents/Resources/swift-transformers_Hub.bundle/gpt2_tokenizer_config.json",
+        "bytes": 234,
+        "sha256": "551e26ec611d8d0c8edc3ef72e518a38418cb71f40de1347dd486a595e1557d7"
+      },
+      {
+        "path": "Contents/Resources/swift-transformers_Hub.bundle/t5_tokenizer_config.json",
+        "bytes": 20746,
+        "sha256": "e0aff0b1de9071e30d9a60a199303b6abe916a64a19932bd1c46992279b41a1f"
+      }
+    ],
+    "developmentArchive": {
+      "path": "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/normal-recording-reconciliation-package-v1/OSwind-recording-reconciliation-development.zip",
+      "bytes": 25500501,
+      "sha256": "08e645abc550b18778d9904a08a776c364fb3a5ade64d6f29b27575502229282",
+      "roundTripAllFileHashesAndStrictSignature": true
+    },
+    "durableDelivery": {
+      "directory": "/Users/vibhusapra/Documents/OSwind-builds/2026-11-04-recording-reconciliation-58ed3b0",
+      "archive": "/Users/vibhusapra/Documents/OSwind-builds/2026-11-04-recording-reconciliation-58ed3b0/OSwind-recording-reconciliation-development.zip",
+      "sha256": "08e645abc550b18778d9904a08a776c364fb3a5ade64d6f29b27575502229282"
+    }
+  },
+  "normalBuildWarnings": {
+    "oldHeaders": [
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwind/AppModel.swift:877:40: warning: reference to captured var 'self' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwind/AppVisualIndex.swift:64:40: warning: reference to captured var 'self' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:2:1: warning: add '@preconcurrency' to suppress 'Sendable'-related warnings from module 'OSwindCore'",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:336:83: warning: main actor-isolated var 'root' can not be referenced from a nonisolated context",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:575:95: warning: capture of 'embedder' with non-Sendable type 'LocalEmbedder' in an isolated closure",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:588:98: warning: capture of 'embedder' with non-Sendable type 'LocalEmbedder' in an isolated closure",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:601:98: warning: capture of 'embedder' with non-Sendable type 'LocalEmbedder' in an isolated closure",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/LibraryVault.swift:39:13: warning: variable 'info' was never mutated; consider changing to 'let' constant",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/PIIModelPreparation.swift:115:18: warning: no calls to throwing functions occur within 'try' expression",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/PreparationProcess.swift:82:65: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/PreparationProcess.swift:91:48: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/SyncCredentialStorage.swift:41:51: warning: 'kSecUseAuthenticationUIFail' was deprecated in macOS 11.0: Instead of kSecUseAuthenticationUI, use kSecUseAuthenticationContext and set LAContext.interactionNotAllowed property [#DeprecatedDeclaration]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/SyncPortableExporter.swift:92:66: warning: no calls to throwing functions occur within 'try' expression",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultProcess.swift:38:102: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultProcess.swift:40:53: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultProcess.swift:65:445: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultSecrets.swift:41:77: warning: 'kSecUseAuthenticationUIFail' was deprecated in macOS 11.0: Instead of kSecUseAuthenticationUI, use kSecUseAuthenticationContext and set LAContext.interactionNotAllowed property [#DeprecatedDeclaration]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VisualModelPreparation.swift:107:18: warning: no calls to throwing functions occur within 'try' expression",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowExportFiles.swift:10:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowExportFiles.swift:11:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowExportFiles.swift:5:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowVideoMux.swift:102:43: warning: capture of 'writer' with non-Sendable type 'AVAssetWriter' in a '@Sendable' closure [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowVideoMux.swift:108:53: warning: capture of 'writer' with non-Sendable type 'AVAssetWriter' in a '@Sendable' closure [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowVideoMux.swift:108:53: warning: capture of 'writer' with non-Sendable type 'AVAssetWriter' in a '@Sendable' closure; this is an error in the Swift 6 language mode [#SendableClosureCaptures]"
+    ],
+    "currentHeaders": [
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwind/AppModel.swift:877:40: warning: reference to captured var 'self' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwind/AppVisualIndex.swift:64:40: warning: reference to captured var 'self' in concurrently-executing code; this is an error in the Swift 6 language mode [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:2:1: warning: add '@preconcurrency' to suppress 'Sendable'-related warnings from module 'OSwindCore'",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:336:83: warning: main actor-isolated var 'root' can not be referenced from a nonisolated context",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:575:95: warning: capture of 'embedder' with non-Sendable type 'LocalEmbedder' in an isolated closure",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:588:98: warning: capture of 'embedder' with non-Sendable type 'LocalEmbedder' in an isolated closure",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCLI/main.swift:601:98: warning: capture of 'embedder' with non-Sendable type 'LocalEmbedder' in an isolated closure",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/LibraryVault.swift:39:13: warning: variable 'info' was never mutated; consider changing to 'let' constant",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/PIIModelPreparation.swift:115:18: warning: no calls to throwing functions occur within 'try' expression",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/PreparationProcess.swift:82:65: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/PreparationProcess.swift:91:48: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/SyncCredentialStorage.swift:41:51: warning: 'kSecUseAuthenticationUIFail' was deprecated in macOS 11.0: Instead of kSecUseAuthenticationUI, use kSecUseAuthenticationContext and set LAContext.interactionNotAllowed property [#DeprecatedDeclaration]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/SyncPortableExporter.swift:92:66: warning: no calls to throwing functions occur within 'try' expression",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultProcess.swift:38:102: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultProcess.swift:40:53: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultProcess.swift:65:445: warning: class method 'sleep' is unavailable from asynchronous contexts; Use Task.sleep(until:clock:) instead.; this is an error in the Swift 6 language mode",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VaultSecrets.swift:41:77: warning: 'kSecUseAuthenticationUIFail' was deprecated in macOS 11.0: Instead of kSecUseAuthenticationUI, use kSecUseAuthenticationContext and set LAContext.interactionNotAllowed property [#DeprecatedDeclaration]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/VisualModelPreparation.swift:107:18: warning: no calls to throwing functions occur within 'try' expression",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowExportFiles.swift:10:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowExportFiles.swift:11:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowExportFiles.swift:5:9: warning: immutable property will not be decoded because it is declared with an initial value which cannot be overwritten",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowVideoMux.swift:102:43: warning: capture of 'writer' with non-Sendable type 'AVAssetWriter' in a '@Sendable' closure [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowVideoMux.swift:108:53: warning: capture of 'writer' with non-Sendable type 'AVAssetWriter' in a '@Sendable' closure [#SendableClosureCaptures]",
+      "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Sources/OSwindCore/WorkflowVideoMux.swift:108:53: warning: capture of 'writer' with non-Sendable type 'AVAssetWriter' in a '@Sendable' closure; this is an error in the Swift 6 language mode [#SendableClosureCaptures]"
+    ],
+    "allHeadersExactlyEqual": true
+  },
+  "precedingPublishedCI": {
+    "head": "62d2ad0b13f40524d24908c980e538967a1265fa",
+    "run": 41856651714,
+    "attempt1": "All3jobs cancelled before runner acquisition; workflow failure. One verified infrastructure retry requested.",
+    "retryLatest": [
+      {
+        "id": 126691608869,
+        "name": "benchmark-harnesses",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "active": []
+      },
+      {
+        "id": 126691609267,
+        "name": "native",
+        "status": "in_progress",
+        "conclusion": null,
+        "active": [
+          "Package app"
+        ]
+      },
+      {
+        "id": 126691609343,
+        "name": "Recording names, calendar review and native lifecycle",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "active": []
+      }
+    ],
+    "scope": "Published predecessor only; two retry jobs again unacquired/cancelled, native in progress at snapshot. No hosted acceptance of58ed/new publication head."
+  },
+  "rawEvidence": {
+    "path": "benchmarks/recording-reconciliation-raw-v1.zip",
+    "bytes": 24847221,
+    "sha256": "037b4c62670e8882163c6dbd691e265bb79ff2da299bf89cd7efbcbb8788b439",
+    "entries": 1390,
+    "focusedCorpusAndMeasurementFiles": 1034,
+    "manifestSHA256": "72f115be1c1163eec1d69d1b9ebc082b8dde74d4dba7cf607eba0b1013b670c8",
+    "roundTripCRCAndAllFileHashes": true,
+    "allOriginalInputsEnginesAndCorporaRetainedLocally": true,
+    "binariesIncluded": false,
+    "broadOwnedCorporaIncluded": false
+  },
+  "remaining": [
+    "Full late/concurrent/combined session and clip transport and restored provenance/enrollment",
+    "Legacy exact-version session aliases",
+    "Live EventKit and signed keyboard/VoiceOver interaction",
+    "Physical mic/system audio/ASR/GPU quality",
+    "Current automatic 24h and controlled energy",
+    "Real two-Mac/provider and distribution acceptance",
+    "Full v0 parity and competitor ranking"
+  ],
+  "environment": {
+    "architecture": "arm64",
+    "macOS": "26.6.2",
+    "processor": "Apple M5 Max",
+    "sharedHost": true
+  },
+  "actualRetainedTestEngines": {
+    "recording-original-reconciliation-progress-v1": [
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "bytes": 137984624,
+        "sha256": "80aae0e2ae18ba557078dd41aee32c156dee9355d362b20a1294ec92248633b3",
+        "mode": "0o755"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "bytes": 647,
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "bytes": 134794635,
+        "sha256": "cc612d39347b4246df5a52ee4fb6ae904f5243616cba83c2be2f22725f8cfcfa",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "bytes": 51475764,
+        "sha256": "f4f1fb4aff004c8188554266ae7e6fe40ceb7711d41be9032881d7ebea6b6a76",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/oswindctl",
+        "bytes": 58266016,
+        "sha256": "738972f075a9485a1e8d484b7224c7bd1fd8a21007800660d44d4a5461d37204",
+        "mode": "0o755"
+      }
+    ],
+    "recording-original-reconciliation-release-build-v1": [
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "bytes": 98643360,
+        "sha256": "9cc5cfeb4f265f77803af7e2e03fcf24f2d9cb1aabc02d9d839859d7c9bd0ec0",
+        "mode": "0o755"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "bytes": 647,
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "bytes": 162722681,
+        "sha256": "f3f31a9c1464113b4bcd0e35d1537bf9eb166bfe0e29c40536d89c106b9d647d",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "bytes": 32422119,
+        "sha256": "843343616b24374045968602085d0155a27231f6bd0ff7322bb3e1f899048b4d",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/oswindctl",
+        "bytes": 39959304,
+        "sha256": "c29961908e3d8eb2efb58f61badcb165d00e47851648785b37300f6a27fac128",
+        "mode": "0o755"
+      }
+    ],
+    "recording-reconciliation-cursor-negative-v1": [
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "bytes": 138007920,
+        "sha256": "89212ec8edcc09a096ea6e57d307cd543274446d2346ccdf2d69b3eab85cc108",
+        "mode": "0o755"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "bytes": 647,
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "bytes": 134807608,
+        "sha256": "4ccaf0cfb6d2eb0f5923729f1f7949f0040dc8908f13b4b73d3a1b475c1a8e05",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "bytes": 51483597,
+        "sha256": "366ff4db545ad09580c85c1790836614ad950d551a60b88a1072ef2bf7a32cb0",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/oswindctl",
+        "bytes": 58266016,
+        "sha256": "738972f075a9485a1e8d484b7224c7bd1fd8a21007800660d44d4a5461d37204",
+        "mode": "0o755"
+      }
+    ],
+    "recording-reconciliation-cursor-boundary-v1": [
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "bytes": 138037296,
+        "sha256": "655d1a3f50b33e08b11e5168af65a64aabec6676ec49bb857d5bc177d1abc02d",
+        "mode": "0o755"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "bytes": 647,
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "bytes": 134836744,
+        "sha256": "eaec584804117adeda9aa9fef9bd6758a40fbec4de4b24f0a3c8822963b269a2",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "bytes": 51498056,
+        "sha256": "61ca279fb0f7eb59883f6339472befb32f4efdf45ccab676bef13a7e59a9e45c",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/oswindctl",
+        "bytes": 58266016,
+        "sha256": "738972f075a9485a1e8d484b7224c7bd1fd8a21007800660d44d4a5461d37204",
+        "mode": "0o755"
+      }
+    ],
+    "recording-reconciliation-bounded-scale-v1": [
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "bytes": 98672256,
+        "sha256": "a081c883fa0cc277e1a25e74bb6b7fe516ebca8f82438bf3fc833fb7be8ad18b",
+        "mode": "0o755"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "bytes": 647,
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "bytes": 162764788,
+        "sha256": "22a558c9b2233525a9829c02dd1e609c38ddd7b490ab6cd767f9f775f1303ca9",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "bytes": 32428326,
+        "sha256": "ea5bef6b0b67d1010c34576845f7144732600e912fb617ff49f52f6fb50bfb5b",
+        "mode": "0o644"
+      },
+      {
+        "path": "actual-engine/oswindctl",
+        "bytes": 39959304,
+        "sha256": "c29961908e3d8eb2efb58f61badcb165d00e47851648785b37300f6a27fac128",
+        "mode": "0o755"
+      }
+    ],
+    "threadSanitizer": [
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests",
+        "bytes": 189287792,
+        "sha256": "20d93a552753d74239da299bb8e3fcbdd875acb54d1319a717387bf462bd1010",
+        "mode": "0o755"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Info.plist",
+        "bytes": 647,
+        "sha256": "5b25a931aaf75753789bbe7e10e783b0513ece9b1314775519b89a7725f141e0",
+        "mode": "0o644"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/DWARF/OSwindPackageTests",
+        "bytes": 148535971,
+        "sha256": "faf78bb5e49f3573cebee34f67bcaaffda7f07c8375e4aa874778e1db5326a4c",
+        "mode": "0o644"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/OSwindPackageTests.xctest/Contents/MacOS/OSwindPackageTests.dSYM/Contents/Resources/Relocations/aarch64/OSwindPackageTests.yml",
+        "bytes": 51567802,
+        "sha256": "bf378afe9dc49e2388f1454bcefd0d562ec0247eaeacb2badfb23841e8b36fba",
+        "mode": "0o644"
+      },
+      {
+        "path": "thread-sanitizer/actual-engine/oswindctl",
+        "bytes": 82143376,
+        "sha256": "c1495cd25073ec3640d76b8e3f2a4fe4a2c1e5620ae84138e824910aa5ec6608",
+        "mode": "0o755"
+      }
+    ]
+  }
+}

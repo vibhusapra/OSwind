@@ -1,0 +1,974 @@
+{
+  "runtimeSource": "281582871034651d0990f73ae5b0164957255078",
+  "scope": "Selected actual optimized and Thread Sanitizer local qualification of recording metadata/editor/archive names. No full v0, whole affected-suite, hosted, normal package, signed interactive, energy, ASR, automatic24h or competitor ranking claim.",
+  "hostObservation": {
+    "hw.model": "Mac17,6",
+    "hw.memsize": "137438953472",
+    "hw.physicalcpu": "18",
+    "hw.logicalcpu": "18",
+    "machdep.cpu.brand_string": "Apple M5 Max",
+    "macOS": "26.6.2",
+    "build": "25G83",
+    "observedAtUTC": "2026-11-04T10:33:57.346939+00:00",
+    "scope": "Observed qualification host fields only; no load/thermal/energy control. No device serial or user identifiers retained."
+  },
+  "runs": {
+    "optimized": {
+      "source": "281582871034651d0990f73ae5b0164957255078",
+      "command": [
+        "swift",
+        "test",
+        "-c",
+        "release",
+        "--jobs",
+        "4",
+        "--filter",
+        "RecordingDetailsTests|RecordedMeetingsModelTests|RecordingNamesModelTests|RecordingSessionNamePerformanceTests|RecordingNameRenderTests"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 273.53271220903844,
+      "inputsAndPriorActualEnginesUnchanged": true,
+      "logSHA256": "c20b238dc8b983ef6821c53d023ea70a3f131799b72d4412a7c2e5ccf50179da",
+      "defined": 91,
+      "counts": {
+        "passed": 90,
+        "skipped": 1,
+        "failed": 0
+      },
+      "skips": [
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingDetailsTests.swift:234: -[OSwindCoreTests.RecordingDetailsTests testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation] : Test skipped - Explicit retained pre-metadata CLI and owned output required"
+      ],
+      "issues": [
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }"
+      ],
+      "actualEngineFrozen": true,
+      "actualSanitizerDiagnostics": [],
+      "issueCollectorNote": "Original issues field may contain quoted compiler source snippets with the string error:. It is retained verbatim; actual sanitizer diagnostics are extracted separately.",
+      "interpretation": "Selected test execution; counts remain separate from overlapping selections."
+    },
+    "thread-sanitizer": {
+      "source": "281582871034651d0990f73ae5b0164957255078",
+      "command": [
+        "swift",
+        "test",
+        "--sanitize",
+        "thread",
+        "--scratch-path",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/tsan-build",
+        "--jobs",
+        "4",
+        "--filter",
+        "RecordingDetailsTests|RecordedMeetingsModelTests|RecordingNamesModelTests|RecordingSessionNamePerformanceTests|RecordingNameRenderTests"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 159.97797541716136,
+      "inputsAndPriorActualEnginesUnchanged": true,
+      "logSHA256": "94cea4960a1742fc218d977a25429b6441ebdcc00b669d82d70ebbb6662f4e36",
+      "defined": 91,
+      "counts": {
+        "passed": 89,
+        "skipped": 2,
+        "failed": 0
+      },
+      "skips": [
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingDetailsTests.swift:234: -[OSwindCoreTests.RecordingDetailsTests testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation] : Test skipped - Explicit retained pre-metadata CLI and owned output required",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/Tests/OSwindCoreTests/RecordingSessionNamePerformanceTests.swift:13: -[OSwindCoreTests.RecordingSessionNamePerformanceTests testOwnedSessionNameLookupCostAtDifferentDensities] : Test skipped - Explicit fresh owned session-name benchmark output required"
+      ],
+      "issues": [
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }",
+        " 59 |         do { _ = try await guarded.value; XCTFail(\"Expected backend cancellation\") } catch is CancellationError {} catch { XCTFail(\"Unexpected error: \\(error)\") }"
+      ],
+      "actualEngineFrozen": true,
+      "actualSanitizerDiagnostics": [],
+      "issueCollectorNote": "Original issues field may contain quoted compiler source snippets with the string error:. It is retained verbatim; actual sanitizer diagnostics are extracted separately.",
+      "interpretation": "Selected test execution; counts remain separate from overlapping selections."
+    },
+    "optimized-old-cli-v1": {
+      "source": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "../optimized/actual-engine",
+      "rebuild": false,
+      "command": [
+        "xcrun",
+        "xctest",
+        "-XCTest",
+        "OSwindCoreTests.RecordingDetailsTests/testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/optimized/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 10.664640999864787,
+      "inputsAndActualEnginesUnchanged": true,
+      "methods": 1,
+      "counts": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      },
+      "logSHA256": "7218f5fc5db24f7eef07b820df6d3f023b0fa24bd97bd7fa8bf6cbde8f52f56f",
+      "actualSanitizerDiagnostics": [],
+      "issueCollectorNote": "Original issues field may contain quoted compiler source snippets with the string error:. It is retained verbatim; actual sanitizer diagnostics are extracted separately.",
+      "interpretation": "Selected test execution; counts remain separate from overlapping selections."
+    },
+    "thread-sanitizer-old-cli-v1": {
+      "source": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "../thread-sanitizer/actual-engine",
+      "rebuild": false,
+      "command": [
+        "xcrun",
+        "xctest",
+        "-XCTest",
+        "OSwindCoreTests.RecordingDetailsTests/testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/thread-sanitizer/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": -6,
+      "elapsedSeconds": 9.44758087489754,
+      "inputsAndActualEnginesUnchanged": true,
+      "methods": 0,
+      "counts": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      },
+      "logSHA256": "8eba3bb642c94c9a3d8e8f9946a3acbf5c95b94128c6172bc566b43d7cd8a91c",
+      "actualSanitizerDiagnostics": [
+        "==76467==ERROR: Interceptors are not working. This may be because ThreadSanitizer is loaded too late (e.g. via dlopen). Please launch the executable with:"
+      ],
+      "issueCollectorNote": "Original issues field may contain quoted compiler source snippets with the string error:. It is retained verbatim; actual sanitizer diagnostics are extracted separately.",
+      "interpretation": "Pre-test launcher abort, zero methods; not a recording behavior failure."
+    },
+    "thread-sanitizer-old-cli-v2": {
+      "source": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "../thread-sanitizer/actual-engine",
+      "rebuild": false,
+      "command": [
+        "xcrun",
+        "xctest",
+        "-XCTest",
+        "OSwindCoreTests.RecordingDetailsTests/testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/thread-sanitizer/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": -6,
+      "elapsedSeconds": 8.266052999999374,
+      "inputsAndActualEnginesUnchanged": true,
+      "methods": 0,
+      "counts": {
+        "passed": 0,
+        "skipped": 0,
+        "failed": 0
+      },
+      "logSHA256": "ea606efb0e76e23ed032d18088c5ae735fcbc7061c5213a5695ad1dfc6ae0bf5",
+      "actualSanitizerDiagnostics": [
+        "==76585==ERROR: Interceptors are not working. This may be because ThreadSanitizer is loaded too late (e.g. via dlopen). Please launch the executable with:"
+      ],
+      "issueCollectorNote": "Original issues field may contain quoted compiler source snippets with the string error:. It is retained verbatim; actual sanitizer diagnostics are extracted separately.",
+      "interpretation": "Pre-test launcher abort, zero methods; not a recording behavior failure."
+    },
+    "thread-sanitizer-old-cli-v3": {
+      "source": "281582871034651d0990f73ae5b0164957255078",
+      "actualEngine": "../thread-sanitizer/actual-engine",
+      "rebuild": false,
+      "command": [
+        "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+        "-XCTest",
+        "OSwindCoreTests.RecordingDetailsTests/testActualRetainedOldCLIRejectsNewMetadataImportWithoutDroppingAssociation",
+        "/Users/vibhusapra/.codex/worktrees/sync-late-dependencies/oswind/.artifacts/recording-session-links-v1/session-names-current-qualification-v1/thread-sanitizer/actual-engine/OSwindPackageTests.xctest"
+      ],
+      "exitCode": 0,
+      "elapsedSeconds": 11.052679833956063,
+      "inputsAndActualEnginesUnchanged": true,
+      "methods": 1,
+      "counts": {
+        "passed": 1,
+        "skipped": 0,
+        "failed": 0
+      },
+      "logSHA256": "bdaaaed352fa8a085c90ca0a2448bbf4a53f41f492092a5f2d6f91fb7c0a2dff",
+      "actualSanitizerDiagnostics": [],
+      "issueCollectorNote": "Original issues field may contain quoted compiler source snippets with the string error:. It is retained verbatim; actual sanitizer diagnostics are extracted separately.",
+      "interpretation": "Selected test execution; counts remain separate from overlapping selections."
+    }
+  },
+  "visualReview": [
+    {
+      "mode": "optimized",
+      "file": "conflicts-compact-dark.png",
+      "sha256": "32abfe4d250bcb3ec4d166bc17ec5a80a182c5f9befd72fd696dad2595f92d2a",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "conflicts-compact-light.png",
+      "sha256": "557e6c01438b60785d7f2df42f52a161a1d97d20650c70512dd8e4abc1771e92",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "conflicts-regular-dark.png",
+      "sha256": "847ec51ee413a44e504edf7c55e770a75c5195bb88c98f2d5845b2e471fa93b4",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "conflicts-regular-light.png",
+      "sha256": "46a4a88725e1d46b13a1ccfe3a547d49ad64ea4b419ecfd3810df9de4b748a7f",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "editor-dark.png",
+      "sha256": "303c7b0e28d995ba072db5ca8fe0d693fbd6ab485dd90b96b782bb65eca3f46f",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "editor-light.png",
+      "sha256": "19c698aa243d85661f3c047aeb05fd156fa46618b010d961295c9b722d05ff0d",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "named-compact-dark.png",
+      "sha256": "46255f949eb694233a8cf56d390cc23b75996317514eacf6533c3bd54e8ebb69",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "named-compact-light.png",
+      "sha256": "82ea531c42abc71234ed488e37670bb783e438f4f5854bccd88018860ba055f9",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "named-regular-dark.png",
+      "sha256": "05eda6ef175393109f885f5d95fe9f145419716b96f59f2c66d8e71877e7efbb",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "named-regular-light.png",
+      "sha256": "910930a71386cbb164ba3da9e765b47bde662eafaf98e37b5e19a16bdd309556",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "saving-dark.png",
+      "sha256": "78f6a4297ac4b9575632cc971018cd245c9a8466cb9a20e00cce55f175a3af29",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "saving-light.png",
+      "sha256": "13c9ceaa7fafdebc892a46a020d9b2976539f5bcd6002bec2e9a67e7e5691b97",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "stale-draft-dark.png",
+      "sha256": "5be62f235a94569a658cdc58b01932e69defd6639ad23a7c76bd1479ae775019",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "optimized",
+      "file": "stale-draft-light.png",
+      "sha256": "1015771a63fd76db4d1e90dc8e83b7f174c5fb8252c52ae11da1dc47741c1a7b",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "conflicts-compact-dark.png",
+      "sha256": "32abfe4d250bcb3ec4d166bc17ec5a80a182c5f9befd72fd696dad2595f92d2a",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "conflicts-compact-light.png",
+      "sha256": "557e6c01438b60785d7f2df42f52a161a1d97d20650c70512dd8e4abc1771e92",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "conflicts-regular-dark.png",
+      "sha256": "847ec51ee413a44e504edf7c55e770a75c5195bb88c98f2d5845b2e471fa93b4",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "conflicts-regular-light.png",
+      "sha256": "46a4a88725e1d46b13a1ccfe3a547d49ad64ea4b419ecfd3810df9de4b748a7f",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "editor-dark.png",
+      "sha256": "303c7b0e28d995ba072db5ca8fe0d693fbd6ab485dd90b96b782bb65eca3f46f",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "editor-light.png",
+      "sha256": "19c698aa243d85661f3c047aeb05fd156fa46618b010d961295c9b722d05ff0d",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "named-compact-dark.png",
+      "sha256": "46255f949eb694233a8cf56d390cc23b75996317514eacf6533c3bd54e8ebb69",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "named-compact-light.png",
+      "sha256": "82ea531c42abc71234ed488e37670bb783e438f4f5854bccd88018860ba055f9",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "named-regular-dark.png",
+      "sha256": "05eda6ef175393109f885f5d95fe9f145419716b96f59f2c66d8e71877e7efbb",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "named-regular-light.png",
+      "sha256": "910930a71386cbb164ba3da9e765b47bde662eafaf98e37b5e19a16bdd309556",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "saving-dark.png",
+      "sha256": "78f6a4297ac4b9575632cc971018cd245c9a8466cb9a20e00cce55f175a3af29",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "saving-light.png",
+      "sha256": "13c9ceaa7fafdebc892a46a020d9b2976539f5bcd6002bec2e9a67e7e5691b97",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "stale-draft-dark.png",
+      "sha256": "5be62f235a94569a658cdc58b01932e69defd6639ad23a7c76bd1479ae775019",
+      "byteIdenticalToReviewedV3": true
+    },
+    {
+      "mode": "thread-sanitizer",
+      "file": "stale-draft-light.png",
+      "sha256": "1015771a63fd76db4d1e90dc8e83b7f174c5fb8252c52ae11da1dc47741c1a7b",
+      "byteIdenticalToReviewedV3": true
+    }
+  ],
+  "ciStaticReview": {
+    "workflowSHA256": "e7615d3ae56e8dac668c891b4a1e6d05428a0bad87f52e46c32cbcff2ca385b8",
+    "allPriorWorkflowBytesUnchanged": true,
+    "priorSource": "2815828",
+    "yamlParsed": true,
+    "selectedNativeMethodPrefix": "VaultSessionTests.testNativeRecordingName",
+    "hostedStatus": "pending"
+  },
+  "runtimeInputsUnchanged": true,
+  "runtimeInputCount": 735,
+  "optimizedLookup": {
+    "cases": [
+      {
+        "expectedNames": 0,
+        "name": "no-names",
+        "observations": [
+          {
+            "iteration": 0,
+            "seconds": 0.000127833,
+            "warmup": true
+          },
+          {
+            "iteration": 1,
+            "seconds": 0.000119625,
+            "warmup": true
+          },
+          {
+            "iteration": 2,
+            "seconds": 0.000113542,
+            "warmup": false
+          },
+          {
+            "iteration": 3,
+            "seconds": 0.000108292,
+            "warmup": false
+          },
+          {
+            "iteration": 4,
+            "seconds": 0.000106583,
+            "warmup": false
+          },
+          {
+            "iteration": 5,
+            "seconds": 0.000105125,
+            "warmup": false
+          },
+          {
+            "iteration": 6,
+            "seconds": 0.000105791,
+            "warmup": false
+          },
+          {
+            "iteration": 7,
+            "seconds": 0.000104709,
+            "warmup": false
+          },
+          {
+            "iteration": 8,
+            "seconds": 0.000103958,
+            "warmup": false
+          },
+          {
+            "iteration": 9,
+            "seconds": 0.000103458,
+            "warmup": false
+          },
+          {
+            "iteration": 10,
+            "seconds": 0.000103541,
+            "warmup": false
+          },
+          {
+            "iteration": 11,
+            "seconds": 0.000102917,
+            "warmup": false
+          },
+          {
+            "iteration": 12,
+            "seconds": 0.000102958,
+            "warmup": false
+          },
+          {
+            "iteration": 13,
+            "seconds": 0.0001035,
+            "warmup": false
+          },
+          {
+            "iteration": 14,
+            "seconds": 0.00010325,
+            "warmup": false
+          },
+          {
+            "iteration": 15,
+            "seconds": 0.000103292,
+            "warmup": false
+          },
+          {
+            "iteration": 16,
+            "seconds": 0.000105792,
+            "warmup": false
+          },
+          {
+            "iteration": 17,
+            "seconds": 0.000102209,
+            "warmup": false
+          },
+          {
+            "iteration": 18,
+            "seconds": 0.000102209,
+            "warmup": false
+          },
+          {
+            "iteration": 19,
+            "seconds": 0.000102,
+            "warmup": false
+          },
+          {
+            "iteration": 20,
+            "seconds": 0.000102167,
+            "warmup": false
+          },
+          {
+            "iteration": 21,
+            "seconds": 0.000104625,
+            "warmup": false
+          },
+          {
+            "iteration": 22,
+            "seconds": 0.0001025,
+            "warmup": false
+          },
+          {
+            "iteration": 23,
+            "seconds": 0.000103,
+            "warmup": false
+          },
+          {
+            "iteration": 24,
+            "seconds": 0.000102334,
+            "warmup": false
+          }
+        ],
+        "statementCount": 9
+      },
+      {
+        "expectedNames": 1,
+        "name": "one-loaded-name",
+        "observations": [
+          {
+            "iteration": 0,
+            "seconds": 0.002961834,
+            "warmup": true
+          },
+          {
+            "iteration": 1,
+            "seconds": 0.002913917,
+            "warmup": true
+          },
+          {
+            "iteration": 2,
+            "seconds": 0.002932458,
+            "warmup": false
+          },
+          {
+            "iteration": 3,
+            "seconds": 0.002997875,
+            "warmup": false
+          },
+          {
+            "iteration": 4,
+            "seconds": 0.002924041,
+            "warmup": false
+          },
+          {
+            "iteration": 5,
+            "seconds": 0.0029555,
+            "warmup": false
+          },
+          {
+            "iteration": 6,
+            "seconds": 0.0030165,
+            "warmup": false
+          },
+          {
+            "iteration": 7,
+            "seconds": 0.002973334,
+            "warmup": false
+          },
+          {
+            "iteration": 8,
+            "seconds": 0.002970083,
+            "warmup": false
+          },
+          {
+            "iteration": 9,
+            "seconds": 0.0029785,
+            "warmup": false
+          },
+          {
+            "iteration": 10,
+            "seconds": 0.0029675,
+            "warmup": false
+          },
+          {
+            "iteration": 11,
+            "seconds": 0.002880583,
+            "warmup": false
+          },
+          {
+            "iteration": 12,
+            "seconds": 0.002924166,
+            "warmup": false
+          },
+          {
+            "iteration": 13,
+            "seconds": 0.002919333,
+            "warmup": false
+          },
+          {
+            "iteration": 14,
+            "seconds": 0.0028935,
+            "warmup": false
+          },
+          {
+            "iteration": 15,
+            "seconds": 0.002926084,
+            "warmup": false
+          },
+          {
+            "iteration": 16,
+            "seconds": 0.003018584,
+            "warmup": false
+          },
+          {
+            "iteration": 17,
+            "seconds": 0.002882542,
+            "warmup": false
+          },
+          {
+            "iteration": 18,
+            "seconds": 0.002888625,
+            "warmup": false
+          },
+          {
+            "iteration": 19,
+            "seconds": 0.002928084,
+            "warmup": false
+          },
+          {
+            "iteration": 20,
+            "seconds": 0.002875333,
+            "warmup": false
+          },
+          {
+            "iteration": 21,
+            "seconds": 0.002843416,
+            "warmup": false
+          },
+          {
+            "iteration": 22,
+            "seconds": 0.002911542,
+            "warmup": false
+          },
+          {
+            "iteration": 23,
+            "seconds": 0.002958416,
+            "warmup": false
+          },
+          {
+            "iteration": 24,
+            "seconds": 0.002796125,
+            "warmup": false
+          }
+        ],
+        "statementCount": 10
+      },
+      {
+        "expectedNames": 512,
+        "name": "all-512-loaded-names",
+        "observations": [
+          {
+            "iteration": 0,
+            "seconds": 0.005989542,
+            "warmup": true
+          },
+          {
+            "iteration": 1,
+            "seconds": 0.005848041,
+            "warmup": true
+          },
+          {
+            "iteration": 2,
+            "seconds": 0.00557925,
+            "warmup": false
+          },
+          {
+            "iteration": 3,
+            "seconds": 0.005568292,
+            "warmup": false
+          },
+          {
+            "iteration": 4,
+            "seconds": 0.005496458,
+            "warmup": false
+          },
+          {
+            "iteration": 5,
+            "seconds": 0.005581125,
+            "warmup": false
+          },
+          {
+            "iteration": 6,
+            "seconds": 0.005657167,
+            "warmup": false
+          },
+          {
+            "iteration": 7,
+            "seconds": 0.005593167,
+            "warmup": false
+          },
+          {
+            "iteration": 8,
+            "seconds": 0.005706666,
+            "warmup": false
+          },
+          {
+            "iteration": 9,
+            "seconds": 0.005600167,
+            "warmup": false
+          },
+          {
+            "iteration": 10,
+            "seconds": 0.00582075,
+            "warmup": false
+          },
+          {
+            "iteration": 11,
+            "seconds": 0.005921166,
+            "warmup": false
+          },
+          {
+            "iteration": 12,
+            "seconds": 0.005677208,
+            "warmup": false
+          },
+          {
+            "iteration": 13,
+            "seconds": 0.005491667,
+            "warmup": false
+          },
+          {
+            "iteration": 14,
+            "seconds": 0.005357209,
+            "warmup": false
+          },
+          {
+            "iteration": 15,
+            "seconds": 0.005523458,
+            "warmup": false
+          },
+          {
+            "iteration": 16,
+            "seconds": 0.005368375,
+            "warmup": false
+          },
+          {
+            "iteration": 17,
+            "seconds": 0.005557834,
+            "warmup": false
+          },
+          {
+            "iteration": 18,
+            "seconds": 0.005540916,
+            "warmup": false
+          },
+          {
+            "iteration": 19,
+            "seconds": 0.005640458,
+            "warmup": false
+          },
+          {
+            "iteration": 20,
+            "seconds": 0.005566292,
+            "warmup": false
+          },
+          {
+            "iteration": 21,
+            "seconds": 0.005823875,
+            "warmup": false
+          },
+          {
+            "iteration": 22,
+            "seconds": 0.005580833,
+            "warmup": false
+          },
+          {
+            "iteration": 23,
+            "seconds": 0.005386084,
+            "warmup": false
+          },
+          {
+            "iteration": 24,
+            "seconds": 0.00550775,
+            "warmup": false
+          }
+        ],
+        "statementCount": 10
+      },
+      {
+        "expectedNames": 512,
+        "name": "loaded-names-plus-4488-other-names",
+        "observations": [
+          {
+            "iteration": 0,
+            "seconds": 0.006363833,
+            "warmup": true
+          },
+          {
+            "iteration": 1,
+            "seconds": 0.005912334,
+            "warmup": true
+          },
+          {
+            "iteration": 2,
+            "seconds": 0.005571959,
+            "warmup": false
+          },
+          {
+            "iteration": 3,
+            "seconds": 0.005556208,
+            "warmup": false
+          },
+          {
+            "iteration": 4,
+            "seconds": 0.005552792,
+            "warmup": false
+          },
+          {
+            "iteration": 5,
+            "seconds": 0.005518875,
+            "warmup": false
+          },
+          {
+            "iteration": 6,
+            "seconds": 0.005634625,
+            "warmup": false
+          },
+          {
+            "iteration": 7,
+            "seconds": 0.005502708,
+            "warmup": false
+          },
+          {
+            "iteration": 8,
+            "seconds": 0.005679667,
+            "warmup": false
+          },
+          {
+            "iteration": 9,
+            "seconds": 0.005513709,
+            "warmup": false
+          },
+          {
+            "iteration": 10,
+            "seconds": 0.005569542,
+            "warmup": false
+          },
+          {
+            "iteration": 11,
+            "seconds": 0.0055285,
+            "warmup": false
+          },
+          {
+            "iteration": 12,
+            "seconds": 0.006179667,
+            "warmup": false
+          },
+          {
+            "iteration": 13,
+            "seconds": 0.006274042,
+            "warmup": false
+          },
+          {
+            "iteration": 14,
+            "seconds": 0.00624725,
+            "warmup": false
+          },
+          {
+            "iteration": 15,
+            "seconds": 0.005835708,
+            "warmup": false
+          },
+          {
+            "iteration": 16,
+            "seconds": 0.005577291,
+            "warmup": false
+          },
+          {
+            "iteration": 17,
+            "seconds": 0.005432583,
+            "warmup": false
+          },
+          {
+            "iteration": 18,
+            "seconds": 0.005529375,
+            "warmup": false
+          },
+          {
+            "iteration": 19,
+            "seconds": 0.00547175,
+            "warmup": false
+          },
+          {
+            "iteration": 20,
+            "seconds": 0.005643834,
+            "warmup": false
+          },
+          {
+            "iteration": 21,
+            "seconds": 0.005390125,
+            "warmup": false
+          },
+          {
+            "iteration": 22,
+            "seconds": 0.005570917,
+            "warmup": false
+          },
+          {
+            "iteration": 23,
+            "seconds": 0.005497667,
+            "warmup": false
+          },
+          {
+            "iteration": 24,
+            "seconds": 0.005557,
+            "warmup": false
+          }
+        ],
+        "statementCount": 10
+      }
+    ],
+    "representatives": 512,
+    "scope": "Actual Core API on 5000 authored audio rows and up to 5000 authored session labels. Warm shared host; all samples including two labelled warmups retained. Timings include settings/snapshot/lookup and exclude setup/trace counting. Canonical payload reads and DML denied during lookup. Not UI, OS-cold, energy, ASR or competitive evidence.",
+    "sources": 5000
+  },
+  "optimizedLookupSummary": [
+    {
+      "case": "no-names",
+      "medianMs": 0.103458,
+      "minMs": 0.102,
+      "maxMs": 0.113542,
+      "samples": 23,
+      "warmups": 2,
+      "statements": 9
+    },
+    {
+      "case": "one-loaded-name",
+      "medianMs": 2.926084,
+      "minMs": 2.796125,
+      "maxMs": 3.018584,
+      "samples": 23,
+      "warmups": 2,
+      "statements": 10
+    },
+    {
+      "case": "all-512-loaded-names",
+      "medianMs": 5.57925,
+      "minMs": 5.357209,
+      "maxMs": 5.921166,
+      "samples": 23,
+      "warmups": 2,
+      "statements": 10
+    },
+    {
+      "case": "loaded-names-plus-4488-other-names",
+      "medianMs": 5.557,
+      "minMs": 5.390125,
+      "maxMs": 6.274042,
+      "samples": 23,
+      "warmups": 2,
+      "statements": 10
+    }
+  ],
+  "rawEvidence": {
+    "path": "benchmarks/recording-session-names-qualified-raw-v1.zip",
+    "bytes": 2067337,
+    "sha256": "c77404e514ddefbd0e12f469053f4a17deb1182a2ebbe4dcdd67e05aaee44e0f",
+    "scope": "Actual binary manifests, inputs, logs, both pre-test launch aborts, corrected same-binary launch, native rasters and raw samples. Executables/source snapshots retained locally; no binary rebuilt for provenance."
+  },
+  "selectionCorrection": "The original selected class filter omitted methods defined in RecordingNameVaultTests.swift. That file extends VaultSessionTests; CI now selects VaultSessionTests.testNativeRecordingName explicitly. Initial selected counts do not include these two methods.",
+  "separateNativeWorkReceipt": "benchmarks/recording-session-names-native-v1.json"
+}

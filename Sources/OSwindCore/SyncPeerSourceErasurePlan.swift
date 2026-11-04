@@ -21,11 +21,19 @@ enum SyncPeerSourceErasurePlan {
                     guard try record.identity.key.digest==digest,try record.reference.content.sha256==sha else {throw OSwindError.database("Source erasure evidence integrity differs")}
                     let key=digest+sha;versions[digest,default:[]].insert(key);identities[digest]=record.identity
                     for dependency in record.dependencies {
-                        if let content=dependency.content {reverse[try dependency.identity.key.digest+content.sha256,default:[]].insert(key)}
+                        if let content=dependency.content {
+                            let parent=try dependency.identity.key.digest,version=parent+content.sha256
+                            reverse[version,default:[]].insert(key)
+                            if case .source(let source)=record.body,source.kind == .recordingMetadata {
+                                // A name may retain a reference after the source
+                                // version's cache body has been purged.
+                                versions[parent,default:[]].insert(version);identities[parent]=dependency.identity
+                            }
+                        }
                     }
                     switch record.body {
                     case .conversationCitation(let citation),.recapCitation(let citation):owners[key]=citation.owner
-                    case .source(let source) where source.recap != nil:owners[key]=record.identity
+                    case .source(let source) where source.recap != nil || source.recordingDetails?.scope.source != nil:owners[key]=record.identity
                     default:break
                     }
                 }
@@ -33,12 +41,24 @@ enum SyncPeerSourceErasurePlan {
             }
             guard code==SQLITE_DONE else {throw db.error()}
         }
-        var queue=Array(versions[object] ?? []),seen=Set(queue),selectedOwners=Set<String>(),cursor=0
+        var queue=Array(versions[object] ?? []),seen=Set(queue),selectedOwners=Set<String>(),nativeNameOwners=[String:SyncObjectIdentity](),cursor=0
         func enqueue(_ keys:Set<String>) {for key in keys where seen.insert(key).inserted {queue.append(key)}}
         func nativeRoots()throws {
             let row=try db.statement("SELECT object_digest||content_sha FROM historical_evidence WHERE handle IN (SELECT handle FROM temp.erasure_historical_ids)");defer {sqlite3_finalize(row)}
             var code=sqlite3_step(row)
             while code==SQLITE_ROW {enqueue([db.text(row,0)]);code=sqlite3_step(row)}
+            guard code==SQLITE_DONE else {throw db.error()}
+            // Canonical name ownership survives an unavailable wire projection
+            // or a real rename which discarded all old name bodies. Retire the
+            // known lifetime, rather than allowing a late put to recreate it.
+            let names=try db.statement("SELECT m.id FROM memories m JOIN temp.erasure_ids e ON e.id=m.id WHERE m.kind='recording-metadata'");defer {sqlite3_finalize(names)};code=sqlite3_step(names)
+            while code==SQLITE_ROW {
+                if let identity=try catalog.preparedIdentity(.source,primary:[.text(Data(db.text(names,0).utf8))]) {
+                    let digest=try identity.key.digest
+                    if digest != object {nativeNameOwners[digest]=identity;identities[digest]=identity;enqueue(versions[digest] ?? [])}
+                }
+                code=sqlite3_step(names)
+            }
             guard code==SQLITE_DONE else {throw db.error()}
         }
         try nativeRoots()
@@ -63,6 +83,6 @@ enum SyncPeerSourceErasurePlan {
         for key in seen {
             try Task.checkCancellation();sqlite3_reset(insert);sqlite3_clear_bindings(insert);db.bind(insert,1,String(key.prefix(64)));db.bind(insert,2,String(key.suffix(64)));try db.done(insert)
         }
-        return Set(seen.map {String($0.prefix(64))}).sorted().compactMap {identities[$0]}
+        return Set(seen.map {String($0.prefix(64))}).union(nativeNameOwners.keys).sorted().compactMap {identities[$0]}
     }
 }

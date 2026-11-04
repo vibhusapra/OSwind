@@ -6,6 +6,10 @@ struct SyncRecordingScope:Codable,Equatable,Sendable {
     let selector:RecordingScope.Selector
     let session:SyncSessionToken?
     let source:SyncVersionReference?
+    init(source:SyncVersionReference?)throws {
+        self.source=source;session=nil;selector=source==nil ? .unavailable:.source
+        try validate()
+    }
     init(_ value:RecordingScope,session resolveSession:((String)throws->SyncSessionToken?)?,source resolveSource:((String,String)throws->SyncVersionReference)?)throws {
         switch value.selector {
         case .unavailable:selector = .unavailable;session=nil;source=nil

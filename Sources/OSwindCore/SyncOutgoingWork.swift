@@ -45,6 +45,7 @@ struct SyncOutgoingWorkQueue {
                 for name in schemas.keys.sorted() where name.hasPrefix("sync_work_") {try db.execute(schemas[name]!)}
             }
             try value.context()
+            try SyncRecordingReconciliation.install(db)
             let sum=try db.statement("SELECT 192*(SELECT COUNT(*) FROM personal_sync_work)=used_bytes FROM personal_sync_work_state WHERE singleton=1");defer {sqlite3_finalize(sum)}
             guard sqlite3_step(sum)==SQLITE_ROW,sqlite3_column_int(sum,0)==1 else {throw OSwindError.database("Sync work accounting differs")}
             return value
@@ -142,7 +143,10 @@ struct SyncOutgoingWorkQueue {
     }
     /// Move durable local policy holds back to ordinary work. Raw lifetime
     /// intents must drain first; no private body or new journal dot is created.
-    func requeueWithheld(_ identities:[SyncObjectIdentity])throws {
+    func requeueWithheld(_ identities:[SyncObjectIdentity])throws {try requeueLive(identities)}
+    /// Requeue already mapped live owners for ordinary, fully admitted export.
+    /// This changes no canonical body, source lifetime or journal sequence.
+    func requeueLive(_ identities:[SyncObjectIdentity])throws {
         guard identities.count<=256 else {throw OSwindError.invalid("Invalid withheld requeue bound")}
         if identities.isEmpty {
             return try SyncChangeCapture.transaction(database) {

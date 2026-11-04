@@ -34,6 +34,7 @@ struct SyncServicePolicy {
             if let speech=body.transcript {try admit(speech)}
             if let visual=body.visualRecording {try admit(visual)}
             if let recap=body.recap {text += [recap.provider]+recap.sources.map(\.match)}
+            if let calendar=body.recordingDetails?.calendar {text += [calendar.calendarID,calendar.seriesID]}
         case .conversation(let body):text += [body.title]
         case .turn(let body):text += [body.question,body.text,body.provider]+body.warnings;filter(body.filter)
         case .conversationCitation(let body),.recapCitation(let body):text += [body.link.match]
@@ -69,6 +70,7 @@ struct SyncServicePolicy {
         try strings([memory.app,memory.bundleID,memory.title,memory.url,memory.text,memory.display].compactMap({$0})+memory.tags+memory.regions.map(\.text))
         if let speech=memory.transcript {try admit(speech)}
         if let visual=memory.visualRecording {try admit(visual)}
+        if let calendar=memory.recordingDetails?.calendar {try strings([calendar.calendarID,calendar.seriesID])}
     }
 
     private func strings(_ values:[String])throws {

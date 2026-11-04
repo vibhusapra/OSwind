@@ -14,7 +14,7 @@ extension SyncPortableRecord {
         func version(_ ref:SyncVersionReference)->SyncPortableDependency {.init(identity:ref.identity,content:ref.content)}
         func filter(_ f:SyncFilterBody)->[SyncPortableDependency] {(f.entity.map {[object($0)]} ?? [])+(f.recordingScope?.source.map {[version($0)]} ?? [])}
         switch body {
-        case .source(let v):return (v.recap?.sources ?? []).map {version($0.source)}
+        case .source(let v):return v.sourceReferences.map {version($0)}
         case .turn(let v):return [object(v.conversation)]+filter(v.filter)
         case .conversationCitation(let v),.recapCitation(let v):return [object(v.owner),version(v.link.source)]
         case .routineRun(let v):return [.init(identity:v.recipe.routine,content:v.recipe.definition)]+(v.conversation.map {[object($0)]} ?? [])+filter(v.filter)
@@ -319,6 +319,13 @@ struct SyncVersionStore {
             if reference.identity.table == .source,case .blob(let data)=row.cells[8] {let memory=try JSONDecoder().decode(Memory.self,from:data);evidence=memory.evidenceHash;entity=memory.entityRevision}
             try context();guard try currentRow(reference.identity).encoded()==row.encoded(),try stored(reference) != nil else {throw OSwindError.invalid("Sync projection source changed during dependency admission")}
             try bindMetadata(record,row:row)
+            if case .source(let body)=record.body,body.kind == .recordingMetadata,case .blob(let payload)=row.cells[8] {
+                let memory=try JSONDecoder().decode(Memory.self,from:payload)
+                if let scope=memory.recordingDetails?.scope,scope.selector == .source {
+                    try RecordingAffiliationStore.save(database,id:memory.id,owner:record.identity,scope:scope,reference:body.recordingDetails?.scope.source)
+                    try RecordingReassignmentStore.consume(database,id:memory.id,owner:record.identity,scope:scope)
+                }
+            }
             let put=try database.statement("INSERT INTO personal_sync_version_projection VALUES(?,?,?,?,?) ON CONFLICT(object_digest) DO UPDATE SET content_sha=excluded.content_sha,row_digest=excluded.row_digest,evidence=excluded.evidence,entity_revision=excluded.entity_revision");defer {sqlite3_finalize(put)}
             database.bind(put,1,try reference.identity.key.digest);database.bind(put,2,reference.content.sha256);database.bind(put,3,SyncProtocolLimits.hex(try row.encoded()));database.bind(put,4,evidence);database.bind(put,5,entity);try database.done(put);try context()
         }
@@ -334,6 +341,142 @@ struct SyncVersionStore {
             guard sqlite3_column_type(row,2)==SQLITE_TEXT,sqlite3_column_type(row,3)==SQLITE_TEXT,Data(memory.evidenceHash.utf8)==Data(database.text(row,2).utf8),Data(memory.entityRevision.utf8)==Data(database.text(row,3).utf8) else {throw OSwindError.database("Sync source revision binding differs from original evidence")}
             switch revision {case .current:break;case .evidence(let expected):guard Data(expected.utf8)==Data(database.text(row,2).utf8) else {throw OSwindError.invalid("Local sync evidence revision differs")};case .entity(let expected):guard Data(expected.utf8)==Data(database.text(row,3).utf8) else {throw OSwindError.invalid("Local sync entity revision differs")}}
             let current=try resolve(value.identity,content:nil,admit:admit);guard try current.reference==value.reference else {throw OSwindError.invalid("Sync source projection changed during admission")};return try value.reference
+        }
+    }
+    private struct RecordingProjection:Equatable {
+        let reference:SyncVersionReference
+        let evidence:String,entity:String,row:String
+    }
+    private func recordingProjection(_ identity:SyncObjectIdentity)throws->RecordingProjection? {
+        let row=try database.statement("SELECT p.content_sha,p.evidence,p.entity_revision,p.row_digest,v.bytes FROM personal_sync_version_projection p LEFT JOIN personal_sync_versions v ON v.object_digest=p.object_digest AND v.content_sha=p.content_sha WHERE p.object_digest=?");defer {sqlite3_finalize(row)};database.bind(row,1,try identity.key.digest)
+        let code=sqlite3_step(row);if code==SQLITE_DONE {return nil}
+        guard code==SQLITE_ROW,(0...3).allSatisfy({sqlite3_column_type(row,Int32($0))==SQLITE_TEXT}),sqlite3_column_type(row,4)==SQLITE_INTEGER else {throw OSwindError.database("Recording projection binding differs")}
+        return try .init(reference:.init(identity:identity,content:.init(sha256:database.text(row,0),bytes:sqlite3_column_int64(row,4))),evidence:database.text(row,1),entity:database.text(row,2),row:database.text(row,3))
+    }
+    /// Rebuild the OLD metadata projection using only the proposed native
+    /// association. Its stored evidence checksum proves that exact association
+    /// was admitted with the old wire reference, even after a name/favorite edit.
+    /// Merely matching an audio evidence hash or namespace supplies no proof.
+    func recordingSourceBinding(_ memory:Memory,historical:HistoricalEvidenceStore?=nil,admit:(SyncPortableRecord)throws->Void,verifyOriginal:((HistoricalEvidence)throws->Void)?=nil)throws->SyncRecordingSourceResolution? {
+        try SyncChangeCapture.transaction(database) {
+            try context()
+            guard memory.kind == .recordingMetadata,let scope=memory.recordingDetails?.scope,scope.selector == .source else {return nil}
+            let identity=try mappedIdentity(.source,[.text(Data(memory.id.utf8))]),native=try currentRow(identity)
+            guard case .blob(let payload)=native.cells[8],try SyncProtocolLimits.encode(JSONDecoder().decode(Memory.self,from:payload))==SyncProtocolLimits.encode(memory) else {throw OSwindError.invalid("Recording metadata changed before affiliation admission")}
+            if let binding=try RecordingAffiliationStore.read(database,id:memory.id) {
+                guard binding.scope==scope else {throw OSwindError.database("Recording affiliation native scope differs")}
+                func validateBinding()throws {
+                    try context()
+                    guard try currentRow(identity).encoded()==native.encoded(),try RecordingAffiliationStore.read(database,id:memory.id)==binding else {throw OSwindError.invalid("Recording affiliation changed during admission")}
+                }
+                func finishBinding(_ result:SyncRecordingSourceResolution)throws->SyncRecordingSourceResolution {try validateBinding();return result}
+                guard binding.owner==identity,let reference=binding.reference else {return try finishBinding(.unavailable)}
+                guard try catalog.preparedIdentity(.source,primary:[.text(Data(scope.id!.utf8))])==reference.identity else {return try finishBinding(.unavailable)}
+                let target=try currentRow(reference.identity)
+                var original=try self.record(reference,admit:admit)
+                if original==nil,let historical,let verifyOriginal {
+                    guard historical.database.handle==database.handle else {throw OSwindError.invalid("Recording archive belongs to another database")}
+                    if let retained=try historical.recordingOriginal(reference,sourceID:scope.id!,admit:admit,verify:verifyOriginal) {
+                        guard case .source(let audio)=retained.record.body,audio.kind == .audio else {throw OSwindError.invalid("Recording affiliation original is not audio")}
+                        try validateBinding()
+                        guard try currentRow(reference.identity).encoded()==target.encoded(),try !HistoricalErasureSchema.hasRevokedVersion(database,retained.record) else {throw OSwindError.invalid("Recording original owner changed or its version was erased")}
+                        // The live checked affiliation authorizes only this exact
+                        // dependency body. The archive alone admits no new head.
+                        let (_,localKey)=try owner(reference.identity)
+                        if try stored(reference)==nil {
+                            let data=try retained.record.encoded(),put=try database.statement("INSERT INTO personal_sync_versions VALUES(?,?,?,?,?,?)");defer {sqlite3_finalize(put)}
+                            database.bind(put,1,try reference.identity.key.digest);database.bind(put,2,reference.content.sha256);database.bind(put,3,reference.identity.table.rawValue);bind(put,4,localKey);sqlite3_bind_int64(put,5,reference.content.bytes);bind(put,6,data);try database.done(put)
+                        }
+                        guard let restored=try stored(reference),try restored.encoded()==retained.record.encoded() else {throw OSwindError.invalid("Recovered recording body differs")}
+                        let after=try historical.read(retained.handle,sourceID:scope.id!,verifyMedia:{_,_,_ in})
+                        guard try after.record.encoded()==retained.record.encoded(),try SyncProtocolLimits.encode(after.memory)==SyncProtocolLimits.encode(retained.memory) else {throw OSwindError.invalid("Recording archive changed while restoring its cache")}
+                        original=restored
+                    }
+                }
+                guard let original else {return try finishBinding(.unavailable)}
+                guard case .source(let audio)=original.body,audio.kind == .audio else {throw OSwindError.invalid("Recording affiliation original is not audio")}
+                guard try currentRow(reference.identity).encoded()==target.encoded() else {throw OSwindError.invalid("Recording affiliation target changed during admission")}
+                return try finishBinding(.available(reference))
+            }
+            if let intent=try RecordingReassignmentStore.read(database,id:memory.id) {
+                guard intent.owner==identity,intent.scope==scope else {throw OSwindError.invalid("Recording reassignment differs from its native owner or scope")}
+                try context()
+                guard try currentRow(identity).encoded()==native.encoded(),try RecordingReassignmentStore.read(database,id:memory.id)==intent else {throw OSwindError.invalid("Recording reassignment changed during admission")}
+                return nil // The explicit native edit authorizes normal current-source admission.
+            }
+            guard let projection=try recordingProjection(identity) else {
+                let heads=try journal.state(for:identity.key).heads
+                if heads.isEmpty {return nil}
+                func finishUnbound(_ result:SyncRecordingSourceResolution)throws->SyncRecordingSourceResolution {
+                    try context()
+                    guard try currentRow(identity).encoded()==native.encoded(),try recordingProjection(identity)==nil,try RecordingAffiliationStore.read(database,id:memory.id)==nil,try journal.state(for:identity.key).heads==heads else {throw OSwindError.invalid("Recording publication changed while checking its binding")}
+                    return result
+                }
+                // bindCurrent verifies a just-published first label before its
+                // projection exists. A real head and the independently checked
+                // current audio projection prove that case. A historical hash
+                // or a different, newer audio wire version cannot stand in.
+                guard heads.count==1,let content=heads.first?.content,
+                      let record=try self.record(.init(identity:identity,content:content),admit:admit),
+                      case .source(let body)=record.body,body.kind == .recordingMetadata,let reference=body.recordingDetails?.scope.source else {return try finishUnbound(.unavailable)}
+                guard try catalog.preparedIdentity(.source,primary:[.text(Data(scope.id!.utf8))])==reference.identity,
+                      let audioProjection=try recordingProjection(reference.identity),audioProjection.reference==reference else {return try finishUnbound(.unavailable)}
+                let target=try currentRow(reference.identity)
+                guard case .blob(let payload)=target.cells[8] else {throw OSwindError.invalid("Recording audio payload differs")}
+                let audio=try JSONDecoder().decode(Memory.self,from:payload)
+                guard audio.kind == .audio,audio.evidenceHash==scope.revision,audioProjection.evidence==scope.revision,try SyncProtocolLimits.hex(target.encoded())==audioProjection.row else {return try finishUnbound(.unavailable)}
+                _=try finishUnbound(.unavailable)
+                if historical != nil,verifyOriginal != nil {
+                    try RecordingAffiliationStore.save(database,id:memory.id,owner:identity,scope:scope,reference:reference)
+                    return try recordingSourceBinding(memory,historical:historical,admit:admit,verifyOriginal:verifyOriginal)
+                }
+                guard let original=try self.record(reference,admit:admit),case .source(let source)=original.body,source.kind == .audio else {return try finishUnbound(.unavailable)}
+                guard try recordingProjection(reference.identity)==audioProjection,try currentRow(reference.identity).encoded()==target.encoded() else {throw OSwindError.invalid("Recording audio projection changed during admission")}
+                return try finishUnbound(.available(reference))
+            }
+            if SyncProtocolLimits.hex(try native.encoded())==projection.row {
+                guard Data(memory.evidenceHash.utf8)==Data(projection.evidence.utf8),Data(memory.entityRevision.utf8)==Data(projection.entity.utf8) else {throw OSwindError.database("Recording native projection checksum differs")}
+            }
+            func finish(_ result:SyncRecordingSourceResolution?)throws->SyncRecordingSourceResolution? {
+                try context()
+                guard try currentRow(identity).encoded()==native.encoded(),try recordingProjection(identity)==projection else {throw OSwindError.invalid("Recording affiliation changed during admission")};return result
+            }
+            guard let record=try self.record(projection.reference,admit:admit) else {return try finish(.unavailable)}
+            guard case .source(let body)=record.body,body.kind == .recordingMetadata,let details=body.recordingDetails else {return try finish(nil)}
+            guard details.scope.selector != .session else {return try finish(nil)}
+            var candidate=try body.projectedMemory(id:memory.id,paths:[:]) {_ in (scope.id!,scope.revision!)}
+            if details.scope.selector == .unavailable {candidate.recordingDetails = .init(scope:scope,calendar:details.calendar)}
+            guard Data(candidate.evidenceHash.utf8)==Data(projection.evidence.utf8),Data(candidate.entityRevision.utf8)==Data(projection.entity.utf8) else {return try finish(nil)}
+            guard let reference=details.scope.source else {return try finish(.unavailable)}
+            guard try catalog.preparedIdentity(.source,primary:[.text(Data(scope.id!.utf8))])==reference.identity else {return try finish(.unavailable)}
+            if historical != nil,verifyOriginal != nil {
+                _=try finish(.available(reference))
+                try RecordingAffiliationStore.save(database,id:memory.id,owner:identity,scope:scope,reference:reference)
+                return try recordingSourceBinding(memory,historical:historical,admit:admit,verifyOriginal:verifyOriginal)
+            }
+            let target=try currentRow(reference.identity)
+            guard let original=try self.record(reference,admit:admit) else {return try finish(.unavailable)}
+            guard case .source(let audio)=original.body,audio.kind == .audio else {throw OSwindError.invalid("Recording affiliation original is not audio")}
+            guard try currentRow(reference.identity).encoded()==target.encoded() else {throw OSwindError.invalid("Recording affiliation target changed during admission")}
+            return try finish(.available(reference))
+        }
+    }
+    /// Only a checked absence, non-audio source or distinct native revision
+    /// returns unavailable. Admission, corruption and callback errors propagate.
+    func currentRecordingSource(localID:String,revision:String,prepare:(SyncObjectIdentity)throws->Void,admit:(SyncPortableRecord)throws->Void)throws->SyncRecordingSourceResolution {
+        try SyncChangeCapture.transaction(database) {
+            try context()
+            let row=try database.statement("SELECT kind FROM memories WHERE id IS ?");defer {sqlite3_finalize(row)};database.bind(row,1,localID)
+            let code=sqlite3_step(row)
+            if code==SQLITE_DONE {return .unavailable}
+            guard code==SQLITE_ROW else {throw database.error()}
+            guard database.text(row,0)==MemoryKind.audio.rawValue else {return .unavailable}
+            let identity=try catalog.registerExisting(.source,primary:[.text(Data(localID.utf8))]);try prepare(identity)
+            let reference=try sourceVersion(localID:localID,revision:.current,admit:admit),native=try currentRow(identity)
+            guard case .blob(let payload)=native.cells[8] else {throw OSwindError.invalid("Recording source payload differs")}
+            let memory=try JSONDecoder().decode(Memory.self,from:payload)
+            guard memory.kind == .audio,Data(memory.id.utf8)==Data(localID.utf8) else {throw OSwindError.invalid("Recording source changed during preparation")}
+            return Data(memory.evidenceHash.utf8)==Data(revision.utf8) ? .available(reference):.unavailable
         }
     }
     func projectedReference(_ identity:SyncObjectIdentity)throws->SyncVersionReference? {

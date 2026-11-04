@@ -52,12 +52,14 @@ struct PersonalSyncErasureRecovery:Sendable {
     private var lockMonitor:Timer?
     private var watchFD:Int32?
     private var watchedVaultID:String?
+    private let recordingCalendarProvider:MeetingCalendarProvider?
     private let personalSyncSetup:((MemoryStore)->PersonalSyncModel)?
     private let openStore:@Sendable (URL) throws -> MemoryStore
     private let syncRecovery:PersonalSyncErasureRecovery
     private let openVault:@Sendable (URL)throws->LibraryVault
-    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recoveryTransfer:LibraryTransferModel?=nil,syncRecovery:PersonalSyncErasureRecovery = .native,membershipRecovery:@escaping @Sendable (URL)->PersonalSyncOwnerChange={PersonalSyncOwnerChange.recover(root:$0)},ownerAdditionPreview:Bool=ProcessInfo.processInfo.environment["OSWIND_OWNER_ADDITION_PREVIEW"]=="1",openVault:@escaping @Sendable (URL)throws->LibraryVault={try LibraryVault(package:$0)}) {
+    init(selection:LibraryLocationSelection?=nil,defaults:UserDefaults = .standard,locked:@escaping () -> Bool={SessionState.locked},openStore:@escaping @Sendable (URL) throws -> MemoryStore={try MemoryStore(root:$0)},personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,recordingCalendarProvider:MeetingCalendarProvider?=nil,recoveryTransfer:LibraryTransferModel?=nil,syncRecovery:PersonalSyncErasureRecovery = .native,membershipRecovery:@escaping @Sendable (URL)->PersonalSyncOwnerChange={PersonalSyncOwnerChange.recover(root:$0)},ownerAdditionPreview:Bool=ProcessInfo.processInfo.environment["OSWIND_OWNER_ADDITION_PREVIEW"]=="1",openVault:@escaping @Sendable (URL)throws->LibraryVault={try LibraryVault(package:$0)}) {
         let resolved=selection ?? LibraryLocationPreferences.selection(demo:CommandLine.arguments.contains("--demo"),defaults:defaults)
+        self.recordingCalendarProvider=recordingCalendarProvider
         self.selection=resolved;self.defaults=defaults;self.locked=locked;self.openStore=openStore;self.personalSyncSetup=personalSyncSetup;requested=resolved.url;self.recoveryTransfer=recoveryTransfer ?? LibraryTransferModel();self.syncRecovery=syncRecovery;self.membershipRecovery=membershipRecovery;self.ownerAdditionPreview=ownerAdditionPreview;self.openVault=openVault
         self.recoveryTransfer.allowed={[weak self] in guard let self else {return false};return !self.terminationRequested && !self.busy && !self.locked()}
         do {
@@ -266,7 +268,7 @@ struct PersonalSyncErasureRecovery:Sendable {
             }
             if vaultPackage != nil && (locked() || pendingLock || terminationRequested) {throw CancellationError()}
             try validateStore?(store)
-            let candidate=try AppModel(root:root,startServices:false,preparedStore:store,personalSyncSetup:personalSyncSetup)
+            let candidate=try AppModel(root:root,startServices:false,preparedStore:store,personalSyncSetup:personalSyncSetup,recordingCalendarProvider:recordingCalendarProvider)
             if ownerAdditionPreview {
                 candidate.personalSync.approveOwnerAddition={[weak self,weak candidate] review in
                     guard let self,let candidate else {return};self.approveSyncDevice(review,from:candidate)

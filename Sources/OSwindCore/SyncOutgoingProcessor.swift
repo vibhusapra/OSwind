@@ -1,7 +1,7 @@
 import Foundation
 import CSQLite
 
-enum SyncOutgoingStep:Equatable,Sendable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),idle}
+enum SyncOutgoingStep:Equatable,Sendable {case captured(Int),prepared(Int),bootstrapped(SyncCanonicalTable,Int),revalidatingRecordings(scanned:Int,queued:Int),idle}
 
 /// Internal synchronous outgoing adapter over all canonical tables. The owning
 /// library supplies current privacy admission and prepared media; no networking,
@@ -75,6 +75,9 @@ struct SyncOutgoingProcessor {
                 let code=sqlite3_step(row);guard code==SQLITE_DONE || code==SQLITE_ROW else {throw database.error()}
                 if code==SQLITE_DONE || sqlite3_column_int(row,0)==0 {return .bootstrapped(table,try queue.bootstrap(table,limit:limit).objects)}
             }
+            if let progress=try SyncRecordingReconciliation.step(queue:queue,cache:cache,limit:limit) {
+                return .revalidatingRecordings(scanned:progress.scanned,queued:progress.queued)
+            }
             // Even an idle call must validate generation, durability and schema.
             try queue.validateIdle();return .idle
         }
@@ -119,6 +122,13 @@ struct SyncOutgoingProcessor {
             _=try self.prepare(self.identity(.routine,[.text(Data(recipe.utf8))]))
             return try self.cache.runRecipe(localRunID:run,recipeID:recipe,ordinal:ordinal,admit:self.processor.admitVersion)
         },runOriginal:{run in try RoutineRunOriginalStore(db:self.db).read(run)},erasedRunConversation:{try self.cache.erasedRunConversation(localRunID:$0)})
+            let verifyOriginal:(HistoricalEvidence)throws->Void={value in
+                guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
+            }
+            base.recordingSourceBinding={memory in try self.cache.recordingSourceBinding(memory,historical:self.historical,admit:self.processor.admitVersion,verifyOriginal:verifyOriginal)}
+            base.recordingSource={_,id,revision in
+                try self.cache.currentRecordingSource(localID:id,revision:revision,prepare:{_=try self.prepare($0)},admit:self.processor.admitVersion)
+            }
             base.recordingSession={session in
                 try RecordedMeetingSchema.populateIfNeeded(self.db)
                 let row=try self.db.statement("SELECT memory_id FROM recorded_meeting_sources WHERE grouped=1 AND recording_id=? ORDER BY memory_id LIMIT 1");defer {sqlite3_finalize(row)};self.db.bind(row,1,session)
@@ -131,9 +141,7 @@ struct SyncOutgoingProcessor {
                 if let token=try self.cache.sessionBinding(localID:id,admit:{_ in try self.processor.admitRow(identity,self.current(identity))}) {return token}
                 return try SyncSessionToken(origin:identity.origin,localID:session)
             }
-            return historical.decorating(base,admit:processor.admitVersion,verify:{value in
-                guard case .source(let body)=value.record.body,try self.processor.media(value.memory)==body.media else {throw OSwindError.invalid("Historical outgoing media differs")}
-            })
+            return historical.decorating(base,admit:processor.admitVersion,verify:verifyOriginal)
         }
         @discardableResult func prepare(_ identity:SyncObjectIdentity)throws->SyncPortableRecord {
             do {return try prepareAdmitted(identity)}catch let error as SyncPublicationPolicyDenied {throw SyncPublicationPolicyDenied(identity:error.identity ?? identity)}

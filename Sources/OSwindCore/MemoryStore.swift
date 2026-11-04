@@ -214,6 +214,9 @@ public final class MemoryStore: @unchecked Sendable {
         try FullTextIdentitySchema.install(RoutineDatabase(handle:db!))
         try TagIndexSchema.install(RoutineDatabase(handle:db!))
         try RecordedMeetingSchema.install(RoutineDatabase(handle:db!))
+        try RecordingAffiliationStore.install(RoutineDatabase(handle:db!))
+        try RecordingReassignmentStore.install(RoutineDatabase(handle:db!))
+        try RecordingRelationshipIndexes.install(RoutineDatabase(handle:db!))
         try SyncIncomingEntitySchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try SyncIncomingSourceErasureSchema.validateSourceTransition(RoutineDatabase(handle:db!),sourceVersion:version)
         try exec(EntitySchema.sql)
@@ -324,7 +327,8 @@ public final class MemoryStore: @unchecked Sendable {
     private func string(_ stmt: OpaquePointer, _ column: Int32) -> String { guard let text = sqlite3_column_text(stmt,column) else { return "" }; return String(decoding:UnsafeBufferPointer(start:text,count:Int(sqlite3_column_bytes(stmt,column))),as:UTF8.self) }
     private func decode(_ stmt: OpaquePointer, column: Int32 = 0) throws -> Memory {
         guard let bytes = sqlite3_column_blob(stmt, column) else { throw OSwindError.database("Missing payload") }
-        return try JSONDecoder().decode(Memory.self, from: Data(bytes: bytes, count: Int(sqlite3_column_bytes(stmt, column))))
+        let memory=try JSONDecoder().decode(Memory.self, from: Data(bytes: bytes, count: Int(sqlite3_column_bytes(stmt, column))))
+        try memory.validateRecordingDetails();return memory
     }
     public func insert(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:false)}
     func insertRestoringRecap(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:true)}
@@ -333,6 +337,7 @@ public final class MemoryStore: @unchecked Sendable {
         guard deferRecapLinks || memory.recap?.sources.allSatisfy({$0.historicalHandle==nil}) != false else {throw OSwindError.invalid("Historical recap bindings require the trusted incoming or backup adapter")}
         guard memory.originalEvidence==nil else {throw OSwindError.invalid("Original evidence is read-only. Save an independent note to create a new source.")}
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
+        try memory.validateRecordingDetails()
         try memory.textObservation?.validated(for:memory)
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
         if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }
@@ -348,6 +353,10 @@ public final class MemoryStore: @unchecked Sendable {
         do {
         try validateRecapInsertion(memory,deferred:deferRecapLinks)
         let previous=try get(memory.id)
+        if let before=previous,before.kind == .recordingMetadata,memory.kind == .recordingMetadata,
+           let a=before.recordingDetails?.scope,let b=memory.recordingDetails?.scope,RecordingDetails.sameTarget(a,b) {
+            try RecordingAffiliationStore.rememberProjection(RoutineDatabase(handle:db!),memory:before)
+        }
         if let before=previous,try !incomingSourceProjection.permits(memory) {
             let changed=before.timestamp.timeIntervalSince1970.bitPattern != memory.timestamp.timeIntervalSince1970.bitPattern || before.kind != memory.kind || [before.title,before.app,before.text].map({Data($0.utf8)}) != [memory.title,memory.app,memory.text].map({Data($0.utf8)}) || before.url.map({Data($0.utf8)}) != memory.url.map({Data($0.utf8)})
             if changed {try retireEntityScopesForSourceRevision(memory.id,db:RoutineDatabase(handle:db!))}
@@ -369,6 +378,9 @@ public final class MemoryStore: @unchecked Sendable {
         bind(stmt, 11, memory.embeddingModel)
         guard sqlite3_step(stmt) == SQLITE_DONE else { throw failure() }
         try replaceSpeakerProjection(memory);try replaceSearchPreview(memory);try replaceVisualProjection(memory);try replaceRecapLinks(memory,deferred:deferRecapLinks)
+        if let previous,try !incomingSourceProjection.permits(memory) {
+            try RecordingReassignmentStore.rememberNativeChange(RoutineDatabase(handle:db!),before:previous,after:memory)
+        }
         try Task.checkCancellation();try exec(ownsTransaction ? "COMMIT":"RELEASE memory_insert")
         if ownsTransaction {_ = finishRecapInvalidation()}
         } catch { try? exec(ownsTransaction ? "ROLLBACK":"ROLLBACK TO memory_insert; RELEASE memory_insert"); throw error }
@@ -772,7 +784,7 @@ public final class MemoryStore: @unchecked Sendable {
     }
     private func changeMetadata(_ id:String,preservingPIIScan:Bool=false,change:(inout Memory)->Void) throws {
         lock.lock();defer {lock.unlock()};try exec("BEGIN IMMEDIATE")
-        do {if var memory=try get(id) {change(&memory);try updateMetadata(memory,preservingPIIScan:preservingPIIScan)};try exec("COMMIT")}
+        do {if var memory=try get(id) {if memory.kind == .recordingMetadata {try RecordingAffiliationStore.rememberProjection(RoutineDatabase(handle:db!),memory:memory)};change(&memory);try updateMetadata(memory,preservingPIIScan:preservingPIIScan)};try exec("COMMIT")}
         catch {try? exec("ROLLBACK");throw error}
     }
     public func setFavorite(_ id: String, value: Bool) throws {try changeMetadata(id,preservingPIIScan:true) {$0.favorite=value}}

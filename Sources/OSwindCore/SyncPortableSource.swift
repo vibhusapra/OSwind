@@ -83,11 +83,27 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
     let favorite:Bool
     let tags:[String]
     let recap:SyncRecapBody?
+    let recordingDetails:SyncRecordingDetails?
     let media:[SyncMediaManifest]
+
+    /// Ordered exact source versions used by both archival stores and admission.
+    var sourceReferences:[SyncVersionReference] {
+        (recap?.sources.map(\.source) ?? [])+(recordingDetails?.scope.source.map {[$0]} ?? [])
+    }
+    func validateSourceParents(_ records:[SyncPortableRecord])throws {
+        guard records.count==sourceReferences.count else {throw OSwindError.invalid("Sync source parent count differs")}
+        for (record,reference) in zip(records,sourceReferences) {
+            guard try record.reference==reference else {throw OSwindError.invalid("Sync source parent version differs")}
+        }
+        if recordingDetails?.scope.source != nil {
+            guard let last=records.last,case .source(let audio)=last.body,audio.kind == .audio else {throw OSwindError.invalid("A recording name must refer to audio evidence")}
+        }
+    }
 
     /// Preparation must supply every retained asset; never silently drop media.
     /// resolve receives the recorded evidence revision, not just a local ID.
-    init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,historical:((RecapSource)throws->SyncVersionReference)?=nil,resolve:(String,String)throws->SyncVersionReference)throws {
+    init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,historical:((RecapSource)throws->SyncVersionReference)?=nil,recordingSession:((String)throws->SyncSessionToken?)?=nil,recordingSource:((String,String)throws->SyncRecordingSourceResolution)?=nil,resolve:@escaping (String,String)throws->SyncVersionReference)throws {
+        try memory.validateRecordingDetails()
         guard memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("Use a canonical complete source before sync preparation")}
         let roles:Set<SyncMediaRole>=Set([(memory.imagePath == nil ? nil:SyncMediaRole.image),(memory.audioPath == nil ? nil:SyncMediaRole.audio),(memory.videoPath == nil ? nil:SyncMediaRole.video)].compactMap {$0})
         guard roles==Set(media.map(\.role)),media.count==roles.count else {throw OSwindError.invalid("Prepare every source media asset exactly once")}
@@ -114,9 +130,20 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
                 return .init(source:reference,score:source.score,match:source.match,passage:source.passage)
             })
         }
+        recordingDetails=try memory.recordingDetails.map {try .init($0,session:recordingSession,source:recordingSource ?? { .available(try resolve($0,$1)) })}
         try validate()
     }
     func validate()throws {
+        if kind == .recordingMetadata || recordingDetails != nil {
+            guard kind == .recordingMetadata,let recordingDetails,media.isEmpty else {throw OSwindError.invalid("Portable recording metadata kind or media differs")}
+            try recordingDetails.validate()
+            var probe=Memory(id:"validation",timestamp:timestamp,endTimestamp:endTimestamp,kind:kind,app:app,bundleID:bundleID,title:title,url:url,text:text,display:display,regions:regions,favorite:favorite,tags:tags)
+            probe.transcript=transcript;probe.visualRecording=visualRecording;probe.textObservation=textObservation;probe.audioSessionID=audioSession?.localProjection
+            probe.recap=recap.map {_ in RecapProvenance(provider:"validation",sources:[])}
+            probe.recordingDetails=try recordingDetails.projected {_ in ("validation",String(repeating:"0",count:64))}
+            try probe.validateRecordingDetails()
+            guard try SyncProtocolLimits.encode(self).count<=32768 else {throw OSwindError.invalid("Portable recording metadata exceeds 32 KiB")}
+        }
         try SyncWireCheck.date(timestamp);if let endTimestamp {try SyncWireCheck.date(endTimestamp);guard endTimestamp>=timestamp else {throw OSwindError.invalid("Sync source end precedes start")}}
         guard text.count<=1_000_000,regions.count<=100_000,tags.count<=100_000,media.count<=3,Set(media.map(\.role)).count==media.count,media.map({$0.role.rawValue})==media.map({$0.role.rawValue}).sorted() else {throw OSwindError.invalid("Invalid sync source size")}
         for s in [app,bundleID,title,url,display].compactMap({$0}) {try SyncWireCheck.text(s,bytes:4*1024*1024)}
@@ -149,6 +176,8 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
             let local=try resolve(link.source)
             return RecapSource(id:local.id,revision:local.evidenceHash,match:link.match,score:link.score,passage:link.passage)
         })}
+        memory.recordingDetails=try recordingDetails?.projected(resolve:resolve)
+        try memory.validateRecordingDetails()
         return memory
     }
 }

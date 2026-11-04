@@ -17,7 +17,8 @@ import EventKit
     @Published var recordingScope:RecordingScope?
     private var recordingChatRequest:UUID?
     let meetings:MeetingsModel
-    lazy var recordedMeetings=RecordedMeetingsModel(store:store,work:libraryWork)
+    private let recordingCalendarProvider:MeetingCalendarProvider?
+    lazy var recordedMeetings=RecordedMeetingsModel(store:store,work:libraryWork,nameDetails:RecordingNamesModel(store:store,work:libraryWork,calendarProvider:recordingCalendarProvider ?? .native()))
     let tools:MCPToolsModel
     let clipboard:ClipboardContextModel
     let voice:VoiceTypingModel
@@ -172,7 +173,8 @@ import EventKit
     private var housekeeping: Timer?
     private var housekeepingRequested=false
     @Published private(set) var housekeepingActive=false
-    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,localModelSetup:LocalModelLibraryModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,audioSetup:((MemoryStore,LocalEmbedder,AppSettings)->AudioController)?=nil,recordingsLocked:@escaping ()->Bool={SessionState.locked}) throws {
+    init(root selectedRoot: URL? = nil, startServices: Bool = true, nativeModelSetup:NativeModelSetupModel?=nil,localModelSetup:LocalModelLibraryModel?=nil,visualSetup:VisualModelSetupModel?=nil,piiSetup:PIIModelSetupModel?=nil,preparedStore:MemoryStore?=nil,drafting:ContextualDraftModel?=nil,meetingsSetup:((MemoryStore,AppSettings)->MeetingsModel)?=nil,toolsSetup:((MemoryStore,AppSettings)->MCPToolsModel)?=nil,clipboardSetup:((MemoryStore,AppSettings)->ClipboardContextModel)?=nil,voiceSetup:((MemoryStore,AppSettings,ContextualDraftModel)->VoiceTypingModel)?=nil,workflowSetup:((MemoryStore,AppSettings)->WorkflowModel)?=nil,personalSyncSetup:((MemoryStore)->PersonalSyncModel)?=nil,audioSetup:((MemoryStore,LocalEmbedder,AppSettings)->AudioController)?=nil,recordingsLocked:@escaping ()->Bool={SessionState.locked},recordingCalendarProvider:MeetingCalendarProvider?=nil) throws {
+        self.recordingCalendarProvider=recordingCalendarProvider
         self.drafting=drafting ?? ContextualDraftModel()
         nativeModels=nativeModelSetup ?? NativeModelSetupModel()
         visualModelSetup=visualSetup ?? VisualModelSetupModel()

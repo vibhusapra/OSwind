@@ -4,16 +4,20 @@ import UserNotifications
 import OSwindCore
 
 enum MeetingCalendarAccess:Equatable,Sendable {case notRequested,full,writeOnly,denied,restricted,unknown}
-struct MeetingFeed:Sendable {let events:[MeetingOccurrence];let revision:UInt64}
+struct MeetingFeed:Sendable {let events:[MeetingOccurrence];let revision:UInt64;var calendars:[MeetingCalendar]=[]}
 struct MeetingCalendarProvider:Sendable {
     var access:@Sendable () async ->MeetingCalendarAccess
     var request:@Sendable () async throws ->MeetingCalendarAccess
     var calendars:@Sendable () async throws ->[MeetingCalendar]
     var events:@Sendable ([String],Bool,PrivacyPolicy,Date) async throws ->MeetingFeed
     var revision:@Sendable ()->UInt64
+    // Recording review uses an explicit bounded historical window. Old feed
+    // fixtures cannot accidentally supply a native access guarantee.
+    var eventsInRange:@Sendable ([String],PrivacyPolicy,DateInterval) async throws->MeetingFeed = {_,_,_ in throw OSwindError.unavailable("Historical calendar review is unavailable")}
+    var accessNow:@Sendable ()->MeetingCalendarAccess = {.unknown}
     static func native()->Self {
         let source=EventKitMeetingSource()
-        return .init(access:{await source.access()},request:{try await source.request()},calendars:{try await source.calendars()},events:{try await source.events(ids:$0,participants:$1,policy:$2,now:$3)},revision:{source.clock.read()})
+        return .init(access:{await source.access()},request:{try await source.request()},calendars:{try await source.calendars()},events:{try await source.events(ids:$0,participants:$1,policy:$2,now:$3)},revision:{source.clock.read()},eventsInRange:{try await source.events(ids:$0,participants:false,policy:$1,range:$2)},accessNow:{EventKitMeetingSource.currentAccess()})
     }
 }
 private final class MeetingStoreRevision:@unchecked Sendable {
@@ -29,7 +33,8 @@ private actor EventKitMeetingSource {
     nonisolated let clock=MeetingStoreRevision()
     private var store:EKEventStore?
     private func instance()->EKEventStore {if let store {return store};let value=EKEventStore();store=value;return value}
-    func access()->MeetingCalendarAccess {
+    func access()->MeetingCalendarAccess {Self.currentAccess()}
+    nonisolated static func currentAccess()->MeetingCalendarAccess {
         switch EKEventStore.authorizationStatus(for:.event) {
         case .notDetermined:return .notRequested
         case .fullAccess:return .full
@@ -58,14 +63,19 @@ private actor EventKitMeetingSource {
         return try values.map {try MeetingCalendar(id:$0.calendarIdentifier,title:$0.title,account:$0.source.title)}.sorted {$0.title.localizedStandardCompare($1.title) == .orderedAscending}
     }
     func events(ids:[String],participants:Bool,policy:PrivacyPolicy,now:Date)throws->MeetingFeed {
+        guard now.timeIntervalSinceReferenceDate.isFinite else {throw OSwindError.invalid("Choose a finite calendar date")}
+        return try events(ids:ids,participants:participants,policy:policy,range:DateInterval(start:now.addingTimeInterval(-1800),end:now.addingTimeInterval(36*3600)))
+    }
+    func events(ids:[String],participants:Bool,policy:PrivacyPolicy,range:DateInterval)throws->MeetingFeed {
+        guard range.start.timeIntervalSinceReferenceDate.isFinite,range.end.timeIntervalSinceReferenceDate.isFinite,range.duration>0,range.duration<=7*86400 else {throw OSwindError.invalid("Read a calendar window of at most seven days")}
         guard access() == .full else {throw OSwindError.unavailable("Calendar read access was removed. Reconnect Calendar before refreshing.")}
-        guard policy.exclusion(app:"com.apple.iCal",title:"",url:nil)==nil,!ids.isEmpty,ids.count<=32,now.timeIntervalSinceReferenceDate.isFinite else {throw OSwindError.unavailable("Select permitted calendars before reading meeting context.")}
+        guard policy.exclusion(app:"com.apple.iCal",title:"",url:nil)==nil,!ids.isEmpty,ids.count<=32 else {throw OSwindError.unavailable("Select permitted calendars before reading meeting context.")}
         try Task.checkCancellation();let before=clock.read(),store=instance();store.reset()
         let keys=Set(ids.map {Data($0.utf8)}),available=store.calendars(for:.event)
         guard available.count<=128 else {throw OSwindError.unavailable("Too many calendars are available for a bounded selection.")}
         let selected=available.filter {keys.contains(Data($0.calendarIdentifier.utf8))}
         guard selected.count==keys.count else {throw OSwindError.unavailable("A selected calendar is no longer available. Review the selection.")}
-        let predicate=store.predicateForEvents(withStart:now.addingTimeInterval(-1800),end:now.addingTimeInterval(36*3600),calendars:selected)
+        let predicate=store.predicateForEvents(withStart:range.start,end:range.end,calendars:selected)
         var result=[MeetingOccurrence](),failure:Error?,count=0
         store.enumerateEvents(matching:predicate) {event,stop in
             count+=1
@@ -93,7 +103,7 @@ private actor EventKitMeetingSource {
         }
         if let failure {throw failure};try Task.checkCancellation()
         guard access() == .full,before==clock.read() else {throw OSwindError.unavailable("Calendar changed during refresh. Refresh again before preparing or joining.")}
-        return .init(events:result,revision:before)
+        return .init(events:result,revision:before,calendars:try selected.map {try MeetingCalendar(id:$0.calendarIdentifier,title:policy.sanitize($0.title).text,account:policy.sanitize($0.source.title).text)})
     }
 }
 
