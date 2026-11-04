@@ -117,7 +117,7 @@ struct ActivityCalendarView:View {
     private func weekday(_ index:Int,snapshot:ActivityCalendarSnapshot)->String {let formatter=DateFormatter();formatter.calendar=Calendar(identifier:.gregorian);formatter.locale = .current;let names=formatter.shortStandaloneWeekdaySymbols ?? ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];return names[(snapshot.firstWeekday-1+index)%7]}
     private func dayTitle(_ day:ActivityCalendarDay,snapshot:ActivityCalendarSnapshot)->String {guard let date=day.start else {return day.key};let formatter=DateFormatter();formatter.calendar=Calendar(identifier:.gregorian);formatter.timeZone=TimeZone(identifier:snapshot.timeZone);formatter.dateStyle = .full;return formatter.string(from:date)}
     private func hourTitle(_ hour:ActivityCalendarHour,snapshot:ActivityCalendarSnapshot)->String {let formatter=DateFormatter();formatter.calendar=Calendar(identifier:.gregorian);formatter.locale=Locale(identifier:"en_US_POSIX");formatter.timeZone=TimeZone(identifier:snapshot.timeZone);formatter.dateFormat="HH:mm XXX";return formatter.string(from:hour.start)}
-    private func typeName(_ kind:MemoryKind)->String {switch kind {case .screen:return "Screens";case .audio:return "Audio";case .note:return "Notes";case .summary:return "Recaps"}}
+    private func typeName(_ kind:MemoryKind)->String {switch kind {case .screen:return "Screens";case .audio:return "Audio";case .note:return "Notes";case .summary:return "Recaps";case .recording:return "Recording names"}}
 }
 struct ActivityCalendarFooter:View {
     @ObservedObject var model:ActivityCalendarModel

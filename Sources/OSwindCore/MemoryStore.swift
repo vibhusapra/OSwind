@@ -324,7 +324,8 @@ public final class MemoryStore: @unchecked Sendable {
     private func string(_ stmt: OpaquePointer, _ column: Int32) -> String { guard let text = sqlite3_column_text(stmt,column) else { return "" }; return String(decoding:UnsafeBufferPointer(start:text,count:Int(sqlite3_column_bytes(stmt,column))),as:UTF8.self) }
     private func decode(_ stmt: OpaquePointer, column: Int32 = 0) throws -> Memory {
         guard let bytes = sqlite3_column_blob(stmt, column) else { throw OSwindError.database("Missing payload") }
-        return try JSONDecoder().decode(Memory.self, from: Data(bytes: bytes, count: Int(sqlite3_column_bytes(stmt, column))))
+        let memory=try JSONDecoder().decode(Memory.self, from: Data(bytes: bytes, count: Int(sqlite3_column_bytes(stmt, column))))
+        try memory.validateRecordingDetails();return memory
     }
     public func insert(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:false)}
     func insertRestoringRecap(_ memory:Memory) throws {try insertValidated(memory,deferRecapLinks:true)}
@@ -333,6 +334,7 @@ public final class MemoryStore: @unchecked Sendable {
         guard deferRecapLinks || memory.recap?.sources.allSatisfy({$0.historicalHandle==nil}) != false else {throw OSwindError.invalid("Historical recap bindings require the trusted incoming or backup adapter")}
         guard memory.originalEvidence==nil else {throw OSwindError.invalid("Original evidence is read-only. Save an independent note to create a new source.")}
         guard memory.searchPreview==nil else { throw OSwindError.invalid("Hydrate a search preview before saving a source") }
+        try memory.validateRecordingDetails()
         try memory.textObservation?.validated(for:memory)
         guard !memory.id.isEmpty, memory.id.count < 200, memory.text.count <= 1_000_000 else { throw OSwindError.invalid("Invalid memory size or identifier") }
         if let transcript=memory.transcript { _ = try transcript.validated(); guard memory.kind == .audio,memory.text == transcript.text else { throw OSwindError.invalid("Transcript and source text differ") } }

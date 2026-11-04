@@ -153,12 +153,16 @@ public extension MemoryStore {
         guard source.owner==recordedMeetingOwner else {throw OSwindError.unavailable("Refresh recordings in this library before opening a source")}
         let snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()};let policy=snapshot.settings.privacy
         return try withRoutineDatabase {db in try db.transaction {try snapshot.withCurrent(root:root,policy:policy) {
+            try recordedMeetingEvidence(source,db:db,policy:policy)
+        }}}
+    }
+    internal func recordedMeetingEvidence(_ source:RecordedMeetingSource,db:RoutineDatabase,policy:PrivacyPolicy)throws->Memory {
+        guard source.owner==recordedMeetingOwner else {throw OSwindError.unavailable("Refresh recordings in this library before opening a source")}
             let row=try db.statement("SELECT revision FROM recorded_meeting_sources WHERE memory_id=?");defer {sqlite3_finalize(row)};db.bind(row,1,source.memoryID)
             guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==source.revision,let memory=try get(source.memoryID),memory.kind == .audio else {throw OSwindError.unavailable("This recording changed. Refresh before opening it.")}
             let group=memory.audioSessionID != nil,id=memory.audioSessionID ?? memory.id
             guard RecordedMeetingSource.key(grouped:group,id:id)==source.sessionKey,policy.exclusion(app:memory.bundleID.isEmpty ? memory.app:memory.bundleID,title:memory.title,url:memory.url)==nil else {throw OSwindError.unavailable("This recording is no longer in the selected session or privacy scope")}
             return memory
-        }}}
     }
 }
 

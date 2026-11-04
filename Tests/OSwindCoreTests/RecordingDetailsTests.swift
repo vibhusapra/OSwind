@@ -1,0 +1,126 @@
+import XCTest
+@testable import OSwindCore
+
+final class RecordingDetailsTests:XCTestCase {
+    private var root:URL!,store:MemoryStore!
+    override func setUpWithError()throws {root=FileManager.default.temporaryDirectory.appendingPathComponent("owned-recording-details-"+UUID().uuidString);store=try MemoryStore(root:root.appendingPathComponent("library"))}
+    override func tearDownWithError()throws {try store.close();try FileManager.default.removeItem(at:root)}
+    @discardableResult private func audio(_ id:String,session:String?="session",offset:Double=0)throws->Memory {
+        var value=Memory(id:id,timestamp:Date(timeIntervalSince1970:100+offset),endTimestamp:Date(timeIntervalSince1970:130+offset),kind:.audio,app:"Authored audio",bundleID:"owned.audio",title:"Original source title",text:"Original authored transcript "+id)
+        value.audioSessionID=session;value.transcript = .init(text:value.text,duration:30,segments:[.init(start:0,end:30,text:value.text)],model:"Authored fixture, no ASR")
+        try store.insert(value);return value
+    }
+    private func source(_ id:String)throws->RecordedMeetingSource {try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==id})}
+    func testNamePersistsWithoutChangingAudioAndFollowsNewClipsInExactSession()throws {
+        let a=try audio("a"),b=try audio("b",offset:40),ref=try source("a")
+        let saved=try store.saveRecordedMeetingName("  Planning discussion  ",for:ref)
+        XCTAssertEqual(saved.name,"Planning discussion");XCTAssertEqual(saved.details.scope.id,"session")
+        XCTAssertEqual(try store.get("a"),a);XCTAssertEqual(try store.get("b"),b);XCTAssertEqual(try store.get("a")?.evidenceHash,a.evidenceHash)
+        XCTAssertEqual(try store.recordedMeetingDetails(for:ref),[saved]);XCTAssertEqual(try store.recordedMeetingEvidence(ref),a)
+        try audio("new",offset:80);XCTAssertEqual(try store.recordedMeetingDetails(for:source("new")),[saved])
+        try audio("unrelated",session:"other",offset:80);XCTAssertTrue(try store.recordedMeetingDetails(for:source("unrelated")).isEmpty)
+        XCTAssertEqual(try store.recordedMeetingPage().sources.count,4,"The metadata record is not an audio clip")
+        XCTAssertEqual(try store.get(saved.id)?.kind,.recording)
+    }
+    func testRenameRequiresExactCurrentSnapshotAcrossConnections()throws {
+        try audio("a");let ref=try source("a"),initial=try store.saveRecordedMeetingName("Initial",for:ref)
+        let other=try MemoryStore(root:store.root);defer {try? other.close()}
+        let otherRef=try XCTUnwrap(other.recordedMeetingPage().sources.first),otherInitial=try XCTUnwrap(other.recordedMeetingDetails(for:otherRef).first)
+        let changed=try other.saveRecordedMeetingName("Changed elsewhere",for:otherRef,replacing:otherInitial)
+        XCTAssertEqual(changed.id,initial.id)
+        XCTAssertThrowsError(try store.saveRecordedMeetingName("Lost update",for:ref,replacing:initial))
+        XCTAssertThrowsError(try store.saveRecordedMeetingName("Blind create",for:ref))
+        let current=try XCTUnwrap(store.recordedMeetingDetails(for:ref).first);XCTAssertEqual(current.name,"Changed elsewhere")
+        let final=try store.saveRecordedMeetingName("Reviewed current edit",for:ref,replacing:current)
+        XCTAssertEqual(final.id,initial.id);XCTAssertNotEqual(final.revision,current.revision)
+    }
+    func testReopenRetainsCanonicalNameAndRefusesPriorStoreSnapshots()throws {
+        try audio("a");let prior=try source("a"),saved=try store.saveRecordedMeetingName("Persistent",for:prior),location=store.root
+        try store.close();store=try MemoryStore(root:location)
+        let current=try source("a"),restored=try XCTUnwrap(store.recordedMeetingDetails(for:current).first)
+        XCTAssertEqual(restored.id,saved.id);XCTAssertEqual(restored.revision,saved.revision);XCTAssertEqual(restored.name,saved.name)
+        XCTAssertThrowsError(try store.recordedMeetingDetails(for:prior));XCTAssertThrowsError(try store.saveRecordedMeetingName("Old store edit",for:current,replacing:saved))
+        XCTAssertEqual(try store.saveRecordedMeetingName("Current store edit",for:current,replacing:restored).id,saved.id)
+    }
+    func testUngroupedNameIsBoundToExactEvidenceVersion()throws {
+        var memory=try audio("legacy",session:nil);try audio("neighbor",session:nil,offset:1)
+        let ref=try source("legacy"),saved=try store.saveRecordedMeetingName("Legacy clip name",for:ref)
+        XCTAssertEqual(saved.details.scope.selector,.source);XCTAssertEqual(saved.details.scope.revision,memory.evidenceHash)
+        XCTAssertTrue(try store.recordedMeetingDetails(for:source("neighbor")).isEmpty)
+        memory.title="Changed original evidence";try store.insert(memory)
+        XCTAssertThrowsError(try store.recordedMeetingDetails(for:ref));XCTAssertTrue(try store.recordedMeetingDetails(for:source("legacy")).isEmpty)
+        XCTAssertNotNil(try store.get(saved.id),"Independent user-authored metadata is not silently rewritten to cite a replacement version")
+    }
+    func testByteDistinctUnicodeAndNULSessionNamesRemainSeparate()throws {
+        for (i,id) in ["é","e\u{301}","\u{0}group","group"].enumerated() {
+            try audio("audio-\(i)",session:id);let ref=try source("audio-\(i)");_ = try store.saveRecordedMeetingName("Name \(i)",for:ref)
+        }
+        for i in 0..<4 {XCTAssertEqual(try store.recordedMeetingDetails(for:source("audio-\(i)")).map(\.name),["Name \(i)"])}
+    }
+    func testConflictingDefinitionsAreExposedAndNeverChosenByRecency()throws {
+        try audio("a");let ref=try source("a"),first=try store.saveRecordedMeetingName("First",for:ref)
+        var second=try XCTUnwrap(store.get(first.id));second.id="owned-conflicting-name";second.title="Second";second.timestamp=Date(timeIntervalSince1970:900)
+        try store.insert(second)
+        XCTAssertEqual(Set(try store.recordedMeetingDetails(for:ref).map(\.name)),["First","Second"])
+        XCTAssertThrowsError(try store.saveRecordedMeetingName("Silent winner",for:ref,replacing:first))
+        XCTAssertEqual(try store.get(first.id)?.title,"First");XCTAssertEqual(try store.get(second.id)?.title,"Second")
+    }
+    func testCurrentAudioAndMetadataPrivacyBothRefuseAccessAndMutation()throws {
+        try audio("a");let ref=try source("a"),saved=try store.saveRecordedMeetingName("Allowed name",for:ref)
+        var settings=AppSettings.load(root:store.root);settings.privacy.excludedApps.append("owned.audio");try settings.save(root:store.root)
+        XCTAssertThrowsError(try store.recordedMeetingDetails(for:ref));XCTAssertThrowsError(try store.saveRecordedMeetingName("No bypass",for:ref,replacing:saved))
+        settings.privacy.excludedApps.removeAll {$0=="owned.audio"};settings.privacy.excludedApps.append("com.oswind.desktop");try settings.save(root:store.root)
+        XCTAssertThrowsError(try store.recordedMeetingDetails(for:ref));XCTAssertThrowsError(try store.saveRecordedMeetingName("No hidden overwrite",for:ref,replacing:saved))
+        XCTAssertEqual(try store.get(saved.id)?.title,"Allowed name")
+    }
+    func testStaleDeletedRegroupedAndForeignAudioReferencesCannotNameSources()throws {
+        var memory=try audio("a");let ref=try source("a")
+        let other=try MemoryStore(root:store.root);defer {try? other.close()}
+        XCTAssertThrowsError(try other.saveRecordedMeetingName("Foreign",for:ref))
+        memory.audioSessionID="different";try store.insert(memory);XCTAssertThrowsError(try store.saveRecordedMeetingName("Stale group",for:ref))
+        let latest=try source("a");try store.delete("a");try store.insert(memory);XCTAssertThrowsError(try store.saveRecordedMeetingName("Recreated",for:latest))
+        XCTAssertEqual(try store.stats(includeDiskUsage:false).count,1)
+    }
+    func testInvalidNamesAndMixedCapturedMetadataRefuseWithoutSaving()throws {
+        try audio("a");let ref=try source("a")
+        for name in [""," \n ","Line\nbreak","NUL\u{0}name",String(repeating:"x",count:201),"e"+String(repeating:"\u{301}",count:5000)] {XCTAssertThrowsError(try store.saveRecordedMeetingName(name,for:ref))}
+        var invalid=Memory(kind:.recording,title:"Missing binding",text:"");XCTAssertThrowsError(try store.insert(invalid))
+        invalid.recordingDetails = .init(scope:try .init(sessionID:"session"));invalid.audioPath="audio/not-captured.wav";XCTAssertThrowsError(try store.insert(invalid))
+        invalid.audioPath=nil;invalid.kind = .note;XCTAssertThrowsError(try store.insert(invalid))
+        invalid.kind = .recording;invalid.text=String(repeating:"x",count:32768);XCTAssertThrowsError(try store.insert(invalid))
+        XCTAssertTrue(try store.recordedMeetingDetails(for:ref).isEmpty)
+    }
+    func testRecordingScopeAndCalendarAssociationChangeEvidenceWithoutChangingEmbeddingText()throws {
+        var value=Memory(kind:.recording,title:"Name",text:"User label")
+        value.recordingDetails = .init(scope:try .init(sessionID:"one"));let hash=value.evidenceHash,text=value.contentHash
+        value.recordingDetails = .init(scope:try .init(sessionID:"two"));XCTAssertEqual(value.contentHash,text);XCTAssertNotEqual(value.evidenceHash,hash)
+        let event=try MeetingOccurrence(calendarID:"calendar",seriesID:"series",originalOccurrence:Date(timeIntervalSince1970:100),start:Date(timeIntervalSince1970:100),end:Date(timeIntervalSince1970:200),title:"Private event title",participants:["Private attendee"],joinURL:URL(string:"https://owned.invalid/secret-token"))
+        let link=try RecordingCalendarLink(event:event,libraryIdentity:String(repeating:"a",count:32)),data=try JSONEncoder().encode(link),string=String(decoding:data,as:UTF8.self)
+        for forbidden in ["Private event title","Private attendee","secret-token","https://"] {XCTAssertFalse(string.contains(forbidden))}
+        XCTAssertEqual(try JSONDecoder().decode(RecordingCalendarLink.self,from:data),link)
+        XCTAssertTrue(link.matches(event,libraryIdentity:String(repeating:"a",count:32)));XCTAssertFalse(link.matches(event,libraryIdentity:String(repeating:"b",count:32)))
+        let moved=try MeetingOccurrence(calendarID:event.calendarID,seriesID:event.seriesID,originalOccurrence:event.originalOccurrence,start:event.start.addingTimeInterval(30),end:event.end.addingTimeInterval(30),title:event.title,participants:event.participants,joinURL:event.joinURL)
+        XCTAssertEqual(moved.id,event.id);XCTAssertFalse(link.matches(moved,libraryIdentity:link.libraryIdentity))
+        let before=value.evidenceHash;value.recordingDetails = .init(scope:value.recordingDetails!.scope,calendar:link);XCTAssertNotEqual(value.evidenceHash,before)
+    }
+    func testMetadataDecodeRefusesUnknownVersionsAndForgedOccurrenceIdentity()throws {
+        let details=RecordingDetails(scope:try .init(sessionID:"session")),data=try JSONEncoder().encode(details)
+        var object=try XCTUnwrap(JSONSerialization.jsonObject(with:data) as? [String:Any]);object["version"]=2
+        XCTAssertThrowsError(try JSONDecoder().decode(RecordingDetails.self,from:JSONSerialization.data(withJSONObject:object)))
+        let event=try MeetingOccurrence(calendarID:"calendar",seriesID:"series",start:Date(timeIntervalSince1970:100),end:Date(timeIntervalSince1970:200),title:"")
+        let link=try RecordingCalendarLink(event:event,libraryIdentity:String(repeating:"a",count:32))
+        var forged=try XCTUnwrap(JSONSerialization.jsonObject(with:JSONEncoder().encode(link)) as? [String:Any]);forged["occurrenceID"]=String(repeating:"0",count:64)
+        XCTAssertThrowsError(try JSONDecoder().decode(RecordingCalendarLink.self,from:JSONSerialization.data(withJSONObject:forged)))
+        XCTAssertThrowsError(try RecordingCalendarLink(event:event,libraryIdentity:"wrong"))
+    }
+    func testBackupRestoreRetainsBothNamesWithoutGrantingCalendarAuthority()throws {
+        try audio("grouped");try audio("legacy",session:nil,offset:1)
+        let a=try store.saveRecordedMeetingName("Group",for:source("grouped")),b=try store.saveRecordedMeetingName("Legacy",for:source("legacy"))
+        let archive=root.appendingPathComponent("owned.oswindbackup"),destination=root.appendingPathComponent("restored"),info=try LibraryBackup.create(store:store,destination:archive)
+        XCTAssertEqual(info.memories,4);_ = try LibraryBackup.restore(archive,to:destination,expectedFingerprint:info.archiveFingerprint)
+        let restored=try MemoryStore(root:destination);defer {try? restored.close()}
+        let page=try restored.recordedMeetingPage()
+        for (id,old) in [("grouped",a),("legacy",b)] {let ref=try XCTUnwrap(page.sources.first {$0.memoryID==id}),named=try XCTUnwrap(restored.recordedMeetingDetails(for:ref).first);XCTAssertEqual(named.id,old.id);XCTAssertEqual(named.name,old.name)}
+        XCTAssertFalse(AppSettings.load(root:destination).meetings.enabled)
+    }
+}

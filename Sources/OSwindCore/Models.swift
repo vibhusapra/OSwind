@@ -1,6 +1,6 @@
 import Foundation
 
-public enum MemoryKind: String, Codable, CaseIterable, Sendable { case screen, audio, note, summary }
+public enum MemoryKind: String, Codable, CaseIterable, Sendable { case screen, audio, note, summary, recording }
 public struct TextRegion: Codable, Equatable, Sendable {
     public var text: String
     public var x, y, width, height: Double
@@ -23,6 +23,8 @@ public struct Memory: Identifiable, Codable, Equatable, Sendable {
     public var visualRecording: VisualRecording?
     public var transcript: SpeechTranscript?
     public var audioSessionID: String?
+    /// User-authored recording metadata, separate from original audio evidence.
+    public var recordingDetails:RecordingDetails?
     public var display: String?
     public var regions: [TextRegion]
     public var favorite: Bool

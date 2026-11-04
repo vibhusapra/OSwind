@@ -88,6 +88,8 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
     /// Preparation must supply every retained asset; never silently drop media.
     /// resolve receives the recorded evidence revision, not just a local ID.
     init(memory:Memory,origin:String,media:[SyncMediaManifest],sessionBinding:SyncSessionToken?=nil,historical:((RecapSource)throws->SyncVersionReference)?=nil,resolve:(String,String)throws->SyncVersionReference)throws {
+        // WIP: remove only with the complete typed recording-details adapter.
+        guard memory.kind != .recording,memory.recordingDetails==nil else {throw OSwindError.unavailable("Recording metadata transport is not prepared yet")}
         guard memory.searchPreview==nil,memory.originalEvidence==nil else {throw OSwindError.invalid("Use a canonical complete source before sync preparation")}
         let roles:Set<SyncMediaRole>=Set([(memory.imagePath == nil ? nil:SyncMediaRole.image),(memory.audioPath == nil ? nil:SyncMediaRole.audio),(memory.videoPath == nil ? nil:SyncMediaRole.video)].compactMap {$0})
         guard roles==Set(media.map(\.role)),media.count==roles.count else {throw OSwindError.invalid("Prepare every source media asset exactly once")}
@@ -117,6 +119,7 @@ struct SyncSourceBody:Codable,Equatable,Sendable {
         try validate()
     }
     func validate()throws {
+        guard kind != .recording else {throw OSwindError.unavailable("Recording metadata transport is not prepared yet")}
         try SyncWireCheck.date(timestamp);if let endTimestamp {try SyncWireCheck.date(endTimestamp);guard endTimestamp>=timestamp else {throw OSwindError.invalid("Sync source end precedes start")}}
         guard text.count<=1_000_000,regions.count<=100_000,tags.count<=100_000,media.count<=3,Set(media.map(\.role)).count==media.count,media.map({$0.role.rawValue})==media.map({$0.role.rawValue}).sorted() else {throw OSwindError.invalid("Invalid sync source size")}
         for s in [app,bundleID,title,url,display].compactMap({$0}) {try SyncWireCheck.text(s,bytes:4*1024*1024)}

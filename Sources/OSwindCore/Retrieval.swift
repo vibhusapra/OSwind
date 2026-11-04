@@ -10,7 +10,8 @@ public extension Memory {
         let audio=transcript.flatMap { try? encoder.encode($0) }.map { SHA256.hash(data:$0).map { String(format:"%02x",$0) }.joined() } ?? ""
         let linked=recap.flatMap {try? encoder.encode($0)}.map {":"+SHA256.hash(data:$0).map {String(format:"%02x",$0)}.joined()} ?? ""
         let observation=textObservation.flatMap {try? encoder.encode($0)}.map {":sampled-text:"+SHA256.hash(data:$0).map {String(format:"%02x",$0)}.joined()+":"+String((endTimestamp ?? timestamp).timeIntervalSinceReferenceDate.bitPattern)} ?? ""
-        let base=contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue + ":" + audio + linked + observation
+        let recording=recordingDetails.flatMap {try? encoder.encode($0)}.map {":recording-details:"+SHA256.hash(data:$0).map {String(format:"%02x",$0)}.joined()} ?? ""
+        let base=contentHash + ":" + String(timestamp.timeIntervalSinceReferenceDate.bitPattern) + ":" + kind.rawValue + ":" + audio + linked + observation + recording
         guard let visualRecording else {return base}
         return base+":"+SHA256.hash(data:(try? encoder.encode(visualRecording)) ?? Data()).map {String(format:"%02x",$0)}.joined()
     }
