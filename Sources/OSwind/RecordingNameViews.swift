@@ -35,6 +35,7 @@ struct RecordingNameSection:View {
             }else if let name=names.rows.first {
                 HStack {Text("Saved recording name").foregroundStyle(.secondary);Spacer();removeButton(name)}.font(.caption)
             }
+            if names.rows.count<=1 {RecordingCalendarSection(calendar:names.calendar,names:names,archive:archive)}
         }
         .sheet(item:$names.editor,onDismiss:{names.editorDismissed()}) {review in
             RecordingNameEditorView(names:names,archive:archive,review:review)
@@ -43,7 +44,7 @@ struct RecordingNameSection:View {
             Button("Remove name",role:.destructive) {names.confirmRemoval()}.disabled(names.saving || archive.busy)
             Button("Cancel",role:.cancel) {names.cancelRemoval()}
         } message: {
-            if let name=names.removal?.expected {Text("\(name.name)\n\nOriginal clips and transcripts are kept.")}
+            if let name=names.removal?.expected {Text(name.name+"\n\n"+(name.details.calendar==nil ? "":"Its calendar link will also be removed. ")+"Original clips and transcripts are kept.")}
         }
     }
     private func removeButton(_ name:RecordedMeetingDetailsSnapshot)->some View {

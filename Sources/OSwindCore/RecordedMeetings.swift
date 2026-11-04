@@ -6,6 +6,7 @@ public struct RecordedMeetingSource:Identifiable,Equatable,Sendable {
     public let memoryID:String,sessionKey:String,title:String,app:String,revision:String,id:String
     public let timestamp:Date,observedEnd:Date?,duration:Double
     public var belongsToSession:Bool {grouped}
+    public func isFromSameOpenLibrary(as other:Self)->Bool {owner==other.owner}
     public var hasObservedInterval:Bool {observedEnd != nil}
     let owner:UUID,grouped:Bool,recordingID:String
     init(memoryID:String,sessionKey:String,title:String,app:String,revision:String,timestamp:Date,observedEnd:Date?,duration:Double,owner:UUID,grouped:Bool,recordingID:String) {

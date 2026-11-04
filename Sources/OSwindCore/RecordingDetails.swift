@@ -122,6 +122,56 @@ public extension MemoryStore {
         }
         _=finishRecapInvalidation();return result
     }
+    /// Save an explicitly reviewed occurrence, optionally creating its label
+    /// in the same transaction. The caller supplies fresh native admission.
+    /// The reference itself grants no Calendar access or attendance authority.
+    @discardableResult func setRecordedMeetingCalendar(_ calendar:RecordingCalendarLink?,for source:RecordedMeetingSource,replacing expected:RecordedMeetingDetailsSnapshot?=nil,recordingName:String?=nil,selection:RecordedMeetingCalendarSelection?=nil,settingsSnapshot:LibrarySettingsSnapshot?=nil,admit:@Sendable ()throws->Void)throws->RecordedMeetingDetailsSnapshot {
+        guard source.owner==recordedMeetingOwner,expected.map({$0.owner==recordedMeetingOwner}) ?? true else {throw RecordedMeetingRefreshError.changed}
+        guard calendar != nil || expected != nil else {throw OSwindError.invalid("Choose a calendar event to link")}
+        let activity=try mediaWriteLease();defer {activity.release()}
+        let snapshot=try settingsSnapshot ?? LibrarySettingsSnapshot.capture(root:root)
+        defer {if settingsSnapshot==nil {snapshot.release()}}
+        let result=try withRoutineDatabase {db in try SyncChangeCapture.transaction(db) {
+            try RecordingDetailsSchema.prepare(db)
+            return try snapshot.withCurrent(root:root,policy:snapshot.settings.privacy) {
+                func binding()throws {
+                    guard let calendar else {return}
+                    guard snapshot.settings.meetings.admits(libraryIdentity:calendar.libraryIdentity),snapshot.settings.meetings.containsCalendar(calendar.calendarID),
+                          try meetingLibraryIdentity()==calendar.libraryIdentity,
+                          snapshot.settings.privacy.exclusion(app:"com.apple.iCal",title:"",url:nil)==nil else {throw OSwindError.unavailable("Review this library and its selected calendars before linking a recording")}
+                }
+                if let selection {
+                    guard selection.source==source,selection.expected==expected,selection.settings==snapshot.settings,
+                          try validateRecordedMeetingCalendarSelection(selection,db:db) else {throw RecordedMeetingRefreshError.changed}
+                }
+                try activity.withActive(for:mediaRootIdentity) {};try Task.checkCancellation();try binding();try admit()
+                let audio=try recordedMeetingEvidence(source,db:db,policy:snapshot.settings.privacy),scope=try recordingDetailsScope(audio)
+                let rows=try recordingDetailsRows(scope:scope,db:db,policy:snapshot.settings.privacy)
+                guard rows.count<=1 else {throw RecordedMeetingRefreshError.changed}
+                let current=try rows.first.map {try recordingDetailsSnapshot($0.memory,revision:$0.revision,policy:snapshot.settings.privacy)}
+                guard current==expected else {throw RecordedMeetingRefreshError.changed}
+                var value:Memory
+                if let row=rows.first,let current {
+                    guard recordingName==nil else {throw OSwindError.invalid("Use Rename to change an existing recording name")}
+                    if current.details.calendar==calendar {return current};value=row.memory
+                }else {
+                    guard calendar != nil,let recordingName else {throw OSwindError.invalid("Enter a recording name before linking the event")}
+                    let clean=try RecordingDetails.name(snapshot.settings.privacy.sanitize(RecordingDetails.name(recordingName)).text)
+                    guard snapshot.settings.privacy.exclusion(app:"com.oswind.desktop",title:clean,url:nil)==nil else {throw OSwindError.unavailable("This recording name is excluded by Privacy")}
+                    value=Memory(kind:.recordingMetadata,app:"OSwind",bundleID:"com.oswind.desktop",title:clean,text:"User-authored recording name; this label does not establish calendar attendance or transcript contents.")
+                }
+                value.recordingDetails = .init(scope:expected?.details.scope ?? scope,calendar:calendar);value.embedding=nil;value.embeddingModel=nil
+                try insert(value)
+                let written=try recordingDetailsSnapshot(value,revision:RecordingDetailsSchema.revision(db,id:value.id),policy:snapshot.settings.privacy)
+                try admit();try binding();try activity.withActive(for:mediaRootIdentity) {};try Task.checkCancellation()
+                _=try recordedMeetingEvidence(source,db:db,policy:snapshot.settings.privacy)
+                let final=try recordingDetailsRows(scope:scope,db:db,policy:snapshot.settings.privacy)
+                guard final.count==1,let row=final.first,try recordingDetailsSnapshot(row.memory,revision:row.revision,policy:snapshot.settings.privacy)==written else {throw RecordedMeetingRefreshError.changed}
+                return written
+            }
+        }}
+        _=finishRecapInvalidation();return result
+    }
     /// Remove one explicitly reviewed definition, including from a conflict.
     /// Never delete or modify the captured audio to resolve a name conflict.
     @discardableResult func removeRecordedMeetingName(_ expected:RecordedMeetingDetailsSnapshot,for source:RecordedMeetingSource)throws->HistoryErasureResult {
@@ -160,7 +210,7 @@ extension MemoryStore {
         defer {sqlite3_finalize(names)};db.bind(names,1,source.grouped ? "session":"source");db.bind(names,2,source.recordingID)
         let code=sqlite3_step(names);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()};return code==SQLITE_ROW
     }
-    private func recordingDetailsScope(_ memory:Memory)throws->RecordingScope {
+    func recordingDetailsScope(_ memory:Memory)throws->RecordingScope {
         if let session=memory.audioSessionID {return try .init(sessionID:session)}
         return try .init(sourceID:memory.id,revision:memory.evidenceHash)
     }

@@ -11,6 +11,8 @@ struct RecordingNameReview:Identifiable,Sendable {
 /// Selected-recording work only. Archive pagination never hydrates all clips
 /// to discover names. The registry owns readers, writes and actor completions.
 @MainActor final class RecordingNamesModel:ObservableObject {
+    let calendar:RecordingCalendarModel
+    private var calendarChanges:AnyCancellable?
     @Published private(set) var rows=[RecordedMeetingDetailsSnapshot]()
     @Published private(set) var loading=false
     @Published private(set) var loaded=false
@@ -32,13 +34,19 @@ struct RecordingNameReview:Identifiable,Sendable {
     private var readJob:UUID?,writeJob:UUID?,generation=UUID()
     private var reviewDraft:(session:String,text:String)?
     init(store:MemoryStore,work:LibraryWorkRegistry,
+         calendarProvider:MeetingCalendarProvider = .native(),
          read:@escaping @Sendable (MemoryStore,RecordedMeetingSource)throws->[RecordedMeetingDetailsSnapshot]={try $0.recordedMeetingDetails(for:$1)},
          save:@escaping @Sendable (MemoryStore,String,RecordedMeetingSource,RecordedMeetingDetailsSnapshot?)throws->RecordedMeetingDetailsSnapshot={try $0.saveRecordedMeetingName($1,for:$2,replacing:$3)},
          remove:@escaping @Sendable (MemoryStore,RecordedMeetingDetailsSnapshot,RecordedMeetingSource)throws->HistoryErasureResult={try $0.removeRecordedMeetingName($1,for:$2)}) {
         self.store=store;self.work=work;self.read=read;self.save=save;self.remove=remove
+        calendar=RecordingCalendarModel(store:store,work:work,provider:calendarProvider)
+        calendar.allowed={[weak self] in guard let self else {return false};return self.allowed() && self.loaded && !self.loading && !self.saving && self.editor==nil && self.removal==nil}
+        calendar.refreshArchive={[weak self] in if let refresh=self?.refreshArchive {refresh()}else {self?.load()}}
+        calendarChanges=calendar.objectWillChange.sink {[weak self] _ in self?.objectWillChange.send()}
+
     }
-    var canEdit:Bool {allowed() && loaded && !loading && !saving && rows.count<=1 && source != nil}
-    var canSave:Bool {allowed() && !saving && !reviewRequired && editor != nil && editor?.source.sessionKey==source?.sessionKey && !draft.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty && draft.count<=200}
+    var canEdit:Bool {allowed() && !calendar.saving && loaded && !loading && !saving && rows.count<=1 && source != nil}
+    var canSave:Bool {allowed() && !calendar.saving && !saving && !reviewRequired && editor != nil && editor?.source.sessionKey==source?.sessionKey && !draft.trimmingCharacters(in:.whitespacesAndNewlines).isEmpty && draft.count<=200}
     func select(_ source:RecordedMeetingSource?,revision:RecordedMeetingRevision?) {
         guard let source,let revision else {clear();return}
         if self.source?.sessionKey != source.sessionKey {
@@ -50,11 +58,12 @@ struct RecordingNameReview:Identifiable,Sendable {
     /// A quiet archive refresh hides obsolete labels but preserves an open
     /// authored draft. A privacy/departure clear below also cancels its write.
     func suspend() {
+        calendar.recheckRecording()
         generation=UUID();if let readJob {work.cancel(id:readJob)};readJob=nil
         rows=[];loading=false;loaded=false;error=nil;archiveRevision=nil
     }
     func clear() {
-        suspend();if let writeJob {work.cancel(id:writeJob)};writeJob=nil
+        suspend();calendar.clear();if let writeJob {work.cancel(id:writeJob)};writeJob=nil
         source=nil;editor=nil;removal=nil;draft="";editorError=nil;reviewDraft=nil;saving=false;notice=nil;removalWrite=nil;reviewRequired=false
     }
     private struct Prepared:Sendable {let values:[RecordedMeetingDetailsSnapshot],revision:RecordedMeetingRevision}
@@ -75,6 +84,7 @@ struct RecordingNameReview:Identifiable,Sendable {
                 let value=try result.get()
                 try store.withCurrentRecordedMeetingRevision(value.revision) {
                     self.rows=value.values;self.loaded=true;self.error=nil
+                    self.calendar.select(source,expected:self.rows.count==1 ? self.rows.first:nil)
                     if let editor=self.editor {
                         let current=self.rows.count==1 ? self.rows.first:nil
                         if self.rows.count>1 || editor.expected != current || (editor.source.id==source.id && editor.source.revision != source.revision) {
@@ -124,7 +134,7 @@ struct RecordingNameReview:Identifiable,Sendable {
         if writeJob==nil {saving=false;editorError="The library is closing. Your draft has not been submitted."}
     }
     func requestRemoval(_ expected:RecordedMeetingDetailsSnapshot) {
-        guard allowed(),loaded,!loading,!saving,rows.contains(expected),let source else {return}
+        guard allowed(),loaded,!loading,!saving,!calendar.saving,rows.contains(expected),let source else {return}
         removal=RecordingNameReview(source:source,expected:expected)
     }
     func cancelRemoval() {removal=nil}
