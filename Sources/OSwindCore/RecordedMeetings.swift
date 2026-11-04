@@ -133,6 +133,17 @@ public extension MemoryStore {
             try RecordedMeetingRevisionSchema.read(db,owner:recordedMeetingOwner,settings:snapshot.settings)
         }}
     }
+    /// Publish separately prepared name values only at their exact revision.
+    /// This is a nonwaiting, read-only admission check for the main actor.
+    func withCurrentRecordedMeetingRevision<T>(_ revision:RecordedMeetingRevision,_ publish:()throws->T)throws->T {
+        guard revision.owner==recordedMeetingOwner else {throw RecordedMeetingRefreshError.changed}
+        let current=try LibrarySettingsSnapshot.capture(root:root,waitForLock:false);defer {current.release()}
+        guard current.settings==revision.settings else {throw RecordedMeetingRefreshError.changed}
+        return try withAvailableRoutineSnapshot {db in
+            guard try RecordedMeetingRevisionSchema.read(db,owner:recordedMeetingOwner,settings:current.settings)==revision else {throw RecordedMeetingRefreshError.changed}
+            return try current.withCurrent(root:root,policy:current.settings.privacy,waitForLock:false,publish)
+        }
+    }
     /// A value page retains no file/media handles. Recheck semantic settings at
     /// UI publication under a nonwaiting, read-only SQL/settings snapshot.
     /// Freshness is as of that read; a later commit is a subsequent change.

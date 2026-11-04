@@ -14,6 +14,55 @@ final class RecordingDetailsTests:XCTestCase {
         try store.insert(value);return value
     }
     private func source(_ id:String)throws->RecordedMeetingSource {try XCTUnwrap(store.recordedMeetingPage().sources.first {$0.memoryID==id})}
+    func testUnnamedSelectedDetailsAvoidPayloadReadsAndAllSQLWrites()throws {
+        try audio("unnamed");let target=try source("unnamed")
+        try store.withRoutineDatabase {db in
+            sqlite3_set_authorizer(db.handle,{_,action,table,column,_,_ in
+                if [SQLITE_INSERT,SQLITE_UPDATE,SQLITE_DELETE].contains(action) {return SQLITE_DENY}
+                if action==SQLITE_READ,let table,let column,String(cString:table)=="memories",String(cString:column)=="payload" {return SQLITE_DENY};return SQLITE_OK
+            },nil)
+        }
+        defer {_ = try? store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}}
+        XCTAssertTrue(try store.recordedMeetingDetails(for:target).isEmpty)
+    }
+    func testNameRevisionPublicationIsReadOnlyAndRefusesAnObsoleteName()throws {
+        try audio("a");let target=try source("a"),name=try store.saveRecordedMeetingName("First",for:target),revision=try store.recordedMeetingRevision()
+        try store.withRoutineDatabase {db in sqlite3_set_authorizer(db.handle,{_,action,table,column,_,_ in
+            if [SQLITE_INSERT,SQLITE_UPDATE,SQLITE_DELETE].contains(action) {return SQLITE_DENY}
+            if action==SQLITE_READ,let table,let column,String(cString:table)=="memories",String(cString:column)=="payload" {return SQLITE_DENY};return SQLITE_OK
+        },nil)}
+        var published=false;try store.withCurrentRecordedMeetingRevision(revision) {published=true};XCTAssertTrue(published)
+        try store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}
+        _=try store.saveRecordedMeetingName("Changed",for:target,replacing:name)
+        XCTAssertThrowsError(try store.withCurrentRecordedMeetingRevision(revision) {XCTFail("An obsolete name was published")})
+    }
+    func testRemovingOneConflictKeepsOtherDefinitionAndOriginalAudio()throws {
+        let original=try audio("a"),target=try source("a"),first=try store.saveRecordedMeetingName("First definition",for:target)
+        var second=try XCTUnwrap(store.get(first.id));second.id="independent-name";second.title="Second definition";try store.insert(second)
+        let definitions=try store.recordedMeetingDetails(for:target);XCTAssertEqual(definitions.count,2)
+        let result=try store.removeRecordedMeetingName(first,for:target)
+        XCTAssertEqual(result.sources,1);XCTAssertTrue(result.searchCacheRemoved);XCTAssertEqual(result.pendingMedia,0)
+        XCTAssertNil(try store.get(first.id));XCTAssertEqual(try store.get("a"),original)
+        XCTAssertEqual(try store.recordedMeetingDetails(for:target).map(\.id),[second.id])
+    }
+    func testNameRemovalRefusesConcurrentEditAndForeignRecording()throws {
+        try audio("a");try audio("b",session:"other")
+        let target=try source("a"),other=try source("b"),first=try store.saveRecordedMeetingName("First",for:target)
+        XCTAssertThrowsError(try store.removeRecordedMeetingName(first,for:other))
+        let fresh=try store.saveRecordedMeetingName("Changed",for:target,replacing:first)
+        XCTAssertThrowsError(try store.removeRecordedMeetingName(first,for:target))
+        XCTAssertEqual(try store.recordedMeetingDetails(for:target),[fresh])
+    }
+    func testNameRemovalFailureRollsBackAuthoredMetadataAndRevision()throws {
+        let original=try audio("a"),target=try source("a"),first=try store.saveRecordedMeetingName("Keep",for:target),revision=try store.recordedMeetingRevision()
+        try store.withRoutineDatabase {db in sqlite3_set_authorizer(db.handle,{_,action,table,_,_,_ in
+            if action==SQLITE_DELETE,let table,String(cString:table)=="memories" {return SQLITE_DENY};return SQLITE_OK
+        },nil)}
+        XCTAssertThrowsError(try store.removeRecordedMeetingName(first,for:target))
+        try store.withRoutineDatabase {sqlite3_set_authorizer($0.handle,nil,nil)}
+        XCTAssertEqual(try store.recordedMeetingDetails(for:target),[first]);XCTAssertEqual(try store.get("a"),original)
+        XCTAssertEqual(try store.recordedMeetingRevision(),revision)
+    }
     private final class IndexBuildProbe:@unchecked Sendable {
         private let lock=NSLock()
         private var starts=0,steps:Int32=0

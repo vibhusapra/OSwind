@@ -84,6 +84,9 @@ public extension MemoryStore {
             try db.execute("SAVEPOINT recording_details_read")
             do {
                 let result=try snapshot.withCurrent(root:root,policy:snapshot.settings.privacy) {
+                    // Absence is a thin display outcome, not authority to edit.
+                    // Every write below still hydrates canonical audio.
+                    if try !hasRecordingNameCandidate(source,db:db,policy:snapshot.settings.privacy) {return [RecordedMeetingDetailsSnapshot]()}
                     let memory=try recordedMeetingEvidence(source,db:db,policy:snapshot.settings.privacy)
                     return try recordingDetailsRows(scope:recordingDetailsScope(memory),db:db,policy:snapshot.settings.privacy).map {try recordingDetailsSnapshot($0.memory,revision:$0.revision,policy:snapshot.settings.privacy)}
                 }
@@ -119,8 +122,44 @@ public extension MemoryStore {
         }
         _=finishRecapInvalidation();return result
     }
+    /// Remove one explicitly reviewed definition, including from a conflict.
+    /// Never delete or modify the captured audio to resolve a name conflict.
+    @discardableResult func removeRecordedMeetingName(_ expected:RecordedMeetingDetailsSnapshot,for source:RecordedMeetingSource)throws->HistoryErasureResult {
+        guard source.owner==recordedMeetingOwner,expected.owner==recordedMeetingOwner else {throw RecordedMeetingRefreshError.changed}
+        let activity=try mediaWriteLease();defer {activity.release()}
+        let snapshot=try LibrarySettingsSnapshot.capture(root:root);defer {snapshot.release()}
+        return try withRoutineDatabase {db in
+            defer {try? db.clearErasureSelection()}
+            let erased=try erasureCancellable(db) {try SyncChangeCapture.transaction(db) {
+                try RecordingDetailsSchema.prepare(db)
+                return try snapshot.withCurrent(root:root,policy:snapshot.settings.privacy) {
+                    try activity.withActive(for:mediaRootIdentity) {};try Task.checkCancellation()
+                    let audio=try recordedMeetingEvidence(source,db:db,policy:snapshot.settings.privacy)
+                    let rows=try recordingDetailsRows(scope:recordingDetailsScope(audio),db:db,policy:snapshot.settings.privacy)
+                    guard let row=rows.first(where:{Data($0.memory.id.utf8)==Data(expected.id.utf8)}),
+                          try recordingDetailsSnapshot(row.memory,revision:row.revision,policy:snapshot.settings.privacy)==expected else {throw RecordedMeetingRefreshError.changed}
+                    try db.prepareCanonicalErasure(row.memory.id);try retireEntityScopesForErasedSources(db)
+                    let result=try db.eraseSelectedHistory()
+                    try activity.withActive(for:mediaRootIdentity) {};try Task.checkCancellation()
+                    return result
+                }
+            }}
+            activity.release()
+            return cleanupErasedAssets(db,sources:erased.sources,turns:erased.turns,histories:erased.historical)
+        }
+    }
 }
 extension MemoryStore {
+    private func hasRecordingNameCandidate(_ source:RecordedMeetingSource,db:RoutineDatabase,policy:PrivacyPolicy)throws->Bool {
+        let row=try db.statement("SELECT revision,grouped,recording_id,app,bundle_id,title,url FROM recorded_meeting_sources WHERE memory_id=?")
+        defer {sqlite3_finalize(row)};db.bind(row,1,source.memoryID)
+        guard sqlite3_step(row)==SQLITE_ROW,db.text(row,0)==source.revision,(sqlite3_column_int(row,1)==1)==source.grouped,
+              Data(db.text(row,2).utf8)==Data(source.recordingID.utf8),
+              policy.exclusion(app:db.text(row,4).isEmpty ? db.text(row,3):db.text(row,4),title:db.text(row,5),url:db.optional(row,6))==nil else {throw RecordedMeetingRefreshError.changed}
+        let names=try db.statement("SELECT 1 FROM recorded_meeting_details WHERE selector=? AND scope_id=? COLLATE BINARY LIMIT 1")
+        defer {sqlite3_finalize(names)};db.bind(names,1,source.grouped ? "session":"source");db.bind(names,2,source.recordingID)
+        let code=sqlite3_step(names);guard code==SQLITE_ROW || code==SQLITE_DONE else {throw db.error()};return code==SQLITE_ROW
+    }
     private func recordingDetailsScope(_ memory:Memory)throws->RecordingScope {
         if let session=memory.audioSessionID {return try .init(sessionID:session)}
         return try .init(sourceID:memory.id,revision:memory.evidenceHash)
